@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getHello(): any {
     return {
-      data: 'Hello World! This is first Sibaq\'22 API response',
+      data: 'Hello World..! This is first Sibaq\'22 API response',
       success: true
     };
   }

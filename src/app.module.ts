@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CollegesModule } from './colleges/colleges.module';
-import { candidate } from './colleges/typeorm';
+import { candidate } from './colleges/typeorm/entities/candidate';
 import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [
@@ -10,9 +10,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         type: 'mysql',
         host: 'localhost',
         port: 3306,
-        username: '',
-        password: '',
-        database: '',
+        username: 'root',
+        password: '9846741707Ss',
+        database: 'sibaq22db',
         entities: [candidate],
         synchronize: true,
     }),

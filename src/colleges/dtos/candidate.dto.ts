@@ -21,8 +21,5 @@ export class candidateDto{
 
    @IsNotEmpty()
    dob:string;
-
-   @IsNotEmpty()
-   photo:string;
-    
+  
 }

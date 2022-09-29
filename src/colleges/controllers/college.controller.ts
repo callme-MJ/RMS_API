@@ -11,8 +11,12 @@ import {
   Res,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+import { storage } from '../config/storage.config';
 import { candidateDto } from '../dtos/candidate.dto';
 import { CollegesService } from '../services/college.service';
 
@@ -26,9 +30,13 @@ export class CollegesController {
   }
 
   @Post('/candidates/register')
+  @UseInterceptors(FileInterceptor('file', { storage }))
   @UsePipes(ValidationPipe)
-  createCandidate(@Body() candidateDto: candidateDto) {
-    return this.collegesService.createCandidate(candidateDto);
+  async createCandidate(
+    @Body() candidateDto: candidateDto,
+    @UploadedFile() file,
+  ) {
+    return this.collegesService.createCandidate(candidateDto, file);
   }
 
   @Get('candidates/:id')

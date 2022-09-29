@@ -39,8 +39,7 @@ export class candidate {
   })
   dob: string;
 
-  @Column({
-    nullable: false,
-  })
-  photo: string;
+  @Column({ type: 'varchar', length: 300, nullable: true })
+   photoPath: string;
+ 
 }

@@ -41,5 +41,8 @@ export class candidate {
 
   @Column({ type: 'varchar', length: 300, nullable: true })
    photoPath: string;
+
+  @Column()
+  chest_No:number;
  
 }

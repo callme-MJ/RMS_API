@@ -21,5 +21,9 @@ export class candidateDto{
 
    @IsNotEmpty()
    dob:string;
+
+   // @IsNotEmpty()
+   chest_No:number;
+
   
 }

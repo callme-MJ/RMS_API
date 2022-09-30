@@ -13,10 +13,12 @@ import {
   ValidationPipe,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { storage } from '../config/storage.config';
+import { candidatesFilterDto } from '../dtos/candidate-filter.dto';
 import { candidateDto } from '../dtos/candidate.dto';
 import { CollegesService } from '../services/college.service';
 
@@ -25,8 +27,8 @@ export class CollegesController {
   constructor(private readonly collegesService: CollegesService) {}
 
   @Get('/candidates/all')
-  getAllCandidates() {
-    return this.collegesService.findAllCandidates();
+  async getAllCandidates(@Query() query) {
+    return this.collegesService.findAllCandidates(query);
   }
 
   @Post('/candidates/register')

@@ -17,25 +17,19 @@ export class JwtStrategy extends PassportStrategy(Strategy,'jwt'){
     }
     async validate(payload:any){
         const user = await this.authService.getById(payload.sub)
-        if (user.role===3) {
-            return{
-                id:payload.sub,
-                username:payload.username,
-                role:'cordinator'
-                
-            }}
-            else if (user.role===2) {
+       
+            if (user.role===1) {
                 return{
                     id:payload.sub,
                     username:payload.username,
-                    role:'controller'
+                    role:'admin'
                     
                 } 
             }
-            else return{
+            else if (user.role===2) return{
                 id:payload.sub,
                 username:payload.username,
-                role:'admin'
+                role:'controller'
                 
             }
         

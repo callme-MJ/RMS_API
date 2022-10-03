@@ -17,49 +17,50 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { storage } from '../config/storage.config';
-import { candidatesFilterDto } from '../dtos/candidate-filter.dto';
-import { candidateDto } from '../dtos/candidate.dto';
-import { CollegesService } from '../services/college.service';
+import { storage } from '../../utils/storage.config';
+import { CandidateDTO } from '../dtos/candidate.dto';
+import { Candidate } from '../entities/candidate.entity';
+import { instituteService } from '../services/institute.service';
 
-@Controller('colleges')
-export class CollegesController {
-  constructor(private readonly collegesService: CollegesService) {}
+@Controller('candidates')
+export class instituteController {
+  constructor(private readonly instituteService: instituteService) {}
 
-  @Get('/candidates/all')
-  async getAllCandidates(@Query() query) {
-    return this.collegesService.findAllCandidates(query);
+  @Get('/')
+  async getAllCandidates():Promise<Candidate[]> {
+    return await this.instituteService.findAllCandidates();
   }
 
-  @Post('/candidates/register')
+  @Post('/')
   @UseInterceptors(FileInterceptor('file', { storage }))
   @UsePipes(ValidationPipe)
   async createCandidate(
-    @Body() candidateDto: candidateDto,
+    @Body() CandidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    return this.collegesService.createCandidate(candidateDto, file);
+    return await this.instituteService.createCandidate(CandidateDTO, file);
   }
 
-  @Get('candidates/:id')
-  async findCandidateById(
+  @Get('/:chest_No')
+  async findCandidateByChestNo(
     @Res() response,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('chest_No', ParseIntPipe) chest_NO: number,
   ) {
-    const candidate = await this.collegesService.findCandidateById(id);
+    const candidate = await this.instituteService.findCandidateByChestNo(chest_NO);
+    
     return response.status(HttpStatus.OK).json({
       candidate,
     });
   }
 
-  @Delete('candidates/:id')
+  @Delete('/:id')
   async deleteUserById(@Param('id', ParseIntPipe) id: number) {
-    return this.collegesService.deleteCandidate(id);
+    return this.instituteService.deleteCandidate(id);
   }
 
-  @Get('/candidates/')
+  @Get('/')
   async querybuilder(@Req() req: Request) {
-    const builder = await this.collegesService.queryBuilder('candidates');
+    const builder = await this.instituteService.queryBuilder('candidates');
 
     if (req.query.search) {
       builder.where(

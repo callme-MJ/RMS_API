@@ -1,6 +1,5 @@
 import { diskStorage } from "multer";
 import { extname } from "path";
-import { fileURLToPath } from "url";
 
 export const storage = diskStorage({ 
     destination: "./public/uploads",

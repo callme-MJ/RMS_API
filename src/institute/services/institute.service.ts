@@ -64,13 +64,6 @@ export class instituteService {
       return result;
     }
   }
-  async instituteCandidiates():Promise<Institute[]> {
-    return await this.instituteRepository
-      .createQueryBuilder('institute')
-      .leftJoinAndSelect('institute.candidates', 'candidates')
-      // .where("institute.id = :id",{id:id})
-      .getMany();
-  }
 
   getDefault(category_ID: string) {
     switch (category_ID) {

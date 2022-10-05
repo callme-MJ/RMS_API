@@ -4,16 +4,18 @@ import { Strategy } from "passport-local";
 import { AuthService } from "src/auth/services/auth.service";
 
 @Injectable()
-export class LocalUsersStrategy extends PassportStrategy(Strategy,'users'){
+export class LocalCordinStrategy extends PassportStrategy(Strategy,'coordinator'){
     constructor (private authService:AuthService){
         super();
     }
 
     async validate(username: string, password:string):Promise<any>{
-        const user = await this.authService.validateUser(username, password)
-    if (!user) {
-        throw new UnauthorizedException("no user");
+        const cordin = await this.authService.validateCordin(username, password)
+        
+    if (!cordin) {
+        throw new UnauthorizedException("no cordinator");
     }
-    return user;
+    return cordin;
+    
     }
 }

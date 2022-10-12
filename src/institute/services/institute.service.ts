@@ -24,15 +24,16 @@ export class instituteService {
   }
 
   async createCandidate(
-    CandidateDTO: CandidateDTO,
+    candidateDTO: CandidateDTO,
     file: any,
   ): Promise<Candidate> {
-    CandidateDTO.photoPath = file.path;
-    CandidateDTO.chest_No =
-      (await this.getChestNO(CandidateDTO.category_ID)) + 1;
-    console.log(CandidateDTO.chest_No);
+    await this.checkEligibility(candidateDTO)
+    candidateDTO.photoPath = file.path;
+    candidateDTO.chest_No =
+      (await this.getChestNO(candidateDTO.category_ID)) + 1;
+    console.log(candidateDTO.chest_No);
 
-    const newCandidate = this.candidateRepository.create(CandidateDTO);
+    const newCandidate = this.candidateRepository.create(candidateDTO);
     return this.candidateRepository.save(newCandidate);
   }
 
@@ -78,5 +79,14 @@ export class instituteService {
       case 'aliya':
         return 5000;
     }
+  }
+  async checkEligibility(candidateDTO:CandidateDTO){
+    let candidate=await this.candidateRepository.createQueryBuilder("candidate")
+    // .select("candidate.id")
+    .where('ad_no = :id', { id: candidateDTO.ad_no })
+    .andWhere('institute_ID = :id', { id: candidateDTO.institute_ID })
+    .getOneOrFail()
+    console.log(candidate);
+    
   }
 }

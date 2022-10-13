@@ -85,7 +85,7 @@ export class instituteService {
     let duplicate = await this.candidateRepository
       .createQueryBuilder('candidate')
       .where('ad_no = :ad_no', { ad_no })
-      .where('institute_ID = :institute_ID', { institute_ID })
+      .andWhere('institute_ID = :institute_ID', { institute_ID })
       .getOne();
     if (duplicate) {
       console.log('This candidate has been registered already');

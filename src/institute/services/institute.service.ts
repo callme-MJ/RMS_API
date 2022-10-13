@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
@@ -88,8 +88,7 @@ export class instituteService {
       .andWhere('institute_ID = :institute_ID', { institute_ID })
       .getOne();
     if (duplicate) {
-      console.log('This candidate has been registered already');
-      return false;
+      throw new BadRequestException("This candidate has been registered already")
     }
     return true;
   }

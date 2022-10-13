@@ -27,14 +27,14 @@ export class instituteService {
     candidateDTO: CandidateDTO,
     file: any,
   ): Promise<Candidate> {
-    await this.checkEligibility(candidateDTO)
-    candidateDTO.photoPath = file.path;
-    candidateDTO.chest_No =
-      (await this.getChestNO(candidateDTO.category_ID)) + 1;
-    console.log(candidateDTO.chest_No);
-
-    const newCandidate = this.candidateRepository.create(candidateDTO);
-    return this.candidateRepository.save(newCandidate);
+    let eligible = await this.checkEligibility(candidateDTO);
+    if (eligible) {
+      candidateDTO.photoPath = file.path;
+      candidateDTO.chest_No =
+        (await this.getChestNO(candidateDTO.category_ID)) + 1;
+      const newCandidate = this.candidateRepository.create(candidateDTO);
+      return this.candidateRepository.save(newCandidate);
+    }
   }
 
   deleteCandidate(id: number) {
@@ -80,13 +80,17 @@ export class instituteService {
         return 5000;
     }
   }
-  async checkEligibility(candidateDTO:CandidateDTO){
-    let candidate=await this.candidateRepository.createQueryBuilder("candidate")
-    // .select("candidate.id")
-    .where('ad_no = :id', { id: candidateDTO.ad_no })
-    .andWhere('institute_ID = :id', { id: candidateDTO.institute_ID })
-    .getOneOrFail()
-    console.log(candidate);
-    
+  async checkEligibility(candidateDTO: CandidateDTO) {
+    let { ad_no, institute_ID } = candidateDTO;
+    let duplicate = await this.candidateRepository
+      .createQueryBuilder('candidate')
+      .where('ad_no = :ad_no', { ad_no })
+      .where('institute_ID = :institute_ID', { institute_ID })
+      .getOne();
+    if (duplicate) {
+      console.log('This candidate has been registered already');
+      return false;
+    }
+    return true;
   }
 }

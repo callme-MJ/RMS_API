@@ -2,6 +2,8 @@ before_script:
   - echo "Before script"
   - cd /var/www/sibaq/rms-api
 building:
+  tags:
+   - auto-deploy
   stage: build
   script:
     - git pull origin master

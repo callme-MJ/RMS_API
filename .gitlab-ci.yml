@@ -1,0 +1,15 @@
+before_script:
+  - echo "Before script"
+  - cd /var/www/sibaq/rms-api
+building:
+  stage: build
+  script:
+    - git pull origin master
+    - rm -rf dist
+    - npm install -f
+    - npm run build
+    - pm2 restart sibaqapi
+deploying:
+  stage: deploy
+  script:
+    - echo "Deployed"

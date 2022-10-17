@@ -38,4 +38,33 @@ export class SessionService {
             throw error;
         }
     }
+    public async create(user:Session) : Promise<Session> { 
+        try{
+            const session: Session = await this.sessionRepository.save(user)
+            if(!session) {
+                throw new NotFoundException("session not created");
+            }
+            return session;
+        } catch (error){
+            throw error;
+        }
+
+    }
+    public async update(id:number,user:Session)  { 
+      
+             await this.sessionRepository.update(id,user)
+           
+       
+
+    }
+    public async remove(id:number): Promise<void>{
+        try {
+             this.sessionRepository.delete(id);
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
+

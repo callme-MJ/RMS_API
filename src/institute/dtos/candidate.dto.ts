@@ -18,9 +18,12 @@ export class CandidateDTO{
    ad_no:number;
 
    @IsNotEmpty()
+   session_ID:number;
+
+   @IsNotEmpty()
    dob:string;
 
-  chest_No:number;
+  chest_No:string;
   photoPath: any;
 
   

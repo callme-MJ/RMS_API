@@ -20,7 +20,7 @@ export class instituteService {
     }
   }
 
-  findCandidateByChestNo(chest_No: number): Promise<Candidate> {
+  findCandidateByChestNo(chest_No: string): Promise<Candidate> {
     try {
       return this.candidateRepository.findOneBy({ chest_No: chest_No });
     } catch (error) {
@@ -35,8 +35,10 @@ export class instituteService {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {
       candidateDTO.photoPath = file.path;
-      candidateDTO.chest_No =
-        (await this.getChestNO(candidateDTO.category_ID)) + 1;
+      let chest_No = await this.getChestNO(candidateDTO);
+      // console.log(chest_No);
+      candidateDTO.chest_No = chest_No;
+
       const newCandidate = this.candidateRepository.create(candidateDTO);
       return this.candidateRepository.save(newCandidate);
     }
@@ -54,12 +56,29 @@ export class instituteService {
     return this.candidateRepository.createQueryBuilder(alias);
   }
 
-  async getChestNO(category_ID: string) {
+  async getChestNO(candidateDTO: CandidateDTO) {
     try {
+      let { category_ID, chest_No } = candidateDTO;
       const query = this.candidateRepository.createQueryBuilder('candidates');
       let Count = await this.candidateRepository.count({
         where: { category_ID: category_ID },
       });
+      let def = await this.incrementString(this.getDefault(category_ID).toString());
+      // console.log(def);
+
+      let NIICSChestNO = 'N' + def;
+      console.log(NIICSChestNO);
+
+      let NIICSMax = await this.candidateRepository
+        .createQueryBuilder('candidates')
+        .leftJoinAndSelect('candidates.institute', 'institute')
+        .leftJoinAndSelect('institute.session', 'session')
+        .where('session.id = :session_ID', { session_ID: '2' })
+        .select('candidates.chest_No', 'chest_No')
+        .getRawMany();
+        console.log(Object.keys(NIICSMax));
+        
+      console.log(NIICSMax);
 
       if (Count < 1) {
         const def = this.getDefault(category_ID);
@@ -114,5 +133,16 @@ export class instituteService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async incrementString(str) {
+    // Find the trailing number or it will match the empty string
+    var count = await str.match(/\d*$/);
+
+    // Take the substring up until where the integer was matched
+    // Concatenate it to the matched count incremented by 1
+    let result = (await str.substr(0, count.index)) + ++count[0];
+    // console.log(result);
+    return result;
   }
 }

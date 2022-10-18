@@ -1,4 +1,5 @@
 import { type } from 'os';
+import { Session } from 'src/session/entities/session.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Institute } from './institute.entity';
 
@@ -28,12 +29,15 @@ export class Candidate {
   @Column({ type: 'varchar', length: 300, nullable: true })
   photoPath: string;
 
+
   @Column()
-  chest_No: number;
+  chest_No: string;
 
   // @OneToMany(() => candidate_program, candidate_Program => candidate_Program.candidate )
   // candidate_program: candidate_program[];
 
-  @ManyToOne( (type)=> Institute, (institute) => institute.candidates)
+  @ManyToOne( ()=> Institute, (institute) => institute.candidates)
   institute: Institute
+
+  
 } 

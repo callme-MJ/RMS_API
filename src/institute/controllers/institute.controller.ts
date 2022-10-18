@@ -60,7 +60,7 @@ export class instituteController {
   @Get('/:chest_No')
   async findCandidateByChestNo(
     @Res() response,
-    @Param('chest_No', ParseIntPipe) chest_NO: number,
+    @Param('chest_No', ParseIntPipe) chest_NO: string,
   ) {
     return await this.instituteService.findCandidateByChestNo(chest_NO);
   }

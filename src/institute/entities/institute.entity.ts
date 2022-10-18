@@ -1,5 +1,6 @@
 import { type } from 'os';
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Session } from 'src/session/entities/session.entity';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn,ManyToOne } from 'typeorm';
 import { Candidate } from './candidate.entity';
 
 @Entity({ name: 'institute' })
@@ -16,13 +17,10 @@ export class Institute {
   @Column()
   cover_Photo: string;
 
-  @Column()
-  is_Nics: string;
-
-  @Column()
-  session_ID: string;
-
-  @OneToMany( (type) => Candidate, candidate => candidate.institute)
+  @OneToMany( () => Candidate, candidate => candidate.institute)
   candidates:Candidate[]
+
+  @ManyToOne( ()=> Session, (session) => session.institutes)
+  session: Session
 
 }

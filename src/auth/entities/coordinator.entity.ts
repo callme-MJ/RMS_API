@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Coordinator {
@@ -23,6 +23,6 @@ export class Coordinator {
   @Column()
   phone_no: string;
   
-  @Column()
-  institute_id: number;
+  // @ManyToOne(() => institute, (id) => institute.id)
+  // institute_id: id;
 }

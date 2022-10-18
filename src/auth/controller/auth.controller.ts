@@ -3,8 +3,8 @@ import { AuthService } from '../services/auth.service';
 import { CordinAuthGuard, LocalAuthGuard } from '../utils/guards/local-authguards';
 import { JwtGuard } from '../utils/guards/jwtGuard';
 import { RolesGuard } from '../utils/guards/rolesGuards';
-import { Roles } from '../utils/decorator';
-import { Role } from '../entities/roles.enum';
+import { Roles } from '../decorators/roles.decorator'
+import { Role } from '../enums/roles.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -13,33 +13,31 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('userlogin')
   userLogin(@Request()req):any {
-    const user =this.authService.userLogin(req.user);
-    return user;
+    return this.authService.userLogin(req.user);
   }
+
   @UseGuards(CordinAuthGuard)
   @Post('cordinatorlogin')
   cordinLogin(@Request()req):any {
-    const cordin =this.authService.cordinLogin(req.user);
-    return cordin;
+    return this.authService.cordinLogin(req.user);
   }
 
-  
   @UseGuards(JwtGuard,RolesGuard)
   @Roles(Role.CONTROLLER,Role.ADMIN)
-  @Get('dashboard')
+  @Get('loggedInUser')
   getDashboard(@Request() req:any) {
     return req.user
   }
 
   @UseGuards(JwtGuard,RolesGuard)
   @Roles(Role.ADMIN)
-  @Get('admin')
+  @Get('loggedInAdmin')
   getpage(@Request()req:any){
-    return 'welcome admin'
+   return  'welcome admin'
   }
   
   @UseGuards(JwtGuard)
-  @Get('candidate/registration')
+  @Get('loggedInCoordinator')
   getpages(@Request()req:any){
     return 'this is candidate registaration page'
   }

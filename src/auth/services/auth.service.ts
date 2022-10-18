@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from '../entities/users.entity';
+import { User } from '../entities/users.entity';
 import { Repository } from 'typeorm';
 import { Coordinator } from '../entities/coordinator.entity';
 
@@ -9,12 +9,12 @@ import { Coordinator } from '../entities/coordinator.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Users) private userRepository:Repository<Users>, 
+    @InjectRepository(User) private userRepository:Repository<User>, 
     @InjectRepository(Coordinator) private coordinatorRepo:Repository<Coordinator>,
     private jwtService:JwtService
   ){}
 
-  async userLogin (user:any){
+  async userLogin (user:User){
     const payload = {
       username:user.username,
       sub:user.id,
@@ -25,7 +25,7 @@ export class AuthService {
     }
   }
 
-  async cordinLogin (cordin:any){
+  async cordinLogin (cordin:Coordinator){
     const payload = {
       username:cordin.username,
       sub:cordin.id,
@@ -58,19 +58,10 @@ export class AuthService {
     
   }
 
-  async findUser(username: string): Promise<Users> {
+  async findUser(username: string): Promise<User> {
     return this.userRepository.findOneBy({ username });
 }
   async findCordin(username: string): Promise<Coordinator> {
     return this.coordinatorRepo.findOneBy({ username });
 }
-
-
-
-  async getUserByUsername(username: string): Promise<any>{
-    const user = this.userRepository.findOneBy({ username })
-      return user;   
-  }
-    
- 
 }

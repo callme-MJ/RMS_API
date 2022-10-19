@@ -10,16 +10,14 @@ import { Role } from '../enums/roles.enum';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
   @Post('userlogin')
-  userLogin(@Request()req):any {
-    return this.authService.userLogin(req.user);
+  userLogin(@Body()body:userAuthenticate) {
+    return this.authService.userLogin(body);
   }
 
-  @UseGuards(CordinAuthGuard)
   @Post('cordinatorlogin')
-  cordinLogin(@Request()req):any {
-    return this.authService.cordinLogin(req.user);
+  cordinLogin(@Body()body:cordinAuthenticate){
+    return this.authService.cordinLogin(body);
   }
 
   @UseGuards(JwtGuard,RolesGuard)

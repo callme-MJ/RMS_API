@@ -14,49 +14,43 @@ export class AuthService {
     private jwtService:JwtService
   ){}
 
-  async userLogin (user:User){
-    const payload = {
-      username:user.username,
-      sub:user.id,
-      role:user.role
+  async userLogin (user:userAuthenticate){
+    const validatedUser = await this.validateUser(user)
+    if (!validatedUser) {       
+      return 'user validation failed'
     }
-    return{
-      access_token:this.jwtService.sign(payload)
-    }
+        const tokens = this.getTokens(user)
+        return tokens
   }
 
-  async cordinLogin (cordin:Coordinator){
-    const payload = {
-      username:cordin.username,
-      sub:cordin.id,
-    }
-    
-    return{
-      access_token:this.jwtService.sign(payload)
-    }
+  async cordinLogin (cordin:cordinAuthenticate){
+    const validatedCordin = await this.validateCordin(cordin)
+   if (!validatedCordin) {
+    return 'cordinator validation failed'
+   }
+    const tokens = this.getTokens(cordin)
+    return tokens;
   }
 
-
-  async validateUser(username: string, password:string):Promise<any>{
-    const user = await this.findUser(username)
-    if (user && user.password === password) {
+  async validateUser(user:userAuthenticate){
+    const isuser = await this.findUser(user.username)    
+    if (isuser && isuser.password === user.password) {
       const {password,...rest} = user;
       return rest;
-    }
+    }else
     return null
-    
   }
-  async validateCordin(username: string, password:string):Promise<any>{
-    const cordin = await this.findCordin(username)
-    
-    if (cordin && cordin.password === password) {
+  
+  async validateCordin(cordin:cordinAuthenticate){
+    const iscordin = await this.findCordin(cordin.username) 
+    if (iscordin && iscordin.password === cordin.password) {
       const {password,...data} = cordin;
       
       return data;
     }
     return null
-    
   }
+
 
   async findUser(username: string): Promise<User> {
     return this.userRepository.findOneBy({ username });
@@ -64,4 +58,28 @@ export class AuthService {
   async findCordin(username: string): Promise<Coordinator> {
     return this.coordinatorRepo.findOneBy({ username });
 }
+
+async getTokens(user:any)  {
+  const  payload: jwtPayload = {
+    username:user.username,
+    id:user.id,
+    role:user.role
+  }
+   const [at, rt] = await Promise.all([
+    this.jwtService.signAsync(payload, {
+      secret: 'sec',
+      expiresIn: '900s',
+    }),
+    this.jwtService.signAsync(payload, {
+      secret: 'sec2',
+      expiresIn: '1d',
+    }),
+  ]);
+
+  return {
+    access_token: at,
+    refresh_token: rt,
+  };
+}
+
 }

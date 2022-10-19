@@ -1,8 +1,10 @@
-interface userAuthenticate{
+interface cordinAuthenticate{
     username: string;
     password: string;
     id:number;
-    role: number;
+    phone_no: string;
     firstname:string;
     lastname:string;
+    email: string;
+
 }

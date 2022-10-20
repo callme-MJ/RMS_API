@@ -7,12 +7,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { instituteModule } from './institute/institute.module';
+import { InstituteModule } from './institute/institute.module';
 import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
-    SessionModule,instituteModule,
+    SessionModule,InstituteModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),

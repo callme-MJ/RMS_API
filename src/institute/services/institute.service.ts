@@ -4,17 +4,21 @@ import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { Institute } from '../entities/institute.entity';
-
+import { Request } from 'express';
+import { ReqQueryDTO } from '../dtos/req-query.dto';
 @Injectable()
-export class instituteService {
+export class InstituteService {
   constructor(
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
+    @InjectRepository(Institute)
+    private readonly instituteRepository: Repository<Institute>,
   ) {}
 
   async findAllCandidates(): Promise<Candidate[]> {
     try {
-      return this.candidateRepository.createQueryBuilder('candidate').getMany();
+      let candidates= await this.candidateRepository.find();
+      return candidates;
     } catch (error) {
       throw error;
     }
@@ -36,7 +40,8 @@ export class instituteService {
     if (eligible) {
       candidateDTO.photoPath = file.path;
       let chest_No = await this.getChestNO(candidateDTO);
-      console.log(chest_No);
+      console.log('chestNo is ' + chest_No);
+
       candidateDTO.chest_No = chest_No;
 
       const newCandidate = this.candidateRepository.create(candidateDTO);
@@ -52,81 +57,70 @@ export class instituteService {
     }
   }
 
-  async queryBuilder(alias: string) {
-    return this.candidateRepository.createQueryBuilder(alias);
-  }
-
   async getChestNO(candidateDTO: CandidateDTO) {
     try {
-      let { category_ID, chest_No } = candidateDTO;
-      const query = this.candidateRepository.createQueryBuilder('candidates');
-      let Count = await this.candidateRepository.count({
-        where: { category_ID: category_ID },
-      });
+      let { categoryID, instituteID } = candidateDTO;
 
-      let def = await this.incrementString(
-        this.getDefault(category_ID).toString(),
-      );
-      // console.log(def);
-
-      let NIICSChestNO = 'N' + def;
-      console.log(NIICSChestNO);
-
-      let NIICSMax = await this.candidateRepository
-        .createQueryBuilder('candidates')
-        .leftJoinAndSelect('candidates.institute', 'institute')
+      let session = await this.instituteRepository
+        .createQueryBuilder('institute')
         .leftJoinAndSelect('institute.session', 'session')
-        .where('session.id = :session_ID', { session_ID: '2' })
-        .select('candidates.chest_No', 'chest_No')
-        .getRawMany();
-      // console.log(NIICSMax);
-      
-      
-      let NIICSarray = NIICSMax.map((item) => {
-        NIICSChestNO= item.chest_No;
-        return NIICSChestNO.match(/\d+/)[0]
-        // NIICSChestNO = item.match(/(\d+)/);
-        // NIICSChestNO.split('N');
-        // return NIICSChestNO;
-      });
-      // console.log(Object.values(NIICSMax));
-      console.log(NIICSarray);
+        .select('session.is_niics')
+        .where('institute.id = :instituteID', { instituteID })
+        .getRawOne();
+      session = Object.values(JSON.parse(JSON.stringify(session)));
+      session = Number(session);
 
-      // console.log(NIICSMax);
+      let count = await this.candidateRepository
+        .createQueryBuilder('candidate')
+        .leftJoinAndSelect('candidate.institute', 'institute')
+        .leftJoinAndSelect('institute.session', 'session')
+        .select('candidate.id')
+        .where('session.is_niics = :session', { session })
+        .andWhere('candidate.categoryID = :categoryID', { categoryID })
+        .getCount();
 
-      // if (Count < 1) {
-      //   const def = this.getDefault(category_ID);
-      //   return NIICSChestNO;
-      //   return def;
-      // } else {
-      //   let result = await query
-      //     .select('chest_No')
-      //     .where('category_ID = :id', { id: category_ID })
-      //     .orderBy('chest_No', 'DESC')
-      //     .limit(1)
-      //     .getRawOne()
-      //     .then((result) => result.chest_No);
-      //   return NIICSChestNO;
-      // }
-      return NIICSChestNO;
+      if (count < 1) {
+        const def = this.getDefault(categoryID);
+        return session == 0
+          ? this.incrementString(def.toString())
+          : this.incrementString('N' + def.toString());
+      } else if (count >= 1) {
+        let ChestNoArray = await this.candidateRepository
+          .createQueryBuilder('candidates')
+          .leftJoinAndSelect('candidates.institute', 'institute')
+          .leftJoinAndSelect('institute.session', 'session')
+          .where('session.is_niics = :session', { session })
+          .andWhere('candidates.categoryID = :categoryID', { categoryID })
+          .select('candidates.chest_No', 'chest_No')
+          .getRawMany();
+        let array = ChestNoArray.map((item) => {
+          let chestNo = item.chest_No;
+          chestNo = chestNo.match(/\d+/)[0];
+          return parseInt(chestNo);
+        });
+        let chestNoMax = Math.max(...array);
+        return session == 0
+          ? this.incrementString(chestNoMax.toString())
+          : this.incrementString('N' + chestNoMax.toString());
+      }
     } catch (error) {
       throw error;
     }
   }
 
-  getDefault(category_ID: string) {
+  getDefault(categoryID: string) {
     try {
-      switch (category_ID) {
+      switch (categoryID) {
         case 'uula':
-          return '1000';
+          return 1000;
         case 'bidaya':
-          return '2000';
+          return 2000;
         case 'saniya':
-          return '3000';
+          return 3000;
         case 'sanaviyya':
-          return '4000';
+          return 4000;
         case 'aliya':
-          return '5000';
+          return 5000;
       }
     } catch (error) {
       throw error;
@@ -134,11 +128,11 @@ export class instituteService {
   }
   async checkEligibility(candidateDTO: CandidateDTO) {
     try {
-      let { ad_no, institute_ID } = candidateDTO;
+      let { ad_no, instituteID } = candidateDTO;
       let duplicate = await this.candidateRepository
         .createQueryBuilder('candidate')
         .where('ad_no = :ad_no', { ad_no })
-        .andWhere('institute_ID = :institute_ID', { institute_ID })
+        .andWhere('institute_ID = :instituteID', { instituteID })
         .getOne();
       if (duplicate) {
         throw new BadRequestException(

@@ -9,13 +9,13 @@ export class Candidate {
   id: number;
 
   @Column()
-  institute_ID: string;
+  instituteID: string;
 
   @Column()
   name: string;
 
   @Column()
-  category_ID: string;
+  categoryID: string;
 
   @Column()
   class: number;
@@ -24,7 +24,7 @@ export class Candidate {
   ad_no: number;
 
   @Column()
-  dob: string;
+  DOB: string;
 
   @Column({ type: 'varchar', length: 300, nullable: true })
   photoPath: string;

@@ -19,6 +19,10 @@ export class Session {
     @Column({ default: true })
     isCurrent: boolean;
 
+    @Expose({ name: 'is_NIICS' })
+    @Column({ default: false })
+    isNIICS: boolean;
+
     @Expose({ groups:['single'] })
     @CreateDateColumn()
     createdAt: Date;

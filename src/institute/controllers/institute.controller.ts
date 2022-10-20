@@ -14,39 +14,54 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { Repository } from 'typeorm';
+import { Query } from 'typeorm/driver/Query';
 import { storage } from '../../utils/storage.config';
 import { CandidateDTO } from '../dtos/candidate.dto';
-import { instituteService } from '../services/institute.service';
+import { ReqQueryDTO } from '../dtos/req-query.dto';
+import { Candidate } from '../entities/candidate.entity';
+import { InstituteService } from '../services/institute.service';
 
 @Controller('candidates')
-export class instituteController {
-  constructor(private readonly instituteService: instituteService) {}
-
+export class InstituteController {
+  constructor(
+    @InjectRepository(Candidate)
+    private readonly candidateRepository: Repository<Candidate>,
+    private readonly instituteService: InstituteService,
+  ) {}
+ 
   @Get('/')
   async getCandidate(@Req() req: Request) {
-    const candidates = await this.instituteService.queryBuilder('candidates');
-
-    if (req.query.search) {
-      candidates.where(
-        'candidates.name LIKE :search OR candidates.ad_no LIKE :search OR candidates.chest_No LIKE :search',
-        { search: `%${req.query.search}%` },
+    try {
+      
+      const candidates = await this.candidateRepository.createQueryBuilder(
+        'candidates',
       );
+      let search = (req.query as unknown as ReqQueryDTO).search,
+        sort = (req.query as unknown as ReqQueryDTO).sort,
+        page = (req.query as unknown as ReqQueryDTO).page || 1;
+      if (search) {
+        candidates.where(
+          'name LIKE :search OR category_ID LIKE :search OR chest_No LIKE :search',
+          { search: `%${search}%` },
+        );
+      }
+
+      if (sort) {
+        candidates.orderBy('candidates.name', sort.toUpperCase()).getMany();
+      }
+
+      const perPage = 15;
+      candidates.offset((page - 1) * perPage).limit(perPage);
+      const [data, total] = await candidates.getManyAndCount();
+
+      return { data, total };
+    } catch (error) {
+      throw error;
     }
-
-    const sort: any = req.query.sort;
-    if (sort) {
-      candidates.orderBy('candidates.name', sort.toUpperCase()).getMany();
-    }
-
-    const page: number = parseInt(req.query.page as any) || 1;
-    const perPage = 15;
-    candidates.offset((page - 1) * perPage).limit(perPage);
-    const [data, total] = await candidates.getManyAndCount();
-
-    return { data, total };
   }
-
   @Post('/')
   @UseInterceptors(FileInterceptor('file', { storage }))
   @UsePipes(ValidationPipe)

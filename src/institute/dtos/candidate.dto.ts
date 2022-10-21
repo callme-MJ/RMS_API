@@ -1,29 +1,24 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
-export class CandidateDTO{
+export class CandidateDTO {
+  @IsNotEmpty()
+  instituteID: string;
 
-   @IsNotEmpty()
-   instituteID:string;
+  @IsNotEmpty()
+  name: string;
 
-   @IsNotEmpty()
-   name:string;
+  @IsNotEmpty()
+  categoryID: string;
 
-   @IsNotEmpty()
-   categoryID:string;
+  @IsNotEmpty()
+  class: number;
 
-   @IsNotEmpty()
-   class:number;
+  @IsNotEmpty()
+  adno: number;
 
-   @IsNotEmpty()
-   adno:number;
+  @IsNotEmpty()
+  dob: string;
 
-   @IsNotEmpty()
-   dob:string;
-
-   
-
-  chestNO:string;
+  chestNO: string;
   photoPath: string;
-
-  
 }

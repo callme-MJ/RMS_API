@@ -70,15 +70,15 @@ export class InstituteController {
   }
 
   @Get('/:chestNO')
-  async findCandidateByChestNo(
+  async findCandidateBychestNO(
     @Res() response,
     @Param('chestNO', ParseIntPipe) chestNO: string,
   ) {
-    return await this.instituteService.findCandidateByChestNo(chestNO);
+    return await this.instituteService.findCandidateBychestNO(chestNO);
   }
 
   @Delete('/:id')
-  async deleteUserById(@Param('id', ParseIntPipe) id: number) {
+  async deleteUserByID(@Param('id', ParseIntPipe) id: number) {
     return this.instituteService.deleteCandidate(id);
   }
   @Patch('/:id')

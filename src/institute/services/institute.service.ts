@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Service } from 'aws-sdk';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
@@ -12,19 +11,17 @@ export class InstituteService {
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(Institute)
     private readonly instituteRepository: Repository<Institute>,
-
   ) {}
 
   async findAllCandidates(): Promise<Candidate[]> {
     try {
-      let candidates = await this.candidateRepository.find();
-      return candidates;
+      return await this.candidateRepository.find();
     } catch (error) {
       throw error;
     }
   }
 
-  findCandidateByChestNo(chestNO: string): Promise<Candidate> {
+  findCandidateBychestNO(chestNO: string): Promise<Candidate> {
     try {
       return this.candidateRepository.findOneBy({ chestNO: chestNO });
     } catch (error) {
@@ -39,11 +36,8 @@ export class InstituteService {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {
       candidateDTO.photoPath = file.path;
-      let chestNO = await this.getChestNO(candidateDTO);
-      console.log('chestNo is ' + chestNO);
-      
+      let chestNO = await this.getchestNO(candidateDTO);
       candidateDTO.chestNO = chestNO;
-      
       const newCandidate = this.candidateRepository.create(candidateDTO);
       return this.candidateRepository.save(newCandidate);
     }
@@ -60,7 +54,10 @@ export class InstituteService {
     try {
       let candidate = await this.candidateRepository.findOneBy({ id });
       if (candidate) {
-        let updatedCandidate = this.candidateRepository.update({id},{...candidateDTO});
+        let updatedCandidate = this.candidateRepository.update(
+          { id },
+          { ...candidateDTO },
+        );
         return updatedCandidate;
       }
     } catch (error) {
@@ -68,7 +65,7 @@ export class InstituteService {
     }
   }
 
-  async getChestNO(candidateDTO: CandidateDTO) {
+  async getchestNO(candidateDTO: CandidateDTO) {
     try {
       let { categoryID, instituteID } = candidateDTO;
 
@@ -96,7 +93,7 @@ export class InstituteService {
           ? this.incrementString(def.toString())
           : this.incrementString('N' + def.toString());
       } else if (count >= 1) {
-        let ChestNoArray = await this.candidateRepository
+        let chestNOArray = await this.candidateRepository
           .createQueryBuilder('candidates')
           .leftJoinAndSelect('candidates.institute', 'institute')
           .leftJoinAndSelect('institute.session', 'session')
@@ -104,15 +101,15 @@ export class InstituteService {
           .andWhere('candidates.categoryID = :categoryID', { categoryID })
           .select('candidates.chestNO', 'chestNO')
           .getRawMany();
-        let array = ChestNoArray.map((item) => {
-          let chestNo = item.chestNO;
-          chestNo = chestNo.match(/\d+/)[0];
-          return parseInt(chestNo);
+        let array = chestNOArray.map((item) => {
+          let chestNO = item.chestNO;
+          chestNO = chestNO.match(/\d+/)[0];
+          return parseInt(chestNO);
         });
-        let chestNoMax = Math.max(...array);
+        let chestNOMax = Math.max(...array);
         return session == 0
-          ? this.incrementString(chestNoMax.toString())
-          : this.incrementString('N' + chestNoMax.toString());
+          ? this.incrementString(chestNOMax.toString())
+          : this.incrementString('N' + chestNOMax.toString());
       }
     } catch (error) {
       throw error;
@@ -157,13 +154,7 @@ export class InstituteService {
   }
 
   async incrementString(str) {
-    // Find the trailing number or it will match the empty string
     var count = await str.match(/\d*$/);
-
-    // Take the substring up until where the integer was matched
-    // Concatenate it to the matched count incremented by 1
-    let result = (await str.substr(0, count.index)) + ++count[0];
-    // console.log(result);
-    return result;
+    return (await str.substr(0, count.index)) + ++count[0];
   }
 }

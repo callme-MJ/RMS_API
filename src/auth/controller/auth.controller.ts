@@ -1,42 +1,50 @@
-import { Controller,UseGuards, Request, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Request, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { CordinAuthGuard, LocalAuthGuard } from '../utils/guards/local-authguards';
-import { JwtGuard } from '../utils/guards/jwtGuard';
-import { RolesGuard } from '../utils/guards/rolesGuards';
+import { JwtGuard } from '../utils/guards/jwt.guard';
+import { RolesGuard } from '../utils/guards/roles.guards';
 import { Roles } from '../decorators/roles.decorator'
 import { Role } from '../enums/roles.enum';
+import { RTGuard } from '../utils/guards/RT.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('userlogin')
-  userLogin(@Body()body:userAuthenticate) {
+  userLogin(@Body() body: UserAuthenticate) {
     return this.authService.userLogin(body);
   }
 
   @Post('cordinatorlogin')
-  cordinLogin(@Body()body:cordinAuthenticate){
+  cordinLogin(@Body() body: CordinAuthenticate) {
     return this.authService.cordinLogin(body);
   }
 
-  @UseGuards(JwtGuard,RolesGuard)
-  @Roles(Role.CONTROLLER,Role.ADMIN)
+  @UseGuards(RTGuard)
+  @Get('refresh')
+  refresh(@Request() req: any) {
+    return this.authService.refreshToken(req.user['username'], req.user['refreshToken'])
+    
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.CONTROLLER, Role.ADMIN)
   @Get('loggedInUser')
-  getDashboard(@Request() req:any) {
+  getDashboard(@Request() req: any) {
     return req.user
   }
 
-  @UseGuards(JwtGuard,RolesGuard)
+  @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get('loggedInAdmin')
-  getpage(@Request()req:any){
-   return  'welcome admin'
+  getpage(@Request() req: any) {
+    return 'welcome admin'
   }
-  
+
   @UseGuards(JwtGuard)
+  // @Roles(Role.COORDINATOR)
   @Get('loggedInCoordinator')
-  getpages(@Request()req:any){
-    return 'this is candidate registaration page'
+  getpages(@Request() req: any) {
+    return req.user
   }
 }

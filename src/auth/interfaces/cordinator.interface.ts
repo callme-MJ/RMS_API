@@ -1,4 +1,4 @@
-interface cordinAuthenticate{
+interface CordinAuthenticate{
     username: string;
     password: string;
     id:number;

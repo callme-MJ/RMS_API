@@ -21,8 +21,8 @@ export class Coordinator {
   email: string;
   
   @Column()
-  phone_no: string;
+  phoneNO: string;
   
   // @ManyToOne(() => institute, (id) => institute.id)
-  // institute_id: id;
+  // instituteID: id;
 }

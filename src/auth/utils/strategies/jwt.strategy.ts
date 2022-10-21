@@ -23,15 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         const cordin = await this.authService.findCordin(payload.username)
         
         if (user) {
-
-            if (user.role === 2) {
-                return {
-                    id: user.id,
-                    username: user.username,
-                    role: 'controller'
-
-                }
-            }
             if (user.role === 1) {
                 return {
                     id: user.id,
@@ -39,12 +30,25 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
                     role: 'admin'
                 }
             }
-        }
-
-        else return cordin;
-            
-
-
-
+            if (user.role === 2) {
+                return {
+                    id: user.id,
+                    username: user.username,
+                    role: 'controller'
+                }
+            }
+            if (user.role === 3) {
+                return {
+                    id: user.id,
+                    username: user.username,
+                    role: 'media'
+                }
+            }
+        }          
+        else return{
+            id:cordin.id,
+            username:cordin.username,
+            role:'coordinator'
+        } 
     }
 }

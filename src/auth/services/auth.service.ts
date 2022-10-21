@@ -1,51 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/users.entity';
 import { Repository } from 'typeorm';
 import { Coordinator } from '../entities/coordinator.entity';
+import * as bcrypt from 'bcrypt'
 
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository:Repository<User>, 
-    @InjectRepository(Coordinator) private coordinatorRepo:Repository<Coordinator>,
-    private jwtService:JwtService
-  ){}
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Coordinator) private coordinatorRepo: Repository<Coordinator>,
+    private jwtService: JwtService
+  ) { }
 
-  async userLogin (user:userAuthenticate){
+  async userLogin(user: UserAuthenticate) {
     const validatedUser = await this.validateUser(user)
-    if (!validatedUser) {       
+    if (!validatedUser) {
       return 'user validation failed'
     }
-        const tokens = this.getTokens(user)
-        return tokens
+    return this.getTokens(user)
   }
 
-  async cordinLogin (cordin:cordinAuthenticate){
+  async cordinLogin(cordin: CordinAuthenticate) {
     const validatedCordin = await this.validateCordin(cordin)
-   if (!validatedCordin) {
-    return 'cordinator validation failed'
-   }
-    const tokens = this.getTokens(cordin)
-    return tokens;
+    if (!validatedCordin) {
+      return 'cordinator validation failed'
+    }
+    return this.getTokens(cordin)
   }
 
-  async validateUser(user:userAuthenticate){
-    const isuser = await this.findUser(user.username)    
-    if (isuser && isuser.password === user.password) {
-      const {password,...rest} = user;
+  async validateUser(user: UserAuthenticate) {
+    const isuser = await this.findUser(user.username)
+    const isPasswordMatching = await bcrypt.compare(user.password, isuser.password);
+    if (isuser && isPasswordMatching) {
+      const { password, ...rest } = user;
       return rest;
-    }else
-    return null
+    } else
+      return null
   }
-  
-  async validateCordin(cordin:cordinAuthenticate){
-    const iscordin = await this.findCordin(cordin.username) 
-    if (iscordin && iscordin.password === cordin.password) {
-      const {password,...data} = cordin;
-      
+
+  async validateCordin(cordin: CordinAuthenticate) {
+    const iscordin = await this.findCordin(cordin.username)
+    const isPasswordMatching = await bcrypt.compare(cordin.password, iscordin.password);
+    if (iscordin && isPasswordMatching) {
+      const { password, ...data } = cordin;
       return data;
     }
     return null
@@ -54,32 +54,41 @@ export class AuthService {
 
   async findUser(username: string): Promise<User> {
     return this.userRepository.findOneBy({ username });
-}
+  }
   async findCordin(username: string): Promise<Coordinator> {
     return this.coordinatorRepo.findOneBy({ username });
-}
-
-async getTokens(user:any)  {
-  const  payload: jwtPayload = {
-    username:user.username,
-    id:user.id,
-    role:user.role
   }
-   const [at, rt] = await Promise.all([
-    this.jwtService.signAsync(payload, {
-      secret: 'sec',
-      expiresIn: '900s',
-    }),
-    this.jwtService.signAsync(payload, {
-      secret: 'sec2',
-      expiresIn: '1d',
-    }),
-  ]);
 
-  return {
-    access_token: at,
-    refresh_token: rt,
-  };
-}
+  async getTokens(user: any) {
+    const payload: JwtPayload = {
+      username: user.username,
+      id: user.id,
+      role: user.role
+    }
+    const [at, rt] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: 'sec',
+        expiresIn: '900s',
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: 'sec2',
+        expiresIn: '1d',
+      }),
+    ]);
+
+    return {
+      access_token: at,
+      refresh_token: rt,
+    };
+  }
+
+  async refreshToken(username: string, refreshToken: string) {
+    const decoded = this.jwtService.decode(refreshToken);
+    if (!username || !refreshToken)
+      throw new ForbiddenException('Token not found');
+    const user = await this.findUser(username)
+    const cordin = await this.findCordin(username)
+    return await this.getTokens(user ? user : cordin)
+  }
 
 }

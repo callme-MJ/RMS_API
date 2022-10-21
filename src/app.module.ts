@@ -11,11 +11,13 @@ import { BullModule } from '@nestjs/bull';
 import { User } from './auth/entities/users.entity';
 import { Coordinator } from './auth/entities/coordinator.entity';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
     AuthModule,
     SessionModule,
+    AdminModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),

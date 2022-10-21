@@ -1,4 +1,4 @@
-interface userAuthenticate{
+interface UserAuthenticate{
     username: string;
     password: string;
     id:number;

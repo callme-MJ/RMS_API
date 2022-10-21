@@ -14,7 +14,8 @@ import { SessionModule } from './session/session.module';
   imports: [
     SessionModule,InstituteModule,
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
+      
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

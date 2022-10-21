@@ -1,9 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { Institute } from '../entities/institute.entity';
+import { S3Service } from './s3.service';
 @Injectable()
 export class InstituteService {
   constructor(
@@ -11,11 +13,21 @@ export class InstituteService {
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(Institute)
     private readonly instituteRepository: Repository<Institute>,
+    private readonly configService: ConfigService,
+    private readonly s3service: S3Service,
   ) {}
 
   async findAllCandidates(): Promise<Candidate[]> {
     try {
       return await this.candidateRepository.find();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  findCandidateByID(id: number): Promise<Candidate> {
+    try {
+      return this.candidateRepository.findOneBy({ id: id });
     } catch (error) {
       throw error;
     }
@@ -31,11 +43,15 @@ export class InstituteService {
 
   async createCandidate(
     candidateDTO: CandidateDTO,
-    file: any,
+    location: string,
+    eTag: string,
+    key: string,
   ): Promise<Candidate> {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {
-      candidateDTO.photoPath = file.path;
+      candidateDTO.photoPath = location;
+      candidateDTO.photoETag = eTag;
+      candidateDTO.photoKey = key;
       let chestNO = await this.getchestNO(candidateDTO);
       candidateDTO.chestNO = chestNO;
       const newCandidate = this.candidateRepository.create(candidateDTO);

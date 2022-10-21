@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InjectRepository } from '@nestjs/typeorm';
+import { log } from 'console';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
 import { storage } from '../../utils/storage.config';
@@ -20,6 +21,7 @@ import { CandidateDTO } from '../dtos/candidate.dto';
 import { ReqQueryDTO } from '../dtos/req-query.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { InstituteService } from '../services/institute.service';
+import { S3Service } from '../services/s3.service';
 
 @Controller('candidates')
 export class InstituteController {
@@ -27,6 +29,7 @@ export class InstituteController {
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
     private readonly instituteService: InstituteService,
+    private readonly s3Service: S3Service
   ) {}
  
   @Get('/')
@@ -60,13 +63,16 @@ export class InstituteController {
     }
   }
   @Post('/')
-  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
   async createCandidate(
     @Body() candidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    return await this.instituteService.createCandidate(candidateDTO, file);
+    let photo = await this.s3Service.uploadFile(file);
+    let {Location,ETag,Key} = photo;    
+    
+    return await this.instituteService.createCandidate(candidateDTO, Location,ETag,Key);
   }
 
   @Get('/:chestNO')
@@ -78,19 +84,30 @@ export class InstituteController {
   }
 
   @Delete('/:id')
-  async deleteUserByID(@Param('id', ParseIntPipe) id: number) {
+  async deleteCandidateByID(@Param('id', ParseIntPipe) id: number) {
+    let candidate=await this.instituteService.findCandidateByID(id)
+    
+    await this.s3Service.deleteFile(candidate);
     return this.instituteService.deleteCandidate(id);
   }
+
   @Patch('/:id')
-  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
   async updateCandidate(
     @Param('id', ParseIntPipe) id: number,
     @Body() candidateDTO: CandidateDTO,
+    @UploadedFile() file,
   ) {
-    console.log(id);
-    
+    let candidate=await this.instituteService.findCandidateByID(id)
+    await this.s3Service.deleteFile(candidate);
+    let photo = await this.s3Service.uploadFile(file);
+    let {Location,ETag,Key} = photo;  
+    candidateDTO.photoPath=Location;
+    candidateDTO.photoETag=ETag;
+    candidateDTO.photoKey=Key; 
     return this.instituteService.updateCandidate(id, candidateDTO);
   }
 
+  
 }

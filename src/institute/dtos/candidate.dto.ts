@@ -21,4 +21,6 @@ export class CandidateDTO {
 
   chestNO: string;
   photoPath: string;
+  photoETag: string;
+  photoKey: string;
 }

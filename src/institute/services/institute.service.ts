@@ -1,11 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Service } from 'aws-sdk';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { Institute } from '../entities/institute.entity';
-import { Request } from 'express';
-import { ReqQueryDTO } from '../dtos/req-query.dto';
+import { S3Service } from './s3Bucket.service';
 @Injectable()
 export class InstituteService {
   constructor(
@@ -13,11 +13,13 @@ export class InstituteService {
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(Institute)
     private readonly instituteRepository: Repository<Institute>,
+    private readonly s3Service: S3Service,
+
   ) {}
 
   async findAllCandidates(): Promise<Candidate[]> {
     try {
-      let candidates= await this.candidateRepository.find();
+      let candidates = await this.candidateRepository.find();
       return candidates;
     } catch (error) {
       throw error;
@@ -41,9 +43,11 @@ export class InstituteService {
       candidateDTO.photoPath = file.path;
       let chest_No = await this.getChestNO(candidateDTO);
       console.log('chestNo is ' + chest_No);
-
+      
       candidateDTO.chest_No = chest_No;
-
+      let s3Response=await this.s3Service.uploadFile(file);
+      console.log(s3Response);
+      
       const newCandidate = this.candidateRepository.create(candidateDTO);
       return this.candidateRepository.save(newCandidate);
     }
@@ -52,6 +56,17 @@ export class InstituteService {
   deleteCandidate(id: number) {
     try {
       return this.candidateRepository.delete({ id });
+    } catch (error) {
+      throw error;
+    }
+  }
+  async updateCandidate(id: number, candidateDTO: CandidateDTO) {
+    try {
+      let candidate = await this.candidateRepository.findOneBy({ id });
+      if (candidate) {
+        let updatedCandidate = this.candidateRepository.update({id},{...candidateDTO});
+        return updatedCandidate;
+      }
     } catch (error) {
       throw error;
     }

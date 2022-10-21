@@ -2,22 +2,19 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
+  Get, Param,
+  ParseIntPipe, Patch, Post,
   Req,
   Res,
   UploadedFile,
   UseInterceptors,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
-import { Query } from 'typeorm/driver/Query';
 import { storage } from '../../utils/storage.config';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { ReqQueryDTO } from '../dtos/req-query.dto';
@@ -63,7 +60,7 @@ export class InstituteController {
     }
   }
   @Post('/')
-  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
   async createCandidate(
     @Body() candidateDTO: CandidateDTO,
@@ -84,4 +81,16 @@ export class InstituteController {
   async deleteUserById(@Param('id', ParseIntPipe) id: number) {
     return this.instituteService.deleteCandidate(id);
   }
+  @Patch('/:id')
+  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UsePipes(ValidationPipe)
+  async updateCandidate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() candidateDTO: CandidateDTO,
+  ) {
+    console.log(id);
+    
+    return this.instituteService.updateCandidate(id, candidateDTO);
+  }
+
 }

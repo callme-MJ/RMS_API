@@ -7,6 +7,27 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+<<<<<<< HEAD
+import { SessionModule } from './session/session.module';
+import { ConfigService, ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { BullModule } from '@nestjs/bull';
+import { User } from './auth/entities/users.entity';
+import { Coordinator } from './auth/entities/coordinator.entity';
+import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
+
+@Module({
+  imports: [
+    AuthModule,
+    SessionModule,
+    AdminModule,
+    ConfigModule.forRoot({
+      isGlobal: true
+=======
 import { InstituteModule } from './institute/institute.module';
 import { SessionModule } from './session/session.module';
 
@@ -16,6 +37,7 @@ import { SessionModule } from './session/session.module';
     ConfigModule.forRoot({
       isGlobal: true,
       
+>>>>>>> feature/candidate-registration
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -25,7 +47,11 @@ import { SessionModule } from './session/session.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
+<<<<<<< HEAD
+        entities: [User,Coordinator],
+=======
         entities: ["dist/**/entities/*.entity{.ts,.js}"],
+>>>>>>> feature/candidate-registration
         autoLoadEntities: true,
         synchronize: configService.get<boolean>('DB_SYNC'),
         migrationsTableName: "migrations",

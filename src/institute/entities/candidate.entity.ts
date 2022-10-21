@@ -21,17 +21,17 @@ export class Candidate {
   class: number;
 
   @Column()
-  ad_no: number;
+  adno: number;
 
   @Column()
-  DOB: string;
+  dob: string;
 
   @Column({ type: 'varchar', length: 300, nullable: true })
   photoPath: string;
 
 
   @Column()
-  chest_No: string;
+  chestNO: string;
 
   // @OneToMany(() => candidate_program, candidate_Program => candidate_Program.candidate )
   // candidate_program: candidate_program[];

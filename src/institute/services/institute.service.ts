@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { Institute } from '../entities/institute.entity';
-import { S3Service } from './s3Bucket.service';
 @Injectable()
 export class InstituteService {
   constructor(
@@ -13,7 +12,6 @@ export class InstituteService {
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(Institute)
     private readonly instituteRepository: Repository<Institute>,
-    private readonly s3Service: S3Service,
 
   ) {}
 
@@ -26,9 +24,9 @@ export class InstituteService {
     }
   }
 
-  findCandidateByChestNo(chest_No: string): Promise<Candidate> {
+  findCandidateByChestNo(chestNO: string): Promise<Candidate> {
     try {
-      return this.candidateRepository.findOneBy({ chest_No: chest_No });
+      return this.candidateRepository.findOneBy({ chestNO: chestNO });
     } catch (error) {
       throw error;
     }
@@ -41,12 +39,10 @@ export class InstituteService {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {
       candidateDTO.photoPath = file.path;
-      let chest_No = await this.getChestNO(candidateDTO);
-      console.log('chestNo is ' + chest_No);
+      let chestNO = await this.getChestNO(candidateDTO);
+      console.log('chestNo is ' + chestNO);
       
-      candidateDTO.chest_No = chest_No;
-      let s3Response=await this.s3Service.uploadFile(file);
-      console.log(s3Response);
+      candidateDTO.chestNO = chestNO;
       
       const newCandidate = this.candidateRepository.create(candidateDTO);
       return this.candidateRepository.save(newCandidate);
@@ -106,10 +102,10 @@ export class InstituteService {
           .leftJoinAndSelect('institute.session', 'session')
           .where('session.is_niics = :session', { session })
           .andWhere('candidates.categoryID = :categoryID', { categoryID })
-          .select('candidates.chest_No', 'chest_No')
+          .select('candidates.chestNO', 'chestNO')
           .getRawMany();
         let array = ChestNoArray.map((item) => {
-          let chestNo = item.chest_No;
+          let chestNo = item.chestNO;
           chestNo = chestNo.match(/\d+/)[0];
           return parseInt(chestNo);
         });
@@ -143,10 +139,10 @@ export class InstituteService {
   }
   async checkEligibility(candidateDTO: CandidateDTO) {
     try {
-      let { ad_no, instituteID } = candidateDTO;
+      let { adno, instituteID } = candidateDTO;
       let duplicate = await this.candidateRepository
         .createQueryBuilder('candidate')
-        .where('ad_no = :ad_no', { ad_no })
+        .where('adno = :adno', { adno })
         .andWhere('institute_ID = :instituteID', { instituteID })
         .getOne();
       if (duplicate) {

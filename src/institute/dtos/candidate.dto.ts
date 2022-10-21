@@ -15,14 +15,14 @@ export class CandidateDTO{
    class:number;
 
    @IsNotEmpty()
-   ad_no:number;
+   adno:number;
 
    @IsNotEmpty()
-   DOB:string;
+   dob:string;
 
    
 
-  chest_No:string;
+  chestNO:string;
   photoPath: string;
 
   

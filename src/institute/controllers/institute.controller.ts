@@ -41,7 +41,7 @@ export class InstituteController {
         page = (req.query as unknown as ReqQueryDTO).page || 1;
       if (search) {
         candidates.where(
-          'name LIKE :search OR category_ID LIKE :search OR chest_No LIKE :search',
+          'name LIKE :search OR category_ID LIKE :search OR chestNO LIKE :search',
           { search: `%${search}%` },
         );
       }
@@ -60,7 +60,7 @@ export class InstituteController {
     }
   }
   @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { storage }))
   @UsePipes(ValidationPipe)
   async createCandidate(
     @Body() candidateDTO: CandidateDTO,
@@ -69,12 +69,12 @@ export class InstituteController {
     return await this.instituteService.createCandidate(candidateDTO, file);
   }
 
-  @Get('/:chest_No')
+  @Get('/:chestNO')
   async findCandidateByChestNo(
     @Res() response,
-    @Param('chest_No', ParseIntPipe) chest_NO: string,
+    @Param('chestNO', ParseIntPipe) chestNO: string,
   ) {
-    return await this.instituteService.findCandidateByChestNo(chest_NO);
+    return await this.instituteService.findCandidateByChestNo(chestNO);
   }
 
   @Delete('/:id')

@@ -1,8 +1,12 @@
 # compiled output
 /dist
 /node_modules
+<<<<<<< HEAD
 /.env
 
+=======
+/.vscode
+>>>>>>> feature/candidate-registration
 # Logs
 logs
 *.log
@@ -36,4 +40,9 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env
+<<<<<<< HEAD
 .gitlab-ci.yml
+=======
+/public
+/public/uplaoads
+>>>>>>> feature/candidate-registration

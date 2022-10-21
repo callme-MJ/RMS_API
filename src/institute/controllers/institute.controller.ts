@@ -13,11 +13,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InjectRepository } from '@nestjs/typeorm';
-import { log } from 'console';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
-import { storage } from '../../utils/storage.config';
 import { CandidateDTO } from '../dtos/candidate.dto';
+import { PhotoDTO } from '../dtos/photo.dto';
 import { ReqQueryDTO } from '../dtos/req-query.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { InstituteService } from '../services/institute.service';
@@ -55,9 +54,10 @@ export class InstituteController {
 
       const perPage = 15;
       candidates.offset((page - 1) * perPage).limit(perPage);
-      const [data, total] = await candidates.getManyAndCount();
+      // const [data, total] = await candidates.getManyAndCount();
 
-      return { data, total };
+      // return { data, total };
+      return await this.instituteService.findAllCandidates()
     } catch (error) {
       throw error;
     }
@@ -69,10 +69,14 @@ export class InstituteController {
     @Body() candidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    let photo = await this.s3Service.uploadFile(file);
-    let {Location,ETag,Key} = photo;    
     
-    return await this.instituteService.createCandidate(candidateDTO, Location,ETag,Key);
+    // let photo = await this.s3Service.uploadFile(file);
+    // let {Location,ETag,Key} = photo; 
+    // console.log(Location,ETag,Key);
+       
+    
+    // return await this.instituteService.createCandidate(candidateDTO,Location,ETag,Key);
+    return await this.instituteService.createCandidate(candidateDTO,file);
   }
 
   @Get('/:chestNO')

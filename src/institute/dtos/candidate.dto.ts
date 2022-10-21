@@ -23,4 +23,5 @@ export class CandidateDTO {
   photoPath: string;
   photoETag: string;
   photoKey: string;
+  photo: import("c:/Users/HP/Desktop/sibaq github/rms-api/src/institute/entities/photo.entitiy").Photo;
 }

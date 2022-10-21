@@ -1,5 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Candidate } from './candidate.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'photo' })
 export class Photo {
@@ -12,9 +11,7 @@ export class Photo {
   @Column()
   key: string;
 
-  @Column()
-  location: string;
 
-//   @OneToOne(() => Candidate, (candidate) => candidate.photo) 
-//   candidate: Candidate;
+  @Column()
+  url:string
 }

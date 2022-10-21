@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { Institute } from '../entities/institute.entity';
+import { Photo } from '../entities/photo.entitiy';
 import { S3Service } from './s3.service';
 @Injectable()
 export class InstituteService {
@@ -13,13 +14,17 @@ export class InstituteService {
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(Institute)
     private readonly instituteRepository: Repository<Institute>,
+    @InjectRepository(Photo)
+    private readonly photoRepository: Repository<Photo>,
     private readonly configService: ConfigService,
-    private readonly s3service: S3Service,
+    private readonly s3Service: S3Service,
   ) {}
 
   async findAllCandidates(): Promise<Candidate[]> {
     try {
-      return await this.candidateRepository.find();
+      return await this.candidateRepository.find({
+        relations: ['photo']
+      });
     } catch (error) {
       throw error;
     }
@@ -43,16 +48,23 @@ export class InstituteService {
 
   async createCandidate(
     candidateDTO: CandidateDTO,
-    location: string,
-    eTag: string,
-    key: string,
+    file: any,
+    // location: string,
+    // eTag: string,
+    // key: string,
   ): Promise<Candidate> {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {
-      candidateDTO.photoPath = location;
-      candidateDTO.photoETag = eTag;
-      candidateDTO.photoKey = key;
+      let photoDTO = await this.s3Service.uploadFile(file);
+      let { Location, ETag, Key } = photoDTO;
+      let photo = await this.photoRepository.create({
+        url: Location,
+        eTag: ETag,
+        key: Key,
+      });
+      await this.photoRepository.save(photo);
       let chestNO = await this.getchestNO(candidateDTO);
+      candidateDTO.photo = photo;
       candidateDTO.chestNO = chestNO;
       const newCandidate = this.candidateRepository.create(candidateDTO);
       return this.candidateRepository.save(newCandidate);

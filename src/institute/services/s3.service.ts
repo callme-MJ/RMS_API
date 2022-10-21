@@ -1,4 +1,4 @@
-import { Injectable, Req, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class S3Service {
   async uploadFile(file) {
     const { originalname } = file;
 
-    return await this.s3_upload(
+    return await this.s3Upload(
       file.buffer,
       this.AWS_S3_BUCKET,
       originalname,
@@ -20,8 +20,8 @@ export class S3Service {
     );
   }
   async deleteFile(file) {
-    let Key=file.photoKey
-    return await this.s3_delete(Key,this.AWS_S3_BUCKET);
+    let Key = file.photoKey;
+    return await this.s3Delete(Key, this.AWS_S3_BUCKET);
   }
   // async deletePublicFile(fileId: number) {
   //     const file = await this.publicFilesRepository.findOne({ id: fileId });
@@ -33,7 +33,7 @@ export class S3Service {
   //     await this.publicFilesRepository.delete(fileId);
   //   }
 
-  async s3_upload(file, bucket, name, mimetype) {
+  async s3Upload(file, bucket, name, mimetype) {
     const params = {
       Bucket: bucket,
       Key: String(name),
@@ -58,7 +58,7 @@ export class S3Service {
     }
   }
 
-  async s3_delete(Key, bucket) {
+  async s3Delete(Key, bucket) {
     const params = {
       Bucket: this.AWS_S3_BUCKET,
       Key: Key,

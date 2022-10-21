@@ -35,20 +35,10 @@ export class Candidate {
   @Column()
   chestNO: string;
 
-  @Column()
-  photoPath: string;
-
-  @Column()
-  photoKey: string;
-
-  @Column()
-  photoETag: string;
-
   @ManyToOne(() => Institute, (institute) => institute.candidates)
   institute: Institute;
 
-  
-  // @OneToOne(() => Photo)
-  // @JoinColumn()
-  // photo: Photo
+  @OneToOne(() => Photo)
+  @JoinColumn()
+  photo: Photo;
 }

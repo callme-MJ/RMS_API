@@ -1,12 +1,9 @@
 # compiled output
 /dist
 /node_modules
-<<<<<<< HEAD
 /.env
 
-=======
 /.vscode
->>>>>>> feature/candidate-registration
 # Logs
 logs
 *.log

@@ -3,8 +3,9 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from 'src/auth/entities/users.entity';
+import { UpdateUserDto } from '../dto/update-user.dto';
+
 
 @Injectable()
 export class AdminUserService {

@@ -3,12 +3,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/roles.enum';
 import { JwtGuard } from 'src/auth/utils/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/utils/guards/roles.guards';
-import { AdminUserService } from '../services/service.user';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateCoordinatorDto } from '../dto/update-coordinator.dto';
+import { AdminUserService } from '../services/service.user';
 
 @Controller('admin')
-@UseGuards(JwtGuard,RolesGuard)
+// @UseGuards(JwtGuard,RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminUserController {
   constructor(private readonly adminservice: AdminUserService) {}

@@ -33,7 +33,10 @@ export class InstituteService {
 
   findCandidateByID(id: number): Promise<Candidate> {
     try {
-      return this.candidateRepository.findOneBy({ id: id });
+      return this.candidateRepository.findOne({
+        where: { id: id },
+        relations: ['photo'],
+      });
     } catch (error) {
       throw error;
     }
@@ -47,27 +50,27 @@ export class InstituteService {
     }
   }
 
-  // async createCandidate(
-  //   candidateDTO: CandidateDTO,
-  //   file: any,
-  // ): Promise<Candidate> {
-  //   let eligible = await this.checkEligibility(candidateDTO);
-  //   if (eligible) {
-  //     let photoDTO = await this.s3Service.uploadFile(file);
-  //     let { Location, ETag, Key } = photoDTO;
-  //     let photo = await this.photoRepository.create({
-  //       url: Location,
-  //       eTag: ETag,
-  //       key: Key,
-  //     });
-  //     await this.photoRepository.save(photo);
-  //     let chestNO = await this.getchestNO(candidateDTO);
-  //     candidateDTO.photo = photo;
-  //     candidateDTO.chestNO = chestNO;
-  //     const newCandidate = this.candidateRepository.create(candidateDTO);
-  //     return this.candidateRepository.save(newCandidate);
-  //   }
-  // }
+  async createCandidate(
+    candidateDTO: CandidateDTO,
+    file: any,
+  ): Promise<Candidate> {
+    let eligible = await this.checkEligibility(candidateDTO);
+    if (eligible) {
+      let photoDTO = await this.s3Service.uploadFile(file);
+      let { Location, ETag, Key } = photoDTO;
+      let photo = await this.photoRepository.create({
+        url: Location,
+        eTag: ETag,
+        key: Key,
+      });
+      await this.photoRepository.save(photo);
+      let chestNO = await this.getchestNO(candidateDTO);
+      candidateDTO.chestNO = chestNO;
+      const newCandidate = this.candidateRepository.create(candidateDTO);
+      newCandidate.photo = photo;
+      return this.candidateRepository.save(newCandidate);
+    }
+  }
 
   async deleteCandidate(id: number) {
     try {
@@ -78,33 +81,31 @@ export class InstituteService {
       throw error;
     }
   }
-  // async updateCandidate(id: number, candidateDTO: CandidateDTO,file:any) {
-  //   try {
-  //     let candidate = await this.findCandidateByID(id);
-  //     console.log(candidate);
-  //     console.log(candidate.photo);
-      
-  //     await this.s3Service.deleteFile(candidate.photo);
-  //     let photoDTO = await this.s3Service.uploadFile(file);
-  //     let { Location, ETag, Key } = photoDTO;
-  //     let photo = await this.photoRepository.create({
-  //       url: Location,
-  //       eTag: ETag,
-  //       key: Key,
-  //     });
-  //     await this.photoRepository.save(photo);
-  //     candidateDTO.photo = photo;
-  //     if (candidate) {
-  //       let updatedCandidate = this.candidateRepository.update(
-  //         { id },
-  //         { ...candidateDTO },
-  //       );
-  //       return updatedCandidate;
-  //     }
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  async updateCandidate(id: number, candidateDTO: CandidateDTO, file: any) {
+    try {
+      let candidate = await this.findCandidateByID(id);
+      let photoID = candidate.photo.id;
+
+      await this.s3Service.deleteFile(candidate.photo);
+      let photoDTO = await this.s3Service.uploadFile(file);
+      let { Location, ETag, Key } = photoDTO;
+      let photo = await this.photoRepository.create({
+        url: Location,
+        eTag: ETag,
+        key: Key,
+      });
+      if (candidate) {
+        let updatedCandidate = this.candidateRepository.update(
+          { id },
+          { ...candidateDTO },
+        );
+        await this.photoRepository.update({ id: photoID }, { ...photo });
+        return updatedCandidate;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async getchestNO(candidateDTO: CandidateDTO) {
     try {
@@ -160,15 +161,15 @@ export class InstituteService {
   getDefault(categoryID: string) {
     try {
       switch (categoryID) {
-        case 'uula':
+        case '1':
           return 1000;
-        case 'bidaya':
+        case '2':
           return 2000;
-        case 'saniya':
+        case '3':
           return 3000;
-        case 'sanaviyya':
+        case '4':
           return 4000;
-        case 'aliya':
+        case '5':
           return 5000;
       }
     } catch (error) {

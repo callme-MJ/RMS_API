@@ -18,8 +18,8 @@ export class CandidateDTO {
 
   @IsNotEmpty()
   dob: string;
-  
-  photo: string;
+
+  // photo: string;
   chestNO: any;
 
 

@@ -4,7 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from 'typeorm';
 import { Institute } from './institute.entity';
 import { Photo } from './photo.entitiy';

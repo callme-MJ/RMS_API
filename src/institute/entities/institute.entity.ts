@@ -1,4 +1,3 @@
-import { Coordinator } from 'src/auth/entities/coordinator.entity';
 import { Session } from 'src/session/entities/session.entity';
 import {
   Column,
@@ -23,9 +22,6 @@ export class Institute {
 
   @OneToMany(() => Candidate, (candidate) => candidate.institute)
   candidates: Candidate[];
-
-  @OneToMany(() => Coordinator, (coordinator) => coordinator.institute)
-  coordinators: Coordinator[];
 
   @ManyToOne(() => Session, (session) => session.institutes)
   session: Session;

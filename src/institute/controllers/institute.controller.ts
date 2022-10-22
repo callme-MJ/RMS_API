@@ -16,7 +16,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
-import { PhotoDTO } from '../dtos/photo.dto';
 import { ReqQueryDTO } from '../dtos/req-query.dto';
 import { Candidate } from '../entities/candidate.entity';
 import { InstituteService } from '../services/institute.service';
@@ -82,9 +81,7 @@ export class InstituteController {
 
   @Delete('/:id')
   async deleteCandidateByID(@Param('id', ParseIntPipe) id: number) {
-    let candidate=await this.instituteService.findCandidateByID(id)
     
-    await this.s3Service.deleteFile(candidate);
     return this.instituteService.deleteCandidate(id);
   }
 
@@ -96,14 +93,7 @@ export class InstituteController {
     @Body() candidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    let candidate=await this.instituteService.findCandidateByID(id)
-    await this.s3Service.deleteFile(candidate);
-    let photo = await this.s3Service.uploadFile(file);
-    let {Location,ETag,Key} = photo;  
-    candidateDTO.photoPath=Location;
-    candidateDTO.photoETag=ETag;
-    candidateDTO.photoKey=Key; 
-    return this.instituteService.updateCandidate(id, candidateDTO);
+    return this.instituteService.updateCandidate(id, candidateDTO,file);
   }
 
   

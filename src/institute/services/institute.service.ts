@@ -24,7 +24,7 @@ export class InstituteService {
   async findAllCandidates(): Promise<Candidate[]> {
     try {
       return await this.candidateRepository.find({
-        relations: ['photo']
+        relations: ['photo'],
       });
     } catch (error) {
       throw error;
@@ -69,16 +69,30 @@ export class InstituteService {
     }
   }
 
-  deleteCandidate(id: number) {
+  async deleteCandidate(id: number) {
     try {
+      let candidate = await this.findCandidateByID(id);
+      await this.s3Service.deleteFile(candidate.photo);
       return this.candidateRepository.delete({ id });
     } catch (error) {
       throw error;
     }
   }
-  async updateCandidate(id: number, candidateDTO: CandidateDTO) {
+  async updateCandidate(id: number, candidateDTO: CandidateDTO,file:any) {
     try {
-      let candidate = await this.candidateRepository.findOneBy({ id });
+      let candidate = await this.findCandidateByID(id);
+      console.log(candidate);
+      
+      await this.s3Service.deleteFile(candidate.photo);
+      let photoDTO = await this.s3Service.uploadFile(file);
+      let { Location, ETag, Key } = photoDTO;
+      let photo = await this.photoRepository.create({
+        url: Location,
+        eTag: ETag,
+        key: Key,
+      });
+      await this.photoRepository.save(photo);
+      candidateDTO.photo = photo;
       if (candidate) {
         let updatedCandidate = this.candidateRepository.update(
           { id },

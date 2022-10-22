@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
+import { Photo } from '../entities/photo.entitiy';
 
 @Injectable()
 export class S3Service {
@@ -19,8 +20,10 @@ export class S3Service {
       file.mimetype,
       );
     }
-    async deleteFile(file) {
-      let Key = file.photoKey;
+    async deleteFile(file:any) {
+      let Key = file.key;
+      console.log(Key);
+      
       return await this.s3Delete(Key, this.AWS_S3_BUCKET);
     }
 

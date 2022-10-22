@@ -8,7 +8,7 @@ import { UpdateCoordinatorDto } from '../dto/update-coordinator.dto';
 import { AdminUserService } from '../services/service.user';
 
 @Controller('admin')
-// @UseGuards(JwtGuard,RolesGuard)
+@UseGuards(JwtGuard,RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminUserController {
   constructor(private readonly adminservice: AdminUserService) {}

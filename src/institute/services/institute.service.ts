@@ -82,6 +82,7 @@ export class InstituteService {
     try {
       let candidate = await this.findCandidateByID(id);
       console.log(candidate);
+      console.log(candidate.photo);
       
       await this.s3Service.deleteFile(candidate.photo);
       let photoDTO = await this.s3Service.uploadFile(file);

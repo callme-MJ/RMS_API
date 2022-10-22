@@ -1,9 +1,9 @@
 import { Controller, UseGuards, Request, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Roles } from '../decorators/roles.decorator';
+import { Role } from '../enums/roles.enum';
 import { AuthService } from '../services/auth.service';
 import { JwtGuard } from '../utils/guards/jwt.guard';
 import { RolesGuard } from '../utils/guards/roles.guards';
-import { Roles } from '../decorators/roles.decorator'
-import { Role } from '../enums/roles.enum';
 import { RTGuard } from '../utils/guards/RT.guard';
 
 @Controller('auth')
@@ -12,6 +12,7 @@ export class AuthController {
 
   @Post('userlogin')
   userLogin(@Body() body: UserAuthenticate) {
+    console.log(body)
     return this.authService.userLogin(body);
   }
 

@@ -5,6 +5,8 @@ import { HttpExceptionFilter } from './exceptions/http-exception-filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // enable cors
+  app.enableCors();
 
   app.useGlobalPipes(new ValidationPipe());
 

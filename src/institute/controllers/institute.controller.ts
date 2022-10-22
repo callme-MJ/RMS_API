@@ -69,13 +69,6 @@ export class InstituteController {
     @Body() candidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    
-    // let photo = await this.s3Service.uploadFile(file);
-    // let {Location,ETag,Key} = photo; 
-    // console.log(Location,ETag,Key);
-       
-    
-    // return await this.instituteService.createCandidate(candidateDTO,Location,ETag,Key);
     return await this.instituteService.createCandidate(candidateDTO,file);
   }
 

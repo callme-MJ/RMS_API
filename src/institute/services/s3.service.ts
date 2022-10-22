@@ -11,27 +11,18 @@ export class S3Service {
 
   async uploadFile(file) {
     const { originalname } = file;
-
+    
     return await this.s3Upload(
       file.buffer,
       this.AWS_S3_BUCKET,
       originalname,
       file.mimetype,
-    );
-  }
-  async deleteFile(file) {
-    let Key = file.photoKey;
-    return await this.s3Delete(Key, this.AWS_S3_BUCKET);
-  }
-  // async deletePublicFile(fileId: number) {
-  //     const file = await this.publicFilesRepository.findOne({ id: fileId });
-  //     const s3 = new S3();
-  //     await s3.deleteObject({
-  //       Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
-  //       Key: file.key,
-  //     }).promise();
-  //     await this.publicFilesRepository.delete(fileId);
-  //   }
+      );
+    }
+    async deleteFile(file) {
+      let Key = file.photoKey;
+      return await this.s3Delete(Key, this.AWS_S3_BUCKET);
+    }
 
   async s3Upload(file, bucket, name, mimetype) {
     const params = {
@@ -45,16 +36,14 @@ export class S3Service {
         LocationConstraint: 'ap-south-1',
       },
     };
-
+    
     // console.log(params);
-
+    
     try {
       let s3Response = await this.s3.upload(params).promise();
-
-      // console.log(s3Response.Location);
       return s3Response;
     } catch (e) {
-      // console.log(e);
+      console.log(e);
     }
   }
 

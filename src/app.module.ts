@@ -5,13 +5,19 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { InstituteModule } from './institute/institute.module';
 import { SessionModule } from './session/session.module';
 
+
 @Module({
   imports: [
+    AuthModule,
+    SessionModule,
+    AdminModule,
     SessionModule,InstituteModule,
     ConfigModule.forRoot({
       isGlobal: true,

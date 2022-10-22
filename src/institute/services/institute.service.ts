@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { logger } from 'handlebars';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { Candidate } from '../entities/candidate.entity';
@@ -49,9 +50,6 @@ export class InstituteService {
   async createCandidate(
     candidateDTO: CandidateDTO,
     file: any,
-    // location: string,
-    // eTag: string,
-    // key: string,
   ): Promise<Candidate> {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {

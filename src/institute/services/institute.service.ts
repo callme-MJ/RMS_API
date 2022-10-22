@@ -47,27 +47,27 @@ export class InstituteService {
     }
   }
 
-  async createCandidate(
-    candidateDTO: CandidateDTO,
-    file: any,
-  ): Promise<Candidate> {
-    let eligible = await this.checkEligibility(candidateDTO);
-    if (eligible) {
-      let photoDTO = await this.s3Service.uploadFile(file);
-      let { Location, ETag, Key } = photoDTO;
-      let photo = await this.photoRepository.create({
-        url: Location,
-        eTag: ETag,
-        key: Key,
-      });
-      await this.photoRepository.save(photo);
-      let chestNO = await this.getchestNO(candidateDTO);
-      candidateDTO.photo = photo;
-      candidateDTO.chestNO = chestNO;
-      const newCandidate = this.candidateRepository.create(candidateDTO);
-      return this.candidateRepository.save(newCandidate);
-    }
-  }
+  // async createCandidate(
+  //   candidateDTO: CandidateDTO,
+  //   file: any,
+  // ): Promise<Candidate> {
+  //   let eligible = await this.checkEligibility(candidateDTO);
+  //   if (eligible) {
+  //     let photoDTO = await this.s3Service.uploadFile(file);
+  //     let { Location, ETag, Key } = photoDTO;
+  //     let photo = await this.photoRepository.create({
+  //       url: Location,
+  //       eTag: ETag,
+  //       key: Key,
+  //     });
+  //     await this.photoRepository.save(photo);
+  //     let chestNO = await this.getchestNO(candidateDTO);
+  //     candidateDTO.photo = photo;
+  //     candidateDTO.chestNO = chestNO;
+  //     const newCandidate = this.candidateRepository.create(candidateDTO);
+  //     return this.candidateRepository.save(newCandidate);
+  //   }
+  // }
 
   async deleteCandidate(id: number) {
     try {
@@ -78,33 +78,33 @@ export class InstituteService {
       throw error;
     }
   }
-  async updateCandidate(id: number, candidateDTO: CandidateDTO,file:any) {
-    try {
-      let candidate = await this.findCandidateByID(id);
-      console.log(candidate);
-      console.log(candidate.photo);
+  // async updateCandidate(id: number, candidateDTO: CandidateDTO,file:any) {
+  //   try {
+  //     let candidate = await this.findCandidateByID(id);
+  //     console.log(candidate);
+  //     console.log(candidate.photo);
       
-      await this.s3Service.deleteFile(candidate.photo);
-      let photoDTO = await this.s3Service.uploadFile(file);
-      let { Location, ETag, Key } = photoDTO;
-      let photo = await this.photoRepository.create({
-        url: Location,
-        eTag: ETag,
-        key: Key,
-      });
-      await this.photoRepository.save(photo);
-      candidateDTO.photo = photo;
-      if (candidate) {
-        let updatedCandidate = this.candidateRepository.update(
-          { id },
-          { ...candidateDTO },
-        );
-        return updatedCandidate;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
+  //     await this.s3Service.deleteFile(candidate.photo);
+  //     let photoDTO = await this.s3Service.uploadFile(file);
+  //     let { Location, ETag, Key } = photoDTO;
+  //     let photo = await this.photoRepository.create({
+  //       url: Location,
+  //       eTag: ETag,
+  //       key: Key,
+  //     });
+  //     await this.photoRepository.save(photo);
+  //     candidateDTO.photo = photo;
+  //     if (candidate) {
+  //       let updatedCandidate = this.candidateRepository.update(
+  //         { id },
+  //         { ...candidateDTO },
+  //       );
+  //       return updatedCandidate;
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async getchestNO(candidateDTO: CandidateDTO) {
     try {

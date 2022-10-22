@@ -18,7 +18,8 @@ export class CandidateDTO {
 
   @IsNotEmpty()
   dob: string;
-  photo: import("c:/Users/HP/Desktop/sibaq github/rms-api/src/institute/entities/photo.entitiy").Photo;
+  
+  photo: string;
   chestNO: any;
 
 

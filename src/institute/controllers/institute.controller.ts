@@ -61,15 +61,15 @@ export class InstituteController {
       throw error;
     }
   }
-  @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
-  @UsePipes(ValidationPipe)
-  async createCandidate(
-    @Body() candidateDTO: CandidateDTO,
-    @UploadedFile() file,
-  ) {
-    return await this.instituteService.createCandidate(candidateDTO,file);
-  }
+  // @Post('/')
+  // @UseInterceptors(FileInterceptor('file'))
+  // @UsePipes(ValidationPipe)
+  // async createCandidate(
+  //   @Body() candidateDTO: CandidateDTO,
+  //   @UploadedFile() file,
+  // ) {
+  //   return await this.instituteService.createCandidate(candidateDTO,file);
+  // }
 
   @Get('/:chestNO')
   async findCandidateBychestNO(
@@ -85,16 +85,16 @@ export class InstituteController {
     return this.instituteService.deleteCandidate(id);
   }
 
-  @Patch('/:id')
-  @UseInterceptors(FileInterceptor('file'))
-  @UsePipes(ValidationPipe)
-  async updateCandidate(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() candidateDTO: CandidateDTO,
-    @UploadedFile() file,
-  ) {
-    return this.instituteService.updateCandidate(id, candidateDTO,file);
-  }
+  // @Patch('/:id')
+  // @UseInterceptors(FileInterceptor('file'))
+  // @UsePipes(ValidationPipe)
+  // async updateCandidate(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() candidateDTO: CandidateDTO,
+  //   @UploadedFile() file,
+  // ) {
+  //   return this.instituteService.updateCandidate(id, candidateDTO,file);
+  // }
 
   
 }

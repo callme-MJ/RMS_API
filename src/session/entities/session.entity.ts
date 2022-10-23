@@ -20,15 +20,19 @@ export class Session {
 
     @Column()
     year: number;
-
+    
+    @Expose({ name: 'chest_no_prefix'})
+    @Column({ nullable: true })
+    chestNoPrefix?: string;
+    
     @OneToMany(() => Institute, instiute => instiute.session)
     institutes: Institute[]
 
-    @Expose({ groups: ['single'] })
+    @Expose({ groups: ['single'], name: 'created_at' })
     @CreateDateColumn()
     createdAt: Date;
 
-    @Expose({ groups: ['single'] })
+    @Expose({ groups: ['single'], name: 'updated_at' })
     @UpdateDateColumn()
     updatedAt: Date;
 }

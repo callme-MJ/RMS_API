@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDTO } from './dto/create-category.dto';
+import { UpdateCategoryDTO } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 
 @Injectable()
@@ -16,7 +15,7 @@ export class CategoryService {
     private readonly sessionService: SessionService
   ) { }
 
-  public async create(payload: CreateCategoryDto): Promise<Category> {
+  public async create(payload: CreateCategoryDTO): Promise<Category> {
     try {
       const session: Session = await this.sessionService.findByID(payload.sessionID);
 
@@ -55,7 +54,7 @@ export class CategoryService {
     }
   }
 
-  public async update(id: number, payload: UpdateCategoryDto): Promise<boolean> {
+  public async update(id: number, payload: UpdateCategoryDTO): Promise<boolean> {
     try {
       const session: Session = await this.sessionService.findByID(payload.sessionID);
 

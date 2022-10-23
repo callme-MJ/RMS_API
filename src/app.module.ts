@@ -7,15 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { InstituteModule } from './institute/institute.module';
 import { SessionModule } from './session/session.module';
+import { CandidateModule } from './candidate/candidate.module';
 import { CategoryModule } from './category/category.module';
+import { InstituteModule } from './institute/institute.module';
+import { S3Service } from './candidate/services/s3.service';
 
 
 @Module({
   imports: [
     SessionModule,
-    SessionModule,InstituteModule,
+    SessionModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -76,7 +78,9 @@ import { CategoryModule } from './category/category.module';
       }),
       inject: [ConfigService],
     }),
-    CategoryModule
+    CategoryModule,
+    CandidateModule,
+    InstituteModule
   ],
   controllers: [AppController],
   providers: [AppService],

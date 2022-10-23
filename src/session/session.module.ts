@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { Session } from './entities/session.entity';
-import { SessionController } from './session.controller';
+import { AdminSessionController } from './admin-session.controller';
 import { SessionService } from './session.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     TypeOrmModule.forFeature([Session])
   ],
-  controllers: [SessionController],
+  controllers: [AdminSessionController],
   providers: [SessionService],
   exports: [SessionService]
 })

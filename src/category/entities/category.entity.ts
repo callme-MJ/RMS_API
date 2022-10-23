@@ -10,6 +10,9 @@ export class Category {
     @Column()
     name: string;
 
+    @Column()
+    chestNoSeries: number;
+
     @Expose({ groups: ['single'] })
     @ManyToOne(() => Session, { eager: true })
     session: Session;

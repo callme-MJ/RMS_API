@@ -1,13 +1,13 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn
 } from 'typeorm';
-import { Institute } from './institute.entity';
-import { Photo } from './photo.entitiy';
+import { Institute } from '../../institute/entities/institute.entity';
+import { Photo } from '../interfaces/photo.entitiy';
+import { Category } from 'src/category/entities/category.entity';
+import { Session } from 'src/session/entities/session.entity';
 
 @Entity({ name: 'candidate' })
 export class Candidate {
@@ -27,10 +27,16 @@ export class Candidate {
   dob: string;
 
   @Column()
-  chestNO: string;
+  chestNO: number;
 
   @ManyToOne(() => Institute, (institute) => institute.candidates)
   institute: Institute;
+
+  @ManyToOne(() => Category)
+  category: Category;
+  
+  @ManyToOne(() => Category)
+  session: Session;
 
   @Column({ nullable: true, type: 'json' })
   photo: Photo;

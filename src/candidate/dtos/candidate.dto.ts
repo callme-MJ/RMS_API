@@ -2,13 +2,13 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CandidateDTO {
   @IsNotEmpty()
-  instituteID: string;
+  instituteID: number;
 
   @IsNotEmpty()
   name: string;
 
   @IsNotEmpty()
-  categoryID: string;
+  categoryID: number;
 
   @IsNotEmpty()
   class: number;
@@ -19,9 +19,5 @@ export class CandidateDTO {
   @IsNotEmpty()
   dob: string;
 
-  // photo: string;
-  chestNO: any;
-
-
-
+  chestNO?: any;
 }

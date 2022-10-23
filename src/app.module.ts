@@ -1,19 +1,25 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { SessionModule } from './session/session.module';
-import { ConfigService, ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { BullModule } from '@nestjs/bull';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SessionModule } from './session/session.module';
+import { CandidateModule } from './candidate/candidate.module';
+import { CategoryModule } from './category/category.module';
+import { InstituteModule } from './institute/institute.module';
+import { S3Service } from './candidate/services/s3.service';
+
 
 @Module({
   imports: [
     SessionModule,
+    SessionModule,
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -71,7 +77,10 @@ import { BullModule } from '@nestjs/bull';
         }
       }),
       inject: [ConfigService],
-    })
+    }),
+    CategoryModule,
+    CandidateModule,
+    InstituteModule
   ],
   controllers: [AppController],
   providers: [AppService],

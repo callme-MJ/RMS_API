@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Session } from './entities/session.entity';
+import { Session, SessionStatus } from './entities/session.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
@@ -23,10 +23,10 @@ export class SessionService {
         }
     }
     
-    public async findByID(id: number) : Promise<Session> {
+    public async findByID(id: number, status: SessionStatus = SessionStatus.ACTIVE) : Promise<Session> {
         try {
             const session: Session = await this.sessionRepository.findOne({
-                where: { id }
+                where: { id, status }
             });
 
             if(!session) {

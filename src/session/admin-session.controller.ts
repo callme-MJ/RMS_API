@@ -2,8 +2,8 @@ import { Controller, Get, Param, SerializeOptions } from '@nestjs/common';
 import { Session } from './entities/session.entity';
 import { SessionService } from './session.service';
 
-@Controller('sessions')
-export class SessionController {
+@Controller('admin/sessions')
+export class AdminSessionController {
     constructor(private readonly sessionService: SessionService)
     { }
 

@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, SerializeOptions, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, SerializeOptions, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import { CreateInstituteDTO } from './dto/create-institute.dto';
 import { UpdateInstituteDTO } from './dto/update-institute.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/institutes')
 export class AdminInstitutesController {
   constructor(private readonly instituteService: InstituteService) { }

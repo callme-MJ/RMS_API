@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, SerializeOptions, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, SerializeOptions, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CategoryService } from './category.service';
 import { CreateCategoryDTO } from './dto/create-category.dto';
 import { UpdateCategoryDTO } from './dto/update-category.dto';
 
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/categories')
 export class AdminCategoryController {
   constructor(private readonly categoryService: CategoryService) { }

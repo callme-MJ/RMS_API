@@ -40,3 +40,5 @@ lerna-debug.log*
 .gitlab-ci.yml
 /public
 /public/uplaoads
+
+test.js

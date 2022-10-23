@@ -7,15 +7,18 @@ import {
   Query,
   SerializeOptions,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { CandidateService, ICandidateFilter } from '../services/candidate.service';
 
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidates')
 export class AdminCandidatesController {
   constructor(

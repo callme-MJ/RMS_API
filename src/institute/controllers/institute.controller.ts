@@ -4,6 +4,7 @@ import {
   Delete,
   Get, Param,
   ParseIntPipe, Patch, Post,
+  Query,
   Req,
   Res,
   UploadedFile,
@@ -16,8 +17,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
-import { ReqQueryDTO } from '../dtos/req-query.dto';
 import { Candidate } from '../entities/candidate.entity';
+import { IFilter } from '../interfaces/filter.interface';
 import { InstituteService } from '../services/institute.service';
 import { S3Service } from '../services/s3.service';
 
@@ -28,27 +29,29 @@ export class InstituteController {
     private readonly candidateRepository: Repository<Candidate>,
     private readonly instituteService: InstituteService,
     private readonly s3Service: S3Service
-  ) {}
- 
-  @Get('/')
-  async getCandidate(@Req() req: Request) {
+  ) { }
+
+  @Get()
+  async getCandidates(@Query() queryParams: IFilter) {
     try {
-      
+
       const candidates = await this.candidateRepository.createQueryBuilder(
         'candidates',
       );
-      let search = (req.query as unknown as ReqQueryDTO).search,
-        sort = (req.query as unknown as ReqQueryDTO).sort,
-        page = (req.query as unknown as ReqQueryDTO).page || 1;
+
+      const search = queryParams.search;
+      const sort = queryParams.sort;
+      const page = queryParams.page || 10;
+
       if (search) {
         candidates.where(
-          'name LIKE :search OR category_ID LIKE :search OR chestNO LIKE :search',
+          'name LIKE :search OR chestNO LIKE :search',
           { search: `%${search}%` },
         );
       }
 
       if (sort) {
-        candidates.orderBy('candidates.name', sort.toUpperCase()).getMany();
+        candidates.orderBy('candidates.name', sort).getMany();
       }
 
       const perPage = 15;
@@ -61,14 +64,13 @@ export class InstituteController {
       throw error;
     }
   }
-  @Post('/')
+  @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @UsePipes(ValidationPipe)
   async createCandidate(
-    @Body() candidateDTO: CandidateDTO,
-    @UploadedFile() file,
+    @Body() payload: CandidateDTO,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.instituteService.createCandidate(candidateDTO,file);
+    return await this.instituteService.createCandidate(payload, file);
   }
 
   @Get('/:chestNO')
@@ -81,7 +83,7 @@ export class InstituteController {
 
   @Delete('/:id')
   async deleteCandidateByID(@Param('id', ParseIntPipe) id: number) {
-    
+
     return this.instituteService.deleteCandidate(id);
   }
 
@@ -93,8 +95,8 @@ export class InstituteController {
     @Body() candidateDTO: CandidateDTO,
     @UploadedFile() file,
   ) {
-    return this.instituteService.updateCandidate(id, candidateDTO,file);
+    return this.instituteService.updateCandidate(id, candidateDTO, file);
   }
 
-  
+
 }

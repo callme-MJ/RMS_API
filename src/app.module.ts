@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InstituteModule } from './institute/institute.module';
 import { SessionModule } from './session/session.module';
+import { CategoryModule } from './category/category.module';
 
 
 @Module({
@@ -74,7 +75,8 @@ import { SessionModule } from './session/session.module';
         }
       }),
       inject: [ConfigService],
-    })
+    }),
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],

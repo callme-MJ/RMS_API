@@ -1,7 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn,OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Expose } from 'class-transformer';
-import { Candidate } from 'src/institute/entities/candidate.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
+
+export enum SessionStatus {
+    INACTIVE,
+    ACTIVE
+}
 
 @Entity()
 export class Session {
@@ -11,24 +15,20 @@ export class Session {
     @Column()
     name: string;
 
-
-    @OneToMany( () => Institute, instiute => instiute.session)
-    institutes:Institute[]
-
-    @Expose({ name: 'is_current' })
     @Column({ default: true })
-    isCurrent: boolean;
+    status: SessionStatus;
 
-    @Expose({ name: 'is_NIICS' })
-    @Column({ default: false })
-    isNIICS: boolean;
+    @Column()
+    year: number;
 
-    @Expose({ groups:['single'] })
+    @OneToMany(() => Institute, instiute => instiute.session)
+    institutes: Institute[]
+
+    @Expose({ groups: ['single'] })
     @CreateDateColumn()
     createdAt: Date;
 
-    @Expose({ groups:['single'] })
+    @Expose({ groups: ['single'] })
     @UpdateDateColumn()
     updatedAt: Date;
-
 }

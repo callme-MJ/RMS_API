@@ -15,13 +15,7 @@ export class Candidate {
   id: number;
 
   @Column()
-  instituteID: string;
-
-  @Column()
   name: string;
-
-  @Column()
-  categoryID: string;
 
   @Column()
   class: number;
@@ -38,7 +32,6 @@ export class Candidate {
   @ManyToOne(() => Institute, (institute) => institute.candidates)
   institute: Institute;
 
-  @OneToOne(() => Photo)
-  @JoinColumn()
+  @Column({ nullable: true, type: 'json' })
   photo: Photo;
 }

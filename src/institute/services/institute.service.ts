@@ -52,7 +52,7 @@ export class InstituteService {
 
   async createCandidate(
     candidateDTO: CandidateDTO,
-    file: any,
+    file: Express.Multer.File,
   ): Promise<Candidate> {
     let eligible = await this.checkEligibility(candidateDTO);
     if (eligible) {

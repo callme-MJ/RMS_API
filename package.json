@@ -42,6 +42,7 @@
     "encodeurl": "^1.0.2",
     "form-data": "^4.0.0",
     "handlebars": "^4.7.7",
+    "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.8.0",
     "passport": "^0.6.0",

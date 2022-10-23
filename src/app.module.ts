@@ -8,10 +8,11 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SessionModule } from './session/session.module';
-import { CandidateModule } from './candidate/candidate.module';
 import { CategoryModule } from './category/category.module';
 import { InstituteModule } from './institute/institute.module';
-import { S3Service } from './candidate/services/s3.service';
+import { LoginModule } from './login/login.module';
+import { AdminModule } from './admin/admin.module';
+import { CandidateModule } from './candidate/candidate.module';
 
 
 @Module({
@@ -80,7 +81,9 @@ import { S3Service } from './candidate/services/s3.service';
     }),
     CategoryModule,
     CandidateModule,
-    InstituteModule
+    InstituteModule,
+    AdminModule,
+    LoginModule
   ],
   controllers: [AppController],
   providers: [AppService],

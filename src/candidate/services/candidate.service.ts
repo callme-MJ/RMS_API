@@ -5,9 +5,13 @@ import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { ValidationException } from 'src/exceptions/validation-exception';
+import { Institute } from 'src/institute/entities/institute.entity';
+import { InstituteService } from 'src/institute/institute.service';
+import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
-import { Candidate } from '../entities/candidate.entity';
+import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
+import { Candidate, Gender } from '../entities/candidate.entity';
 import { IFilter } from '../interfaces/filter.interface';
 import { S3Service } from './s3.service';
 
@@ -22,6 +26,7 @@ export class CandidateService {
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
     private readonly s3Service: S3Service,
+    private readonly instituteService: InstituteService,
     private readonly categoryService: CategoryService
   ) { }
 
@@ -33,7 +38,7 @@ export class CandidateService {
 
       const search = queryParams.search;
       const sort = queryParams.sort;
-      const page = queryParams.page || 10;
+      const page = queryParams.page || 1;
 
       if (search) {
         candidatesQuery.where(
@@ -64,8 +69,7 @@ export class CandidateService {
   findCandidateByID(id: number): Promise<Candidate> {
     try {
       return this.candidateRepository.findOne({
-        where: { id: id },
-        relations: ['photo'],
+        where: { id}
       });
     } catch (error) {
       throw error;
@@ -86,9 +90,20 @@ export class CandidateService {
   ): Promise<Candidate> {
     await this.checkEligibility(candidateDTO);
 
+    if(candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
+
+    const institute: Institute = await this.instituteService.findOne(+candidateDTO.instituteID);
+    const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
+
+    if(!institute || !category) throw new ValidationException("Institute or Category can't be empty");
+
     let chestNO = await this.getchestNO(candidateDTO);
     candidateDTO.chestNO = chestNO;
     const newCandidate = this.candidateRepository.create(candidateDTO);
+    newCandidate.category = category;
+    newCandidate.institute = institute;
+    newCandidate.session = category.session;
+
     const candidate: Candidate = await this.candidateRepository.save(newCandidate);
 
     return await this.uploadPhoto(candidate, photo);
@@ -103,9 +118,9 @@ export class CandidateService {
       throw error;
     }
   }
-  async updateCandidate(id: number, candidateDTO: CandidateDTO, photo?: Express.Multer.File): Promise<boolean> {
+  async updateCandidate(id: number, payload: UpdateCandidateDTO, photo?: Express.Multer.File): Promise<boolean> {
     try {
-      let candidate = await this.findCandidateByID(id);
+      const candidate = await this.findCandidateByID(id);
 
       if (!candidate) throw new NotFoundException("Candidate not found");
 
@@ -114,7 +129,9 @@ export class CandidateService {
         await this.uploadPhoto(candidate, photo);
       }
 
-      await this.candidateRepository.save({ candidate, ...candidateDTO });
+      // TODO: Handle updated session, category and institute here
+
+      await this.candidateRepository.save({ ...candidate, ...payload });
 
       return true;
     } catch (error) {
@@ -132,11 +149,13 @@ export class CandidateService {
 
       const lastChestNoInTheCategory = await this.candidateRepository.createQueryBuilder('candidate')
         .leftJoinAndSelect('candidate.session', 'session')
+        .leftJoinAndSelect('candidate.category', 'category')
         .where('session.id = :sessionID', { sessionID: category.session.id })
+        .andWhere('category.id = :categoryID', { categoryID: category.id })
         .orderBy('candidate.chestNO', 'DESC')
         .getOne();
 
-      return lastChestNoInTheCategory ? lastChestNoInTheCategory.chestNO++ : category.chestNoSeries;
+      return lastChestNoInTheCategory ? lastChestNoInTheCategory.chestNO + 1 : category.chestNoSeries;
     } catch (error) {
       throw error;
     }

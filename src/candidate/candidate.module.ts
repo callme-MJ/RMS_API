@@ -5,11 +5,13 @@ import { CandidateService } from './services/candidate.service';
 import { Candidate } from './entities/candidate.entity';
 import { S3Service } from './services/s3.service';
 import { CategoryModule } from 'src/category/category.module';
+import { InstituteModule } from 'src/institute/institute.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Candidate]),
-    CategoryModule
+    CategoryModule,
+    InstituteModule
   ],
   controllers: [AdminCandidatesController],
   providers: [CandidateService, S3Service]

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
@@ -45,6 +46,8 @@ export class CategoryService {
       const category: Category = await this.categoryRepository.findOne({
         where: { id }
       });
+
+      if(!category) throw new NotFoundException("Category not found");
 
       if(!category.session || !category.session.status) return null;
 

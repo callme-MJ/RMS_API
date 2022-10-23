@@ -1,4 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { Gender } from '../entities/candidate.entity';
 
 export class CandidateDTO {
   @IsNotEmpty()
@@ -18,6 +19,10 @@ export class CandidateDTO {
 
   @IsNotEmpty()
   dob: string;
+
+  @IsNotEmpty()
+  @IsEnum(Gender)
+  gender: Gender;
 
   chestNO?: any;
 }

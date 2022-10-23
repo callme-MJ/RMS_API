@@ -6,4 +6,7 @@ export class CreateCategoryDTO {
     
     @IsNotEmpty()
     name: string;
+    
+    @IsNotEmpty()
+    chestNoSeries: number;
 }

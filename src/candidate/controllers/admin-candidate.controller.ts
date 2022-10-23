@@ -5,6 +5,7 @@ import {
   Get, Param,
   ParseIntPipe, Patch, Post,
   Query,
+  SerializeOptions,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CandidateDTO } from '../dtos/candidate.dto';
+import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { CandidateService, ICandidateFilter } from '../services/candidate.service';
 
 @Controller('admin/candidates')
@@ -30,14 +32,15 @@ export class AdminCandidatesController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('photo'))
   async createCandidate(
     @Body() payload: CandidateDTO,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() photo: Express.Multer.File,
   ) {
-    return await this.candidateService.createCandidate(payload, file);
+    return await this.candidateService.createCandidate(payload, photo);
   }
-
+  
+  @SerializeOptions({ groups: ['single'] })
   @Get(':chestNO')
   async findCandidateBychestNO(
     @Param('chestNO', ParseIntPipe) chestNO: number,
@@ -55,9 +58,9 @@ export class AdminCandidatesController {
   @UsePipes(ValidationPipe)
   async updateCandidate(
     @Param('id', ParseIntPipe) id: number,
-    @Body() candidateDTO: CandidateDTO,
+    @Body() body: UpdateCandidateDTO,
     @UploadedFile() photo: Express.Multer.File,
   ) {
-    return this.candidateService.updateCandidate(+id, candidateDTO, photo);
+    return this.candidateService.updateCandidate(+id, body, photo);
   }
 }

@@ -6,7 +6,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity, ManyToOne, OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Candidate } from '../../candidate/entities/candidate.entity';
 
@@ -38,7 +39,7 @@ export class Institute {
   createdAt: Date;
   
   @Expose({ groups: ['single'], name: 'updated_at'})
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @Exclude()

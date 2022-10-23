@@ -1,13 +1,22 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Institute } from '../../institute/entities/institute.entity';
 import { Photo } from '../interfaces/photo.entitiy';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
+import { Exclude, Expose } from 'class-transformer';
+
+export enum Gender {
+  MALE = "M",
+  FEMALE = "F"
+}
 
 @Entity({ name: 'candidate' })
 export class Candidate {
@@ -29,15 +38,30 @@ export class Candidate {
   @Column()
   chestNO: number;
 
+  @Column({ nullable: true, type: 'json' })
+  photo: Photo;
+
+  @Column({ type: 'varchar', default: Gender.MALE })
+  gender: Gender;
+
   @ManyToOne(() => Institute, (institute) => institute.candidates)
   institute: Institute;
 
   @ManyToOne(() => Category)
   category: Category;
   
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Session)
   session: Session;
 
-  @Column({ nullable: true, type: 'json' })
-  photo: Photo;
+  @Expose({ groups: ['single'], name: 'created_at'})
+  @CreateDateColumn()
+  createdAt: Date;
+  
+  @Expose({ groups: ['single'], name: 'updated_at'})
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Exclude()
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

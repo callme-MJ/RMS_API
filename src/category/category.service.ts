@@ -13,12 +13,14 @@ export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-    private readonly sessionService: SessionService
-  ) { }
+    private readonly sessionService: SessionService,
+  ) {}
 
   public async create(payload: CreateCategoryDTO): Promise<Category> {
     try {
-      const session: Session = await this.sessionService.findByID(payload.sessionID);
+      const session: Session = await this.sessionService.findByID(
+        payload.sessionID,
+      );
 
       return this.categoryRepository.save({ ...payload, session });
     } catch (error) {
@@ -32,9 +34,9 @@ export class CategoryService {
         where: {
           session: {
             id: sessionID,
-            status: SessionStatus.ACTIVE
-          }
-        }
+            status: SessionStatus.ACTIVE,
+          },
+        },
       });
     } catch (error) {
       throw error;
@@ -44,12 +46,12 @@ export class CategoryService {
   public async findOne(id: number): Promise<Category> {
     try {
       const category: Category = await this.categoryRepository.findOne({
-        where: { id }
+        where: { id },
       });
 
-      if(!category) throw new NotFoundException("Category not found");
+      if (!category) throw new NotFoundException('Category not found');
 
-      if(!category.session || !category.session.status) return null;
+      if (!category.session || !category.session.status) return null;
 
       return category;
     } catch (error) {
@@ -57,9 +59,14 @@ export class CategoryService {
     }
   }
 
-  public async update(id: number, payload: UpdateCategoryDTO): Promise<boolean> {
+  public async update(
+    id: number,
+    payload: UpdateCategoryDTO,
+  ): Promise<boolean> {
     try {
-      const session: Session = await this.sessionService.findByID(payload.sessionID);
+      const session: Session = await this.sessionService.findByID(
+        payload.sessionID,
+      );
 
       await this.categoryRepository.save({ ...payload, id, session });
       return true;

@@ -41,23 +41,32 @@ export class SessionService {
       throw error;
     }
   }
-  public async create(user: Session): Promise<Session> {
+  public async create(session: Session): Promise<Session> {
     try {
-      const session: Session = await this.sessionRepository.save(user);
-      if (!session) {
-        throw new NotFoundException('session not created');
-      }
-      return session;
+      const newSession: Session = await this.sessionRepository.save(session);
+      return newSession;
     } catch (error) {
       throw error;
     }
   }
-  public async update(id: number, user: Session) {
-    await this.sessionRepository.update(id, user);
+  public async update(id: number, session: Session): Promise<boolean> {
+    try {
+      const session: Session = await this.sessionRepository.findOne({
+        where: { id },
+      });
+      if (!session) {
+        throw new NotFoundException('session not found');
+      }
+      await this.sessionRepository.update(id, session);
+      return true;
+    } catch (error) {
+      throw error;
+    }
   }
-  public async remove(id: number): Promise<void> {
+  public async remove(id: number): Promise<boolean> {
     try {
       this.sessionRepository.delete(id);
+      return true;
     } catch (error) {
       throw error;
     }

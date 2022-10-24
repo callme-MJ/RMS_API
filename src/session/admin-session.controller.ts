@@ -21,19 +21,20 @@ export class AdminSessionController {
         return await this.sessionService.findByID(id);
     }
     @Post()
-    @SerializeOptions({ groups: ['collection'] })
-    public async create(@Body('createSessionDto')CreateSessionDTO: Session) : Promise<Session> {
+    @SerializeOptions({ groups: ['single'] })
+    public async create(@Body()CreateSessionDTO: Session) : Promise<Session> {
         return await this.sessionService.create(CreateSessionDTO);
     }
 
     @Put(":id")
     @SerializeOptions({ groups: ['single'] })
-    public async update(@Param('id')id:number,@Body('updateSesionDTO')UpdateSesionDTO: Session) : Promise<void> {
-        return await this.sessionService.update(id,UpdateSesionDTO);
+    public async update(@Param('id')id:number,@Body('updateSesionDTO')UpdateSesionDTO: Session) : Promise<boolean> {
+        await this.sessionService.update(id,UpdateSesionDTO);
+        return true;
     }
     @Delete()
-    @SerializeOptions({ groups: ['collection'] })
-    public async delete(@Body('id') id: number) : Promise<void> {
+    @SerializeOptions({ groups: ['single'] })
+    public async delete(@Param('id') id: number) : Promise<boolean> {
         return await this.sessionService.remove(id);
     }
 }

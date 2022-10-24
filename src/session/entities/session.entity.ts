@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
 
 export enum SessionStatus {
@@ -32,7 +32,7 @@ export class Session {
     @CreateDateColumn()
     createdAt: Date;
 
-    @Expose({ groups: ['single'], name: 'updated_at' })
+    @Exclude()
     @UpdateDateColumn()
     updatedAt: Date;
 }

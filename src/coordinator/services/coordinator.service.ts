@@ -9,6 +9,10 @@ import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { S3Service } from 'src/candidate/services/s3.service';
 import { ValidationException } from 'src/exceptions/validation-exception';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
+import { Institute } from 'src/institute/entities/institute.entity';
+import { InstituteService } from 'src/institute/institute.service';
+import { Session, SessionStatus } from 'src/session/entities/session.entity';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class CoordinatorService {
@@ -16,17 +20,25 @@ export class CoordinatorService {
     @InjectRepository(Coordinator)
     private readonly coordinatorRepo: Repository<Coordinator>,
     private readonly s3Service: S3Service,
+    private readonly instituteService: InstituteService,
+    private readonly sessionService: SessionService,
 ) { }
 
-async  createCandidate(
+async  createCoordinator(
     createCoordinatorDto: CreateCoordinatorDto,
-    photo: Express.Multer.File,):Promise<Coordinator> {
-      if(!photo) throw new ValidationException("Photo is required");
+    photo: Express.Multer.File,):Promise<boolean> {  
+
+      const institute:Institute = await this.instituteService.findOne(createCoordinatorDto.instituteID);
       const password = await this.encodePassword(createCoordinatorDto.password)    
       const newCoordinator = this.coordinatorRepo.create({...createCoordinatorDto,password});
+      newCoordinator.institute = institute;
+      newCoordinator.session = institute.session;
+      const isUsernameAvailable = await this.usernameAvailabilityCheck(createCoordinatorDto.username);
       const coordinator: Coordinator = await this.coordinatorRepo.save(newCoordinator);
-
-    return await this.uploadPhoto(coordinator, photo);
+      if (photo) {
+        await this.uploadPhoto(coordinator, photo);
+      }
+      return true
   }
 
   private async uploadPhoto(coordinator: Coordinator, photo: Express.Multer.File) : Promise<Coordinator> {
@@ -39,15 +51,29 @@ async  createCandidate(
         key: uploadedImage.Key,
         url: uploadedImage.Location
       }
-      return await this.coordinatorRepo.save(coordinator);
+      await this.coordinatorRepo.save(coordinator);
+      return 
     } catch (error) {
       throw error;
     }
   }
 
-  findAll( ) {
-    return this.coordinatorRepo.find();
-  }
+  
+    public async findAll(sessionID: number = 0): Promise<Coordinator[]> {
+    try {
+      return this.coordinatorRepo.find({
+        where: {
+          session: {
+            id: sessionID,
+            status: SessionStatus.ACTIVE
+          }
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+  
 
   public async findByUsername(username: string): Promise<Coordinator> {
     try {
@@ -78,8 +104,8 @@ async  createCandidate(
       }
       if (updateCoordinatordto.password)
       updateCoordinatordto.password = await this.encodePassword(updateCoordinatordto.password)
-      
-      return this.coordinatorRepo.update(id,updateCoordinatordto)
+      this.coordinatorRepo.update(id,updateCoordinatordto)
+      return true;
     }catch(error){
       throw error;
     }
@@ -90,7 +116,8 @@ async  createCandidate(
       const coordinator = await this.findOne(id);
       if (!coordinator) throw new NotFoundException("Coordinator not found");
       await this.s3Service.deleteFile(coordinator.photo);
-      return this.coordinatorRepo.delete(id);
+      this.coordinatorRepo.delete(id);
+      return true; 
     }catch(error){
       throw error
     }
@@ -112,4 +139,20 @@ async  createCandidate(
     const SALT=  await bcrypt.genSalt(10);
     return await bcrypt.hash(rawPassword,SALT)
   }
+
+  async usernameAvailabilityCheck(username: string): Promise<boolean> {
+
+    const availability = this.coordinatorRepo
+    .createQueryBuilder('coordinator')
+    .leftJoinAndSelect('coordinator.session', 'session')
+    .leftJoinAndSelect('session.institute', 'institute')
+    // .leftJoinAndSelect('institute.admin', 'admin')
+    .leftJoinAndSelect('session.cnadidates', 'candidate')
+    // .where('coordinator.username = :username', { username })
+    .andWhere('coordinator.username OR candidate.username = :username', { username })
+    .getCount();
+    if (availability) throw new ValidationException("Username already taken");
+    return false;
+    
+}
 }

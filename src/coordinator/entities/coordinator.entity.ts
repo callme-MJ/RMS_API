@@ -1,6 +1,7 @@
 import { Expose } from "class-transformer";
 import { Photo } from "src/candidate/interfaces/photo.entitiy";
 import { Institute } from "src/institute/entities/institute.entity";
+import { Session } from "src/session/entities/session.entity";
 import { ManyToOne, Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity({name:'coordinator'})
@@ -35,4 +36,8 @@ export class Coordinator {
     @Expose({ name: 'institute_id' })
     @ManyToOne(() => Institute, (institute) => institute.coordinators)
     institute: Institute;
+
+    @Expose({ name: 'session_id' })
+    @ManyToOne(() =>  Session, (session) => session.coordinators)
+    session: Session;
 }

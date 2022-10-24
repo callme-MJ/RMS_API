@@ -80,7 +80,7 @@ export class LoginService {
         user.password,
       );
       if (!isPasswordCorrect) {
-        throw new ValidationException('Invalid email or password');
+        throw new ValidationException('Invalid username or password');
       }
 
       return this.getTokens(user);

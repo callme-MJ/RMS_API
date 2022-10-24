@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
+import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 
 export enum SessionStatus {
     INACTIVE,
@@ -27,6 +28,9 @@ export class Session {
     
     @OneToMany(() => Institute, instiute => instiute.session)
     institutes: Institute[]
+
+    @OneToMany(() => Coordinator, coordinator => coordinator.session)
+    coordinators: Coordinator[]
 
     @Expose({ groups: ['single'], name: 'created_at' })
     @CreateDateColumn()

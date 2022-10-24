@@ -24,11 +24,11 @@ export class AdminCoordinatorController {
     
     @Post()
     @UseInterceptors(FileInterceptor('photo'))
-    async createCandidate(
+    async createCoordinator(
       @Body() payload: CreateCoordinatorDto,
       @UploadedFile() photo: Express.Multer.File,
     ) {
-      return await this.coordinatorService.createCandidate(payload, photo);
+      return await this.coordinatorService.createCoordinator(payload, photo);
     }
 
   @Get()

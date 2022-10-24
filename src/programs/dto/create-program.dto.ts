@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 export class CreateProgramDto {
   @IsNotEmpty()
-  programID: string;
+  programCode: string;
 
   @IsNotEmpty()
   sessionID: number;

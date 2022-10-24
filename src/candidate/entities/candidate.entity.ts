@@ -1,19 +1,16 @@
+import { Exclude, Expose } from 'class-transformer';
+import { Category } from 'src/category/entities/category.entity';
+import { Session } from 'src/session/entities/session.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  ManyToOne, PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Institute } from '../../institute/entities/institute.entity';
 import { Photo } from '../interfaces/photo.entitiy';
-import { Category } from 'src/category/entities/category.entity';
-import { Session } from 'src/session/entities/session.entity';
-import { Exclude, Expose } from 'class-transformer';
-import { Program } from 'src/programs/entities/program.entity';
 
 export enum Gender {
   MALE = 'M',

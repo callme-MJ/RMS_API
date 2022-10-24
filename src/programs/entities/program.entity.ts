@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
+import { Session } from 'src/session/entities/session.entity';
 import {
     Column,
     CreateDateColumn,
@@ -12,7 +13,7 @@ export class Program {
   id: number;
 
   @Column()
-  programID: string;
+  programCode: string;
 
   @Column()
   name: string;
@@ -78,7 +79,10 @@ export class Program {
   skill: string;
 
   @ManyToOne(() => Category, (category) => category.programs)
-  category: Category[];
+  category: Category;
+
+  @ManyToOne(() => Session, (session) => session.programs)
+  session: Session;
 
   @Expose({ groups: ['single'], name: 'created_at'})
   @CreateDateColumn()

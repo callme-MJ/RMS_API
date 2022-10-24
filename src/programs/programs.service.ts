@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
+import { SessionStatus } from 'src/session/entities/session.entity';
+import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
@@ -12,19 +13,39 @@ export class ProgramsService {
   constructor(
     @InjectRepository(Program)
     private readonly programRepository: Repository<Program>,
+    private readonly categoryService: CategoryService,
+    private readonly sessionService: SessionService,
   ) {}
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {
     try {
-      return await this.programRepository.save(createProgramDto);
+      const category = await this.categoryService.findOne(
+        createProgramDto.categoryID,
+      );
+      const session = await this.sessionService.findByID(
+        createProgramDto.sessionID,
+      );
+      if (!category || !session)
+        throw new NotFoundException('Category or Session not found');
+      const program = await this.programRepository.save(createProgramDto);
+      program.session = session;
+      program.category = category;
+      return program;
     } catch (error) {
       throw error;
     }
   }
 
-  public async findAll(): Promise<Program[]> {
+  public async findAll(sessionID: number = 0): Promise<Program[]> {
     try {
-      return this.programRepository.find();
+      return this.programRepository.find({
+        where: {
+          session: {
+            id: sessionID,
+            status: SessionStatus.ACTIVE,
+          },
+        },
+      });
     } catch (error) {
       throw error;
     }
@@ -32,9 +53,12 @@ export class ProgramsService {
 
   public async findOne(id: number): Promise<Program> {
     try {
-      return this.programRepository.findOne({
+      let program: Program = await this.programRepository.findOne({
         where: { id },
       });
+      if (!program) throw new NotFoundException('Category not found');
+      if (!program.session || !program.session.status) return null;
+      return program;
     } catch (error) {
       throw error;
     }

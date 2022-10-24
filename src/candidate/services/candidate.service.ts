@@ -155,7 +155,7 @@ export class CandidateService {
         .orderBy('candidate.chestNO', 'DESC')
         .getOne();
 
-      return lastChestNoInTheCategory ? lastChestNoInTheCategory.chestNO + 1 : category.chest_no_series;
+      return lastChestNoInTheCategory ? lastChestNoInTheCategory.chestNO + 1 : category.chestNoSeries;
     } catch (error) {
       throw error;
     }

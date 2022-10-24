@@ -17,8 +17,9 @@ export class Category {
   @Column()
   name: string;
 
+  @Expose({ name: 'chest_no_series' })
   @Column()
-  chest_no_series: number;
+  chestNoSeries: number;
 
   @Expose({ groups: ['single'] })
   @ManyToOne(() => Session, { eager: true })

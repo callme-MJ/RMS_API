@@ -28,6 +28,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 message = message.message;
             }
         }
+
+        console.error(exception);        
         
         const { httpAdapter } = this.httpAdapterHost;
 

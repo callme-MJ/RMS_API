@@ -1,7 +1,9 @@
 # compiled output
 /dist
 /node_modules
+/.env
 
+/.vscode
 # Logs
 logs
 *.log
@@ -36,3 +38,7 @@ lerna-debug.log*
 
 .env
 .gitlab-ci.yml
+/public
+/public/uplaoads
+
+test.js

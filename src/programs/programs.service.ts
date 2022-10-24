@@ -12,7 +12,6 @@ export class ProgramsService {
   constructor(
     @InjectRepository(Program)
     private readonly programRepository: Repository<Program>,
-    private readonly categoryService: CategoryService,
   ) {}
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {

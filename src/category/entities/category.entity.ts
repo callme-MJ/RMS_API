@@ -1,19 +1,29 @@
-import { Expose } from "class-transformer";
-import { Session } from "src/session/entities/session.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Expose } from 'class-transformer';
+import { Program } from 'src/programs/entities/program.entity';
+import { Session } from 'src/session/entities/session.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Category {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    chestNoSeries: number;
+  @Column()
+  chestNoSeries: number;
 
-    @Expose({ groups: ['single'] })
-    @ManyToOne(() => Session, { eager: true })
-    session: Session;
+  @Expose({ groups: ['single'] })
+  @ManyToOne(() => Session, { eager: true })
+  session: Session;
+
+  @OneToMany(() => Program, (program) => program.category)
+  programs: Program[];
 }

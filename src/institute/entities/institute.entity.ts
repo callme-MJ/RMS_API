@@ -5,9 +5,11 @@ import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
-  Entity, ManyToOne, OneToMany,
+  Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from 'typeorm';
 import { Candidate } from '../../candidate/entities/candidate.entity';
 
@@ -18,7 +20,7 @@ export class Institute {
 
   @Column()
   name: string;
-  
+
   @Column()
   shortName: string;
 
@@ -34,11 +36,11 @@ export class Institute {
   @ManyToOne(() => Session, (session) => session.institutes, { eager: true })
   session: Session;
 
-  @Expose({ groups: ['single'], name: 'created_at'})
+  @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
-  
-  @Expose({ groups: ['single'], name: 'updated_at'})
+
+  @Expose({ groups: ['single'], name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
 

@@ -27,9 +27,10 @@ export class ProgramsService {
       );
       if (!category || !session)
         throw new NotFoundException('Category or Session not found');
-      const program = await this.programRepository.save(createProgramDto);
+      const program = await this.programRepository.create(createProgramDto);
       program.session = session;
       program.category = category;
+      await this.programRepository.save(program);
       return program;
     } catch (error) {
       throw error;

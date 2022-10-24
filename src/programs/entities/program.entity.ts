@@ -5,7 +5,7 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
+    Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
 @Entity({ name: 'program' })
 export class Program {

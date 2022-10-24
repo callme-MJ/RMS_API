@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ProgramsService } from './programs.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { ProgramsService } from './programs.service';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/programs')

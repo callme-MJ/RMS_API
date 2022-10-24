@@ -15,13 +15,11 @@ export class CreateSessionDTO {
   @IsNotEmpty()
   chestNOPrefix: string;
 
-  @Expose({ groups: ['single'], name: 'created_at'})
+  @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
-  
-  @Expose({ groups: ['single'], name: 'updated_at'})
+
+  @Expose({ groups: ['single'], name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
-
-  
 }

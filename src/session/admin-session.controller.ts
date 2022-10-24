@@ -35,7 +35,8 @@ export class AdminSessionController {
     @Delete()
     @SerializeOptions({ groups: ['single'] })
     public async delete(@Param('id') id: number) : Promise<boolean> {
-        return await this.sessionService.remove(id);
+         await this.sessionService.remove(id);
+         return true;
     }
 }
 

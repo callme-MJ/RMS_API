@@ -11,4 +11,4 @@ import { ProgramsService } from './program.service';
   controllers: [AdminProgramsController],
   providers: [ProgramsService],
 })
-export class ProgramsModule {}
+export class ProgramModule {}

@@ -1,21 +1,20 @@
+import { Exclude, Expose } from 'class-transformer';
+import { Category } from 'src/category/entities/category.entity';
+import { Session } from 'src/session/entities/session.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
+  ManyToOne, PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
 import { Institute } from '../../institute/entities/institute.entity';
 import { Photo } from '../interfaces/photo.entitiy';
-import { Category } from 'src/category/entities/category.entity';
-import { Session } from 'src/session/entities/session.entity';
-import { Exclude, Expose } from 'class-transformer';
 
 export enum Gender {
-  MALE = "M",
-  FEMALE = "F"
+  MALE = 'M',
+  FEMALE = 'F',
 }
 
 @Entity({ name: 'candidate' })
@@ -49,15 +48,15 @@ export class Candidate {
 
   @ManyToOne(() => Category)
   category: Category;
-  
+
   @ManyToOne(() => Session)
   session: Session;
 
-  @Expose({ groups: ['single'], name: 'created_at'})
+  @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
-  
-  @Expose({ groups: ['single'], name: 'updated_at'})
+
+  @Expose({ groups: ['single'], name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
 

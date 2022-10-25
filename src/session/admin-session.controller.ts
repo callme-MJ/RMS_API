@@ -7,7 +7,7 @@ import {
   Post,
   Put,
   SerializeOptions,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Session } from './entities/session.entity';

@@ -30,7 +30,7 @@ export class Institute {
   @Column({ nullable: true, type: 'json' })
   coverPhoto: Photo;
 
-  @OneToMany(() => Candidate, (candidate) => candidate.institute)
+  @OneToMany(() => Candidate, (candidate) => candidate.institute, { eager: true })
   candidates: Candidate[];
 
   @ManyToOne(() => Session, (session) => session.institutes, { eager: true })

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
-import { Program } from 'src/programs/entities/program.entity';
+import { Program } from 'src/program/entities/program.entity';
 
 export enum SessionStatus {
     INACTIVE,
@@ -26,7 +26,7 @@ export class Session {
     @Column({ nullable: true })
     chestNoPrefix?: string;
     
-    @OneToMany(() => Institute, instiute => instiute.session)
+    @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
 
     @OneToMany(() => Program, program => program.session)

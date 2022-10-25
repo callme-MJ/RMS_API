@@ -1,11 +1,11 @@
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
 import {
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn,
-    Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
 @Entity({ name: 'program' })
 export class Program {
@@ -78,10 +78,10 @@ export class Program {
   @Column()
   skill: string;
 
-  @ManyToOne(() => Category, (category) => category.programs)
+  @ManyToOne(() => Category, (category) => category.programs, { eager: true })
   category: Category;
 
-  @ManyToOne(() => Session, (session) => session.programs)
+  @ManyToOne(() => Session, (session) => session.programs, { eager: true })
   session: Session;
 
   @Expose({ groups: ['single'], name: 'created_at'})
@@ -92,7 +92,7 @@ export class Program {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Expose()
+  @Exclude()
   @DeleteDateColumn()
   deletedAt: Date;
 }

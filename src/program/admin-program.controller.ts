@@ -1,8 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
-import { ProgramsService } from './programs.service';
+import { IProgramFilter, ProgramsService } from './program.service';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/programs')
@@ -15,8 +25,8 @@ export class AdminProgramsController {
   }
 
   @Get()
-  findAll() {
-    return this.programsService.findAll();
+  findAll(@Query() queryParams: IProgramFilter) {
+    return this.programsService.findAll(queryParams);
   }
 
   @Get(':id')

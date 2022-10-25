@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
 import { SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
@@ -8,6 +9,9 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { Program } from './entities/program.entity';
 
+export interface IProgramFilter extends IFilter {
+  sessionID: number;
+}
 @Injectable()
 export class ProgramsService {
   constructor(
@@ -37,12 +41,12 @@ export class ProgramsService {
     }
   }
 
-  public async findAll(sessionID: number = 0): Promise<Program[]> {
+  public async findAll(queryParams: IProgramFilter): Promise<Program[]> {
     try {
       return this.programRepository.find({
         where: {
           session: {
-            id: sessionID,
+            id: queryParams.sessionID,
             status: SessionStatus.ACTIVE,
           },
         },

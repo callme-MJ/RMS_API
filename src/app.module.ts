@@ -13,7 +13,7 @@ import { InstituteModule } from './institute/institute.module';
 import { LoginModule } from './login/login.module';
 import { AdminModule } from './admin/admin.module';
 import { CandidateModule } from './candidate/candidate.module';
-import { ProgramsModule } from './programs/programs.module';
+import { ProgramsModule } from './program/program.module';
 
 
 @Module({

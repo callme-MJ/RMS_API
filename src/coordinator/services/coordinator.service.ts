@@ -13,6 +13,7 @@ import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteService } from 'src/institute/institute.service';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
+import { error } from 'console';
 
 @Injectable()
 export class CoordinatorService {
@@ -31,9 +32,10 @@ async  createCoordinator(
       const institute:Institute = await this.instituteService.findOne(createCoordinatorDto.instituteID);
       const password = await this.encodePassword(createCoordinatorDto.password)    
       const newCoordinator = this.coordinatorRepo.create({...createCoordinatorDto,password});
-      newCoordinator.institute = institute;
+      newCoordinator.institute = institute;      
       newCoordinator.session = institute.session;
       const isUsernameAvailable = await this.usernameAvailabilityCheck(createCoordinatorDto.username);
+      if (isUsernameAvailable=== false) throw new ValidationException('User name not Available')
       const coordinator: Coordinator = await this.coordinatorRepo.save(newCoordinator);
       if (photo) {
         await this.uploadPhoto(coordinator, photo);
@@ -142,17 +144,21 @@ async  createCoordinator(
 
   async usernameAvailabilityCheck(username: string): Promise<boolean> {
 
-    const availability = this.coordinatorRepo
+    const availability = await this.coordinatorRepo
     .createQueryBuilder('coordinator')
     .leftJoinAndSelect('coordinator.session', 'session')
-    .leftJoinAndSelect('session.institute', 'institute')
-    // .leftJoinAndSelect('institute.admin', 'admin')
-    .leftJoinAndSelect('session.cnadidates', 'candidate')
-    // .where('coordinator.username = :username', { username })
-    .andWhere('coordinator.username OR candidate.username = :username', { username })
-    .getCount();
-    if (availability) throw new ValidationException("Username already taken");
-    return false;
+    // .leftJoinAndSelect('session.institutes', 'institute')
+    // .leftJoinAndSelect('institute.candidates', 'candidate')
+    // to check whether the username is taken by candidates, since candidates doesn't hold a username its unwanted
     
-}
+    // .leftJoinAndSelect('session.user' , 'user')
+    // to check whether the username is taken by user, since user isn't found its a TODO
+    
+    .select('coordinator.id')
+    .andWhere('coordinator.username', { username })
+    .getCount();
+    if (availability > 0) return false; 
+    return true;}
+    
+    
 }

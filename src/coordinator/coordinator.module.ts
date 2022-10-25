@@ -8,9 +8,10 @@ import { CandidateModule } from 'src/candidate/candidate.module';
 import { S3Service } from 'src/candidate/services/s3.service';
 import { InstituteModule } from 'src/institute/institute.module';
 import { InstituteService } from 'src/institute/institute.service';
+import { Institute } from 'src/institute/entities/institute.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Coordinator]),CandidateModule,InstituteModule],
+  imports:[TypeOrmModule.forFeature([Coordinator,Institute]),CandidateModule,InstituteModule],
   controllers: [AdminCoordinatorController],
   providers: [CoordinatorService,S3Service,InstituteService],
   exports:[CoordinatorService]

@@ -10,7 +10,7 @@ import { S3Service } from 'src/candidate/services/s3.service';
     TypeOrmModule.forFeature([Institute])
   ],
   controllers: [AdminInstitutesController],
-  providers: [InstituteService, S3Service],
+  providers: [InstituteService, S3Service, ],
   exports: [InstituteService]
 })
 export class InstituteModule { }

@@ -26,7 +26,7 @@ export class Session {
     @Column({ nullable: true })
     chestNoPrefix?: string;
     
-    @OneToMany(() => Institute, instiute => instiute.session)
+    @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
 
     @OneToMany(() => Coordinator, coordinator => coordinator.session)

@@ -13,7 +13,13 @@ import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteService } from 'src/institute/institute.service';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
-import { error } from 'console';
+import { IFilter } from 'src/candidate/interfaces/filter.interface';
+import { Admin } from 'src/admin/entities/admin.entity';
+import { AdminService } from 'src/admin/admin.service';
+
+export interface ICoordinatorFilter extends IFilter{
+  sessionID : number
+}
 
 @Injectable()
 export class CoordinatorService {
@@ -23,7 +29,8 @@ export class CoordinatorService {
     private readonly s3Service: S3Service,
     private readonly instituteService: InstituteService,
     private readonly sessionService: SessionService,
-) { }
+    private readonly adminService: AdminService
+  ) {}
 
 async  createCoordinator(
     createCoordinatorDto: CreateCoordinatorDto,
@@ -61,16 +68,17 @@ async  createCoordinator(
   }
 
   
-    public async findAll(sessionID: number = 0): Promise<Coordinator[]> {
+    public async findAll(queryParams:ICoordinatorFilter): Promise<Coordinator[]> {
     try {
       return this.coordinatorRepo.find({
         where: {
           session: {
-            id: sessionID,
+            id: queryParams.sessionID,
             status: SessionStatus.ACTIVE
           }
         }
       });
+      
     } catch (error) {
       throw error;
     }
@@ -95,18 +103,19 @@ async  createCoordinator(
     }
   }
 
-  async updateCoordinator(id: number, updateCoordinatordto: UpdateCoordinatorDto, photo?: Express.Multer.File) {
+  async updateCoordinator(id: number, updateData: UpdateCoordinatorDto, file?: Express.Multer.File) {
     try{
       const coordinator = await this.findOne(id);
       if (!coordinator) throw new NotFoundException("Coordinator not found");
 
-      if(photo) {
+      if(file) {
         await this.s3Service.deleteFile(coordinator.photo);
-        await this.uploadPhoto(coordinator, photo);
+        await this.uploadPhoto( coordinator, file);
       }
-      if (updateCoordinatordto.password)
-      updateCoordinatordto.password = await this.encodePassword(updateCoordinatordto.password)
-      this.coordinatorRepo.update(id,updateCoordinatordto)
+      if (updateData.password)
+      updateData.password = await this.encodePassword(updateData.password)
+
+      await this.coordinatorRepo.save({...coordinator,...updateData})
       return true;
     }catch(error){
       throw error;
@@ -143,7 +152,7 @@ async  createCoordinator(
   }
 
   async usernameAvailabilityCheck(username: string): Promise<boolean> {
-
+    const availableFromAdmin = await this.adminService.findByUsername(username)    
     const availability = await this.coordinatorRepo
     .createQueryBuilder('coordinator')
     .leftJoinAndSelect('coordinator.session', 'session')
@@ -155,9 +164,9 @@ async  createCoordinator(
     // to check whether the username is taken by user, since user isn't found its a TODO
     
     .select('coordinator.id')
-    .andWhere('coordinator.username', { username })
+    .andWhere('coordinator.username= :username', { username })
     .getCount();
-    if (availability > 0) return false; 
+    if (availability ||availableFromAdmin ) return false;     
     return true;}
     
     

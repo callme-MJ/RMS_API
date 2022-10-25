@@ -3,7 +3,7 @@ import {
   Controller,
   Delete,
   Get, Param,
-  ParseIntPipe, Patch, Post, UploadedFile,
+  ParseIntPipe, Patch, Post, Query, UploadedFile,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -13,7 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateCoordinatorDto } from '../dto/create-coordinator.dto';
 import { UpdateCoordinatorDto } from '../dto/update-coordinator.dto';
-import { CoordinatorService } from '../services/coordinator.service';
+import { CoordinatorService, ICoordinatorFilter } from '../services/coordinator.service';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/coordinator')
@@ -32,8 +32,12 @@ export class AdminCoordinatorController {
     }
 
   @Get()
-  findAll() {
-    return this.coordinatorService.findAll();
+  async findAll(@Query()queryParams:ICoordinatorFilter) {
+    try
+    {return await this.coordinatorService.findAll(queryParams);}
+    catch (error){
+      throw error
+    }
   }
   
   @Get(':id')
@@ -42,13 +46,13 @@ export class AdminCoordinatorController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('photo'))
   @UsePipes(ValidationPipe)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateCordinDto: UpdateCoordinatorDto,
+    @Body() updateData: UpdateCoordinatorDto,
     @UploadedFile() photo: Express.Multer.File,) {
-    return this.coordinatorService.updateCoordinator(id, updateCordinDto);
+    return this.coordinatorService.updateCoordinator(+id, updateData,photo);
   }
   @Delete(':id')
     async remove(@Param('id') id: string) {

@@ -40,9 +40,9 @@ export class AdminCandidatesController {
     @Body() payload: CandidateDTO,
     @UploadedFile() photo: Express.Multer.File,
   ) {
-    return await this.candidateService.createCandidate(payload,photo,);
+    return await this.candidateService.createCandidate(payload, photo,);
   }
-  
+
   @SerializeOptions({ groups: ['single'] })
   @Get(':chestNO')
   async findCandidateBychestNO(

@@ -73,13 +73,9 @@ export class CandidateService {
 
   async findAllCandidatesOfInstitute(id: number, queryParams: ICandidateFilter) {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    console.log(loggedInCoordinator.institute.id);
-    // const coordinatorRep =   loggedInCoordinator.getRepository(Coordinator);
-    // const instituteID = await coordinatorRep.find();
     let candidates= await this.candidateRepository.createQueryBuilder('candidates')
     .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
     .getMany();
-    console.log(candidates);
     return candidates;
   }
 
@@ -109,18 +105,14 @@ export class CandidateService {
     await this.checkEligibility(candidateDTO);
 
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
+
     let loggedInCoordinator= await this.coordinatorService.findOne(id);
     if (loggedInCoordinator)
     id=loggedInCoordinator.institute.id || candidateDTO.instituteID;
-      const institute: Institute = await this.instituteService.findOne(id);
-      // const institute: Institute = await this.instituteService.findOne(+candidateDTO.instituteID);
-
-    
-
+    const institute: Institute = await this.instituteService.findOne(id)
     const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
-
+ 
     if (!institute || !category) throw new ValidationException("Institute or Category can't be empty");
-
     let chestNO = await this.getchestNO(candidateDTO);
     candidateDTO.chestNO = chestNO;
     const newCandidate = this.candidateRepository.create(candidateDTO);

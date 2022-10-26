@@ -31,7 +31,7 @@ export class CandidateProgramService {
         throw new NotFoundException('Candidate or Program not found');
 
       const newCandidateProgram: CandidateProgram =
-      await this.candidateProgramRepository.create(createCandidateProgramDTO);
+        await this.candidateProgramRepository.create(createCandidateProgramDTO);
       newCandidateProgram.candidate = candidate;
       newCandidateProgram.program = program;
       await this.candidateProgramRepository.save(newCandidateProgram);
@@ -56,7 +56,7 @@ export class CandidateProgramService {
           'Candidate has not applied for this program',
         );
       return candidateProgram;
-      } catch (error) {}
+    } catch (error) {}
   }
 
   public async update(
@@ -82,6 +82,7 @@ export class CandidateProgramService {
   public async checkEligibility(newCandidateProgram): Promise<boolean> {
     try {
       const { chestNO, programCode } = newCandidateProgram;
+      const sessionID = newCandidateProgram.program.session.id;
       const candidateProgram = await this.candidateProgramRepository
         .createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
@@ -92,6 +93,7 @@ export class CandidateProgramService {
 
       const instituteID = await candidateProgram
         .where('candidate.chestNO = :chestNO', { chestNO })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('institute.id')
         .getRawOne();
 
@@ -105,6 +107,7 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
       const duplicateGroup = await candidateProgram
@@ -117,6 +120,7 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'group',
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
       const groupCountData = await candidateProgram
@@ -142,6 +146,7 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
       if (single > 6) {
@@ -161,6 +166,7 @@ export class CandidateProgramService {
         .andWhere('program.mode = :mode', {
           mode: 'stage',
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -183,6 +189,7 @@ export class CandidateProgramService {
         .where('program.program_code = :programCode', {
           programCode,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('program.curb_group')
         .getRawOne();
       let result = Object.values(JSON.parse(JSON.stringify(curbGroupData)));
@@ -195,6 +202,7 @@ export class CandidateProgramService {
         .andWhere('program.curb_group = :curbGroup', {
           curbGroup,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -202,6 +210,7 @@ export class CandidateProgramService {
         .where('program.program_code = :programCode', {
           programCode,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('program.max_count_curb')
         .getRawOne();
       let result1 = Object.values(JSON.parse(JSON.stringify(maxCurbGroupData)));
@@ -218,6 +227,7 @@ export class CandidateProgramService {
         .where('program.program_code = :programCode', {
           programCode,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('program.language_group')
         .getRawOne();
       let result2 = Object.values(
@@ -232,6 +242,7 @@ export class CandidateProgramService {
         .andWhere('program.language_group = :languageGroup', {
           languageGroup,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 

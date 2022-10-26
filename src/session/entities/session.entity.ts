@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
+import { Candidate } from 'src/candidate/entities/candidate.entity';
 
 export enum SessionStatus {
     INACTIVE,
@@ -28,6 +29,9 @@ export class Session {
     
     @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
+    
+    @OneToMany(() => Candidate, candidate => candidate.session)
+    candidates: Candidate[]
 
     @OneToMany(() => Coordinator, coordinator => coordinator.session)
     coordinators: Coordinator[]

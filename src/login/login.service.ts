@@ -14,12 +14,15 @@ import { IAuthenticate } from './interfaces/authenticate.interface';
 import { IAuthenticatedUser } from './interfaces/authenticated-user.interface';
 import { ITokens } from './interfaces/tokens.interface';
 import { UserTypes } from './interfaces/user-types.enum';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class LoginService {
   constructor(
     private readonly adminService: AdminService,
     private readonly coordinatorService: CoordinatorService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService
   ) { }
@@ -41,7 +44,15 @@ export class LoginService {
     }
   }
 
-  public async validateUser(
+  public async validateUser(payload:IAuthenticate):Promise<User>{
+    try{
+      return await this.userService.findByUsername(payload.username)
+    }catch(error){
+      throw error
+    }
+  }
+
+  public async validate(
     credentials: IAuthenticate,
     type: UserTypes,
   ): Promise<IAuthenticatedUser> {
@@ -55,6 +66,9 @@ export class LoginService {
 
         case UserTypes.COORDINATOR:
           user = await this.validateCoordinator(credentials);
+
+        case UserTypes.USER:
+          user = await this.validateUser(credentials)
           
           break;
           default:
@@ -69,7 +83,7 @@ export class LoginService {
 
   public async login(credentials: LoginDTO, type: UserTypes): Promise<ITokens> {
     try {
-      const user = await this.validateUser(credentials, type);
+      const user = await this.validate(credentials, type);
 
       if (!user) {
         throw new NotFoundException('User does not exist');
@@ -97,6 +111,9 @@ export class LoginService {
 
         case UserTypes.COORDINATOR:
           return this.coordinatorService.findByColumn(column, value);
+
+          case UserTypes.USER:
+            return this.userService.findByColumn(column,value);
         default:
           throw new ValidationException("Invalid user type");
       }
@@ -109,7 +126,7 @@ export class LoginService {
     const payload = {
       id: user.id,
       username: user.username,
-      type: user.type
+      type: user.type,
     };
 
     const options = {
@@ -151,7 +168,7 @@ export class LoginService {
         id: user.id,
         username: user.username,
         password: user.password,
-        type
+        type,
       });
 
     } catch (error) {

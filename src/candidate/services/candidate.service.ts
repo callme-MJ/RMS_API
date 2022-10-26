@@ -1,16 +1,15 @@
-import { createParamDecorator, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
-import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { ValidationException } from 'src/exceptions/validation-exception';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteService } from 'src/institute/institute.service';
 import { SessionService } from 'src/session/session.service';
-import { DataSource, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { Candidate, Gender } from '../entities/candidate.entity';
@@ -31,6 +30,7 @@ export class CandidateService {
     // private readonly coordinatorRepo: Repository<Coordinator>,
     private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
+    private readonly sessionService: SessionService,
     private readonly instituteService: InstituteService,
     private readonly categoryService: CategoryService
   ) { }

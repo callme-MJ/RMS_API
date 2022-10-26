@@ -14,6 +14,7 @@ import { LoginModule } from './login/login.module';
 import { AdminModule } from './admin/admin.module';
 import { CandidateModule } from './candidate/candidate.module';
 import { CoordinatorModule } from './coordinator/coordinator.module';
+import { UserModule } from './user/user.module';
 
 
 @Module({
@@ -85,7 +86,8 @@ import { CoordinatorModule } from './coordinator/coordinator.module';
     InstituteModule,
     AdminModule,
     LoginModule,
-    CoordinatorModule
+    CoordinatorModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],

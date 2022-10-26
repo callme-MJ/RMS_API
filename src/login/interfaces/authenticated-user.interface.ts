@@ -4,5 +4,5 @@ export interface IAuthenticatedUser {
     id: number;
     username: string;
     password: string;
-    type: UserTypes
+    type: UserTypes;
 }

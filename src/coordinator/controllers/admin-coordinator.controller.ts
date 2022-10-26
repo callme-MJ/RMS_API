@@ -32,7 +32,7 @@ export class AdminCoordinatorController {
     }
 
   @Get()
-  async findAll(@Query()queryParams:ICoordinatorFilter) {
+  async findAll(@Query() queryParams:ICoordinatorFilter) {
     try
     {return await this.coordinatorService.findAll(queryParams);}
     catch (error){

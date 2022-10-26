@@ -52,19 +52,17 @@ export class Candidate {
   @OneToMany(() => Session, (session) => session.candidates)
   sessions: Session[];
 
-  @OneToMany(()=> CandidateProgram,(candidateProgram)=>candidateProgram.candidate)
+  @OneToMany(
+    () => CandidateProgram,
+    (candidateProgram) => candidateProgram.candidate, { eager: true }
+  )
   candidatePrograms: CandidateProgram[];
 
-  // @OneToMany(
-  //   () => CandidateProgram,
-  //   (candidateProgram) => candidateProgram.candidate,
-  // )
-  // candidatePrograms: CandidateProgram[];
-
-  @ManyToOne(() => Institute, (institute) => institute.candidates, { eager: true })
+  @ManyToOne(() => Institute, (institute) => institute.candidates, {
+    eager: true,
+  })
   institute: Institute;
 
- 
   @ManyToOne(() => Category, (category) => category.candidates, { eager: true })
   category: Category;
 

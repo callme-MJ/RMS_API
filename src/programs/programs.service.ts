@@ -37,17 +37,17 @@ export class ProgramsService {
     }
   }
 
-  public async findAll(): Promise<Program[]> {
+  public async findAll(sessionID:number =0): Promise<Program[]> {
     try {
-      return this.programRepository.find()
-      // return this.programRepository.find({
-      //   where: {
-      //     session: {
-      //       id: sessionID,
-      //       status: SessionStatus.ACTIVE,
-      //     },
-      //   },
-      // });
+      // return this.programRepository.find()
+      return this.programRepository.find({
+        where: {
+          session: {
+            id: sessionID,
+            status: SessionStatus.ACTIVE,
+          },
+        },
+      });
     } catch (error) {
       throw error;
     }

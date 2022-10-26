@@ -1,18 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,
+  UsePipes,
+  ValidationPipe
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CandidateProgramService } from './candidate-program.service';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
 
-// @UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidate-program')
+@UseGuards(AuthGuard('jwt-admin'))
+@Controller('admin/candidate-programs')
 export class CandidateProgramController {
-  constructor(private readonly candidateProgramService: CandidateProgramService) {}
+  constructor(
+    private readonly candidateProgramService: CandidateProgramService,
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
   create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
-  return this.candidateProgramService.create(createCandidateProgramDto);
+    return this.candidateProgramService.create(createCandidateProgramDto);
   }
 
   @Get()
@@ -26,7 +32,10 @@ export class CandidateProgramController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCandidateProgramDto: UpdateCandidateProgramDTO) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCandidateProgramDto: UpdateCandidateProgramDTO,
+  ) {
     return this.candidateProgramService.update(+id, updateCandidateProgramDto);
   }
 

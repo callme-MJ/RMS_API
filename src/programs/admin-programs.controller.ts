@@ -14,7 +14,7 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { ProgramsService } from './programs.service';
 
-@UseGuards(AuthGuard('jwt-admin'))
+// @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/programs')
 export class AdminProgramsController {
   constructor(private readonly programsService: ProgramsService) {}
@@ -24,18 +24,14 @@ export class AdminProgramsController {
     return this.programsService.create(createProgramDto);
   }
   @Get()
-  findAll(){
-    return this.programsService.findAll();
+  findAll(@Query('session_id') sessionID: number = 0) {
+    return this.programsService.findAll(+sessionID);
   }
 
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.programsService.findOne(+id);
   }
-  // @Get(':id')
-  // findOneByProgramCode(@Param('programCode') programCode: string) {
-  //   return this.programsService.findOneByProgramCode(programCode);
-  // }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProgramDto: UpdateProgramDto) {

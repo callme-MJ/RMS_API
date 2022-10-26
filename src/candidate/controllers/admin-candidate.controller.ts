@@ -18,7 +18,7 @@ import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { CandidateService, ICandidateFilter } from '../services/candidate.service';
 
-@UseGuards(AuthGuard('jwt-admin'))
+// @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidates')
 export class AdminCandidatesController {
   constructor(
@@ -57,8 +57,8 @@ export class AdminCandidatesController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
+  @UseInterceptors(FileInterceptor('photo'))
   async updateCandidate(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateCandidateDTO,

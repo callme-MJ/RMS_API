@@ -13,6 +13,7 @@ import { SessionModule } from 'src/session/session.module';
     TypeOrmModule.forFeature([Program])
   ],
   controllers: [AdminProgramsController],
-  providers: [ProgramsService]
+  providers: [ProgramsService],
+  exports: [ProgramsService]
 })
 export class ProgramsModule {}

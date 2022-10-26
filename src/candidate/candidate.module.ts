@@ -14,6 +14,7 @@ import { InstituteModule } from 'src/institute/institute.module';
     InstituteModule
   ],
   controllers: [AdminCandidatesController],
-  providers: [CandidateService, S3Service]
+  providers: [CandidateService, S3Service],
+  exports: [CandidateService]
 })
 export class CandidateModule { }

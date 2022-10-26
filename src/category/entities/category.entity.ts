@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { Program } from 'src/programs/entities/program.entity';
 import { Session } from 'src/session/entities/session.entity';
 import {
@@ -27,4 +28,7 @@ export class Category {
 
   @OneToMany(() => Program, (program) => program.category)
   programs: Program[];
+
+  @OneToMany(() => Candidate, (Candidate) => Candidate.category)
+  candidates: Candidate[];
 }

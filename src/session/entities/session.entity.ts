@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/programs/entities/program.entity';
+import { Candidate } from 'src/candidate/entities/candidate.entity';
 
 export enum SessionStatus {
     INACTIVE,
@@ -31,6 +32,9 @@ export class Session {
 
     @OneToMany(() => Program, program => program.session)
     programs: Program[]
+
+    @OneToMany(() => Candidate, candidate => candidate.session)
+    candidates: Candidate[]
 
     @Expose({ groups: ['single'], name: 'created_at' })
     @CreateDateColumn()

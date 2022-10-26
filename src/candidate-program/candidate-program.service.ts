@@ -31,7 +31,7 @@ export class CandidateProgramService {
         throw new NotFoundException('Candidate or Program not found');
 
       const newCandidateProgram: CandidateProgram =
-        await this.candidateProgramRepository.create(createCandidateProgramDTO);
+      await this.candidateProgramRepository.create(createCandidateProgramDTO);
       newCandidateProgram.candidate = candidate;
       newCandidateProgram.program = program;
       await this.candidateProgramRepository.save(newCandidateProgram);
@@ -56,7 +56,7 @@ export class CandidateProgramService {
           'Candidate has not applied for this program',
         );
       return candidateProgram;
-    } catch (error) {}
+      } catch (error) {}
   }
 
   public async update(

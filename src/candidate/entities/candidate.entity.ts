@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -54,16 +55,16 @@ export class Candidate {
 
   @OneToMany(
     () => CandidateProgram,
-    (candidateProgram) => candidateProgram.candidate, { eager: true }
+    (candidateProgram) => candidateProgram.candidate,
   )
   candidatePrograms: CandidateProgram[];
 
-  @ManyToOne(() => Institute, (institute) => institute.candidates, {
-    eager: true,
-  })
+  @ManyToOne(() => Institute, (institute) => institute.candidates, {eager:true})
+  @JoinTable()
   institute: Institute;
 
-  @ManyToOne(() => Category, (category) => category.candidates, { eager: true })
+  @ManyToOne(() => Category, (category) => category.candidates, {eager:true})
+  @JoinTable()
   category: Category;
 
   @ManyToOne(() => Session)

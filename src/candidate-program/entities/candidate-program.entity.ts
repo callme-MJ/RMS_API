@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { Program } from 'src/programs/entities/program.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
@@ -48,11 +48,11 @@ export class CandidateProgram {
   @Column({ nullable: true })
   isSelected: number;
 
-  @ManyToOne(() => Program, (program) => program.candidatePrograms, {
-    eager: true,
-  })
+  @ManyToOne(() => Program, (program) => program.candidatePrograms, { eager: true })
+  @JoinTable()
   program: Program;
 
-  @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms)
+  @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, { eager: true })
+  @JoinTable()
   candidate: Candidate;
 }

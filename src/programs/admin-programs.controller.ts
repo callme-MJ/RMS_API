@@ -14,7 +14,7 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { ProgramsService } from './programs.service';
 
-// @UseGuards(AuthGuard('jwt-admin'))
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/programs')
 export class AdminProgramsController {
   constructor(private readonly programsService: ProgramsService) {}

@@ -5,7 +5,7 @@ import { UpdateInstituteDTO } from './dto/update-institute.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 
-// @UseGuards(AuthGuard('jwt-admin'))
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/institutes')
 export class AdminInstitutesController {
   constructor(private readonly instituteService: InstituteService) { }

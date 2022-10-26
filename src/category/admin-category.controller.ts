@@ -4,7 +4,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDTO } from './dto/create-category.dto';
 import { UpdateCategoryDTO } from './dto/update-category.dto';
 
-// @UseGuards(AuthGuard('jwt-admin'))
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/categories')
 export class AdminCategoryController {
   constructor(private readonly categoryService: CategoryService) { }

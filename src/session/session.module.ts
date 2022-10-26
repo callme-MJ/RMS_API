@@ -13,4 +13,4 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [SessionService],
   exports: [SessionService]
 })
-export class SessionModule {}
+export class SessionModule { }

@@ -1,12 +1,12 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
-import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import {
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn,
-    Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
 @Entity({ name: 'program' })
 export class Program {
@@ -79,24 +79,24 @@ export class Program {
   @Column()
   skill: string;
 
-  @OneToMany(()=> CandidateProgram,(candidateProgram)=>candidateProgram.program)
+  @OneToMany(() => CandidateProgram, (candidateProgram) => candidateProgram.program)
   candidatePrograms: CandidateProgram[];
-  
+
   @ManyToOne(() => Category, (category) => category.programs)
   category: Category;
 
-  @ManyToOne(() => Session, (session) => session.programs, { eager: true })
+  @ManyToOne(() => Session, (session) => session.programs)
   session: Session;
 
-  @Expose({ groups: ['single'], name: 'created_at'})
+  @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
-  
-  @Expose({ groups: ['single'], name: 'updated_at'})
+
+  @Expose({ groups: ['single'], name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Exclude()
+  @Expose()
   @DeleteDateColumn()
   deletedAt: Date;
 }

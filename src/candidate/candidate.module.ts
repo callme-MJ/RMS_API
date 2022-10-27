@@ -8,10 +8,10 @@ import { CategoryModule } from 'src/category/category.module';
 import { InstituteModule } from 'src/institute/institute.module';
 import { CoordinatorCandidatesController } from './controllers/coordinator-candidate.controller';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
-import { CoordinatorModule } from 'src/coordinator/coordinator.module';
 import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { AdminService } from 'src/admin/admin.service';
 import { Admin } from 'src/admin/entities/admin.entity';
+import { ControllerCandidatesController } from './controllers/controller-candidate.controller';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { Admin } from 'src/admin/entities/admin.entity';
     CategoryModule,
     InstituteModule,
   ],
-  controllers: [AdminCandidatesController,CoordinatorCandidatesController],
+  controllers: [AdminCandidatesController,CoordinatorCandidatesController,ControllerCandidatesController],
   providers: [CandidateService, S3Service,CoordinatorService,AdminService],
   exports: [CandidateService]
 })

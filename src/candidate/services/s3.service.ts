@@ -44,6 +44,7 @@ export class S3Service {
     };
 
     try {
+      
       // TODO: Resize the image before upload
       return await this.s3.upload(params).promise();
     } catch (error) {

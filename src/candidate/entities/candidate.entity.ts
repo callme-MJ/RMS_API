@@ -65,7 +65,8 @@ export class Candidate {
   @JoinTable()
   category: Category;
 
-  @ManyToOne(() => Session)
+  @Expose({ name: 'session_id' })
+  @ManyToOne(() => Session,(session)=>session.candidates,{eager:true})
   session: Session;
 
   @Expose({ groups: ['single'], name: 'created_at' })

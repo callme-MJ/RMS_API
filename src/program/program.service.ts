@@ -19,7 +19,7 @@ export class ProgramsService {
     private readonly programRepository: Repository<Program>,
     private readonly categoryService: CategoryService,
     private readonly sessionService: SessionService,
-  ) {}
+  ) { }
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {
     try {
@@ -41,13 +41,13 @@ export class ProgramsService {
     }
   }
 
-  public async findAll(sessionID:number =0): Promise<Program[]> {
+  public async findAll(sessionID: number = 0): Promise<Program[]> {
     try {
       // return this.programRepository.find()
       return this.programRepository.find({
         where: {
           session: {
-            id: queryParams.sessionID,
+            id: sessionID,
             status: SessionStatus.ACTIVE,
           },
         },
@@ -59,9 +59,9 @@ export class ProgramsService {
 
   public async findOne(id: number): Promise<Program> {
     try {
-      let program = await this.programRepository.findOneBy({id});
+      let program = await this.programRepository.findOneBy({ id });
       // console.log(program);
-      
+
       // if (!program) throw new NotFoundException('Program not found');
       // if (!program.session || !program.session.status) return null;
       return program;

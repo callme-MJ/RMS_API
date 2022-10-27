@@ -2,8 +2,9 @@ import { Exclude, Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Program } from 'src/program/entities/program.entity';
 
 export enum SessionStatus {
   INACTIVE,
@@ -31,11 +32,14 @@ export class Session {
     @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
 
-    @OneToMany(() => Coordinator, coordinator => coordinator.session)
-    coordinators: Coordinator[]
-
+    @OneToMany(() => Program, program => program.session)
+    programs: Program[]
+    
     @OneToMany(() => Candidate, candidate => candidate.session)
     candidates: Candidate[]
+
+    @OneToMany(() => Coordinator, coordinator => coordinator.session)
+    coordinators: Coordinator[]
 
     @Expose({ groups: ['single'], name: 'created_at' })
     @CreateDateColumn()

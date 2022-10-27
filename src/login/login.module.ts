@@ -10,10 +10,14 @@ import { JwtAdminStrategy } from './admin/strategies/jwt-admin-strategy';
 import { CoordinatorLoginController } from './coordinator/login.controller';
 import { JwtCoordinatorStrategy } from './coordinator/strategies/jwt-coordinator-strategy';
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
+import { UserLoginController } from './user/login.controller';
+import { JwtUserStrategy } from './user/strategies/user-jwt-strategy';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     AdminModule,
+    UserModule,
     CoordinatorModule,
     PassportModule.register({ defaultStrategy: 'jwt-admin', session: false }),
     JwtModule.registerAsync({
@@ -29,8 +33,9 @@ import { CoordinatorModule } from 'src/coordinator/coordinator.module';
   controllers: [
     LoginController,
     AdminLoginController,
-    CoordinatorLoginController
+    CoordinatorLoginController,
+    UserLoginController
   ],
-  providers: [LoginService, JwtAdminStrategy, JwtCoordinatorStrategy ]
+  providers: [LoginService, JwtAdminStrategy, JwtCoordinatorStrategy, JwtUserStrategy ]
 })
 export class LoginModule {}

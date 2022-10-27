@@ -16,6 +16,7 @@ import { CoordinatorModule } from './coordinator/coordinator.module';
 import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
+import { UserModule } from './user/user.module';
 
 
 @Module({
@@ -90,7 +91,8 @@ import { AdminModule } from './admin/admin.module';
     AdminModule,
     LoginModule,
     CoordinatorModule,
-    ProgramModule,
+    ProgramModule,,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],

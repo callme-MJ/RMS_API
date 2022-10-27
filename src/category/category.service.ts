@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
@@ -14,6 +15,7 @@ export class CategoryService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     private readonly sessionService: SessionService,
+    private readonly coordinatorService: CoordinatorService,
   ) {}
 
   public async create(payload: CreateCategoryDTO): Promise<Category> {
@@ -30,6 +32,24 @@ export class CategoryService {
 
   public async findAll(sessionID: number = 0): Promise<Category[]> {
     try {
+      return this.categoryRepository.find({
+        where: {
+          session: {
+            id: sessionID,
+            status: SessionStatus.ACTIVE,
+          },
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async findAllForCoordinator(session:number): Promise<Category[]> {
+    try {
+
+      const coordinator = await this.coordinatorService.findOne(session); 
+      const sessionID = coordinator.session.id;
       return this.categoryRepository.find({
         where: {
           session: {

@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, SerializeOptions, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CategoryService } from './category.service';
-import { CreateCategoryDTO } from './dto/create-category.dto';
-import { UpdateCategoryDTO } from './dto/update-category.dto';
+import { CategoryService } from '../category.service';
+import { CreateCategoryDTO } from '../dto/create-category.dto';
+import { UpdateCategoryDTO } from '../dto/update-category.dto';
+
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/categories')

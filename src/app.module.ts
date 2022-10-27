@@ -21,9 +21,6 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    CandidateProgramModule,
-    SessionModule,
-    SessionModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -92,7 +89,9 @@ import { UserModule } from './user/user.module';
     LoginModule,
     CoordinatorModule,
     ProgramModule,
-    UserModule
+    UserModule,
+    CandidateProgramModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

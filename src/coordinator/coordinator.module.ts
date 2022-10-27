@@ -13,9 +13,11 @@ import { Coordinator } from './entities/coordinator.entity';
 import { CoordinatorService } from './services/coordinator.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Coordinator,Institute,Admin]),CandidateModule,InstituteModule,AdminModule],
+  imports:[TypeOrmModule.forFeature([Coordinator,Institute,Admin]),
+  InstituteModule,
+  AdminModule],
   controllers: [AdminCoordinatorController],
-  providers: [CoordinatorService,S3Service,InstituteService,AdminService],
+  providers: [CoordinatorService,S3Service],
   exports:[CoordinatorService]
 })
 export class CoordinatorModule {}

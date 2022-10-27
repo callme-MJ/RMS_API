@@ -17,5 +17,6 @@ import { CoordinatorModule } from 'src/coordinator/coordinator.module';
   ],
   controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController],
   providers: [CandidateProgramService],
+  exports: [CandidateProgramService]
 })
 export class CandidateProgramModule { }

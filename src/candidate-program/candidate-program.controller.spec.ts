@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CandidateProgramController } from './admin-candidate-program.controller';
+import { CandidateProgramController } from './controllers/admin-candidate-program.controller';
 import { CandidateProgramService } from './candidate-program.service';
 
 describe('CandidateProgramController', () => {

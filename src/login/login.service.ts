@@ -90,7 +90,7 @@ export class LoginService {
       if (!user) {
         throw new NotFoundException('User does not exist');
       }
-
+      // const isPasswordCorrect = (credentials.password === user.password)
       const isPasswordCorrect = await bcrypt.compare(
         credentials.password,
         user.password,

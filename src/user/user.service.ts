@@ -28,7 +28,7 @@ async  createUser(createUserDto: CreateUserDto) {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.userRepo.findOneBy({id});
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) 

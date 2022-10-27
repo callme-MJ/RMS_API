@@ -78,7 +78,7 @@ export class CandidateService {
     .getMany();
     return candidates;
   }
-
+ 
   findCandidateByID(id: number): Promise<Candidate> {
     try {
       return this.candidateRepository.findOne({

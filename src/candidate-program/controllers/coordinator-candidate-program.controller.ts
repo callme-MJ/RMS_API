@@ -6,21 +6,24 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Request,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CandidateProgramService } from './candidate-program.service';
-import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
-import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
+import { ICandidateFilter } from 'src/candidate/services/candidate.service';
+import { CandidateProgramService } from '../candidate-program.service';
+import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
+import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidate-programs')
-export class CandidateProgramController {
+@UseGuards(AuthGuard('jwt-coordinator'))
+@Controller('coordinator/candidate-programs')
+export class CoordinatorCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
-  ) {}
+  ) { }
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -29,8 +32,13 @@ export class CandidateProgramController {
   }
 
   @Get()
-  findAll() {
-    return this.candidateProgramService.findAll();
+  async getAllCandidteProgramsOfInstitute
+    (@Request() req: any, @Query() queryParams: ICandidateFilter) {
+      try {
+        return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(req.user.id, queryParams);
+      } catch (error) {
+        throw error;
+      }
   }
 
   @Get(':id')

@@ -10,6 +10,11 @@ export class AdminService {
         private readonly adminRepository: Repository<Admin>
     ) { }
 
+    public async findByID(id: number): Promise<Admin> {
+        return this.adminRepository.findOneBy({id})
+    }
+
+    
     public async findByUsername(username: string): Promise<Admin> {
         try {
             return this.adminRepository.findOne({

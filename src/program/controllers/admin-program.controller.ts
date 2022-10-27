@@ -10,14 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateProgramDto } from './dto/create-program.dto';
-import { UpdateProgramDto } from './dto/update-program.dto';
-import { IProgramFilter, ProgramsService } from './program.service';
+import { CreateProgramDto } from '../dto/create-program.dto';
+import { UpdateProgramDto } from '../dto/update-program.dto';
+import { IProgramFilter, ProgramsService } from '../program.service';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/programs')
 export class AdminProgramsController {
-  constructor(private readonly programsService: ProgramsService) {}
+  constructor(private readonly programsService: ProgramsService) { }
 
   @Post()
   create(@Body() createProgramDto: CreateProgramDto) {

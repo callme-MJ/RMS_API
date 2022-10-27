@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
-import { CandidateService } from 'src/candidate/services/candidate.service';
+import { CandidateService, ICandidateFilter } from 'src/candidate/services/candidate.service';
+import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { Program } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Repository } from 'typeorm';
@@ -15,6 +16,7 @@ export class CandidateProgramService {
     @InjectRepository(CandidateProgram)
     private readonly candidateProgramRepository: Repository<CandidateProgram>,
     private readonly candidateService: CandidateService,
+    private readonly coordinatorService: CoordinatorService,
     private readonly programsService: ProgramsService,
   ) {}
   public async create(createCandidateProgramDTO: CreateCandidateProgramDTO) {
@@ -44,6 +46,14 @@ export class CandidateProgramService {
 
   public async findAll() {
     return this.candidateProgramRepository.find();
+  }
+
+  public async findAllCandidateProgramsOfInstitute(id: number, queryParams: ICandidateFilter){
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    let candidatePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    .where('candidatePrograms.program.institute.id = :instituteId', {instituteId: loggedInCoordinator.institute.id})
+    .getMany()
+    return candidatePrograms;
   }
 
   public async findOne(id: number) {

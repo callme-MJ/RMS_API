@@ -86,13 +86,10 @@ async  createCoordinator(
   
 
   public async findByUsername(username: string): Promise<Coordinator> {
-    try {
-        return this.coordinatorRepo.findOne({
-            where: { username }
-        });
-    } catch (error) {
-        throw error;
-    }
+   return  this.coordinatorRepo.findOne({
+    where: {username}
+  });
+   
 }
 
   findOne(id: number) {

@@ -15,7 +15,7 @@ import { CreateCoordinatorDto } from '../dto/create-coordinator.dto';
 import { UpdateCoordinatorDto } from '../dto/update-coordinator.dto';
 import { CoordinatorService, ICoordinatorFilter } from '../services/coordinator.service';
 
-@UseGuards(AuthGuard('jwt-admin'))
+// @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/coordinator')
 export class AdminCoordinatorController {
   constructor(

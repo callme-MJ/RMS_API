@@ -63,16 +63,18 @@ export class LoginService {
 
         case UserTypes.ADMIN:
           user = await this.validateAdmin(credentials);
+        break;
 
         case UserTypes.COORDINATOR:
           user = await this.validateCoordinator(credentials);
+          break;
 
         case UserTypes.USER:
           user = await this.validateUser(credentials)
-          
           break;
+
           default:
-          throw new ValidationException("User's role is not valid");
+            throw new ValidationException("User's role is not valid");
       }
 
       return user;
@@ -84,7 +86,7 @@ export class LoginService {
   public async login(credentials: LoginDTO, type: UserTypes): Promise<ITokens> {
     try {
       const user = await this.validate(credentials, type);
-
+      
       if (!user) {
         throw new NotFoundException('User does not exist');
       }

@@ -5,7 +5,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CandidateModule } from './candidate/candidate.module';
@@ -13,8 +12,9 @@ import { CategoryModule } from './category/category.module';
 import { InstituteModule } from './institute/institute.module';
 import { LoginModule } from './login/login.module';
 import { AdminModule } from './admin/admin.module';
-import { CandidateModule } from './candidate/candidate.module';
 import { CoordinatorModule } from './coordinator/coordinator.module';
+import { ProgramModule } from './program/program.module';
+import { SessionModule } from './session/session.module';
 
 
 @Module({

@@ -1,11 +1,12 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
 @Entity({ name: 'program' })
 export class Program {
@@ -78,7 +79,10 @@ export class Program {
   @Column()
   skill: string;
 
-  @ManyToOne(() => Category, (category) => category.programs, { eager: true })
+  @OneToMany(()=> CandidateProgram,(candidateProgram)=>candidateProgram.program)
+  candidatePrograms: CandidateProgram[];
+  
+  @ManyToOne(() => Category, (category) => category.programs)
   category: Category;
 
   @ManyToOne(() => Session, (session) => session.programs, { eager: true })

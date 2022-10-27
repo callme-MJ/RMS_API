@@ -57,8 +57,8 @@ export class AdminCandidatesController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
+  @UseInterceptors(FileInterceptor('photo'))
   async updateCandidate(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateCandidateDTO,

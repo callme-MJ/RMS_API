@@ -7,19 +7,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CandidateProgramModule } from './candidate-program/candidate-program.module';
 import { CandidateModule } from './candidate/candidate.module';
 import { CategoryModule } from './category/category.module';
 import { InstituteModule } from './institute/institute.module';
 import { LoginModule } from './login/login.module';
-import { AdminModule } from './admin/admin.module';
 import { CoordinatorModule } from './coordinator/coordinator.module';
 import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
+import { AdminModule } from './admin/admin.module';
 
 
 @Module({
   imports: [
-    ProgramModule,
+    CandidateProgramModule, 
+    SessionModule,
     SessionModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -87,7 +89,8 @@ import { SessionModule } from './session/session.module';
     InstituteModule,
     AdminModule,
     LoginModule,
-    CoordinatorModule
+    CoordinatorModule,
+    ProgramModule,
   ],
   controllers: [AppController],
   providers: [AppService],

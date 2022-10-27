@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateProgramDto } from './dto/create-program.dto';
@@ -23,14 +23,13 @@ export class AdminProgramsController {
   create(@Body() createProgramDto: CreateProgramDto) {
     return this.programsService.create(createProgramDto);
   }
-
   @Get()
-  findAll(@Query() queryParams: IProgramFilter) {
-    return this.programsService.findAll(queryParams);
+  findAll(@Query('session_id') sessionID: number = 0) {
+    return this.programsService.findAll(+sessionID);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.programsService.findOne(+id);
   }
 

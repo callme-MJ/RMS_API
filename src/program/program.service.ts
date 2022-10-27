@@ -41,8 +41,9 @@ export class ProgramsService {
     }
   }
 
-  public async findAll(queryParams: IProgramFilter): Promise<Program[]> {
+  public async findAll(sessionID:number =0): Promise<Program[]> {
     try {
+      // return this.programRepository.find()
       return this.programRepository.find({
         where: {
           session: {
@@ -58,11 +59,24 @@ export class ProgramsService {
 
   public async findOne(id: number): Promise<Program> {
     try {
+      let program = await this.programRepository.findOneBy({id});
+      // console.log(program);
+      
+      // if (!program) throw new NotFoundException('Program not found');
+      // if (!program.session || !program.session.status) return null;
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+  public async findOneByProgramCode(programCode: string): Promise<Program> {
+    try {
       let program: Program = await this.programRepository.findOne({
-        where: { id },
+        where: { programCode },
       });
-      if (!program) throw new NotFoundException('Category not found');
-      if (!program.session || !program.session.status) return null;
+      // console.log(program);
+      // if (!program) throw new NotFoundException('Program not found');
+      // if (!program.session || !program.session.status) return null;
       return program;
     } catch (error) {
       throw error;

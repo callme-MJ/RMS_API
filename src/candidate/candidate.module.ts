@@ -21,5 +21,6 @@ import { Admin } from 'src/admin/entities/admin.entity';
   ],
   controllers: [AdminCandidatesController,CoordinatorCandidatesController],
   providers: [CandidateService, S3Service,CoordinatorService,AdminService],
+  exports: [CandidateService]
 })
 export class CandidateModule { }

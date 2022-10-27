@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { Expose } from 'class-transformer';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/programs/entities/program.entity';
+import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 
 export enum SessionStatus {
     INACTIVE,
@@ -26,8 +27,11 @@ export class Session {
     @Column({ nullable: true })
     chestNoPrefix?: string;
     
-    @OneToMany(() => Institute, instiute => instiute.session)
+    @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
+
+    @OneToMany(() => Coordinator, coordinator => coordinator.session)
+    coordinators: Coordinator[]
 
     @OneToMany(() => Program, program => program.session)
     programs: Program[]

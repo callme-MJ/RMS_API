@@ -10,5 +10,6 @@ import { ProgramsService } from './program.service';
   imports: [CategoryModule, SessionModule, TypeOrmModule.forFeature([Program])],
   controllers: [AdminProgramsController],
   providers: [ProgramsService],
+  exports:[ProgramsService]
 })
 export class ProgramModule {}

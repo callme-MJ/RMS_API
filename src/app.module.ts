@@ -21,7 +21,7 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    CandidateProgramModule, 
+    CandidateProgramModule,
     SessionModule,
     SessionModule,
     ConfigModule.forRoot({
@@ -91,10 +91,10 @@ import { UserModule } from './user/user.module';
     AdminModule,
     LoginModule,
     CoordinatorModule,
-    ProgramModule,,
+    ProgramModule,
     UserModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

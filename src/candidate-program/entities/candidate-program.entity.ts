@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
-import { Program } from 'src/programs/entities/program.entity';
+import { Program } from 'src/program/entities/program.entity';
 import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'candidate_program' })

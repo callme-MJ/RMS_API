@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { Repository } from 'typeorm';
 import { Session, SessionStatus } from './entities/session.entity';
+import { CreateSessionDTO } from './dto/create-session.dto';
 
 @Injectable()
 export class SessionService {
@@ -71,4 +72,13 @@ export class SessionService {
       throw error;
     }
   }
+
+    // public async create(payload: CreateSessionDTO) : Promise<Session[]> {
+    //     try {
+    //         return await this.sessionRepository.save(payload);
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
 }

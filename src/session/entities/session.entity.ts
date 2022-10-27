@@ -1,15 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
-import { Program } from 'src/programs/entities/program.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm';
+import { Program } from 'src/program/entities/program.entity';
 
 export enum SessionStatus {
   INACTIVE,
@@ -27,15 +19,15 @@ export class Session {
   @Column({ default: true })
   status: SessionStatus;
 
-  @Column()
-  year: number;
-
-  @Expose({ name: 'chest_no_prefix' })
-  @Column({ nullable: true })
-  chestNoPrefix?: string;
-
-  @OneToMany(() => Program, (program) => program.session)
-  programs: Program[];
+    @Column()
+    year: number;
+    
+    @Expose({ name: 'chest_no_prefix'})
+    @Column({ nullable: true })
+    chestNoPrefix?: string;
+    
+    @OneToMany(() => Institute, institute => institute.session)
+    institutes: Institute[]
 
   @OneToMany(() => Institute, (instiute) => instiute.session)
   institutes: Institute[];

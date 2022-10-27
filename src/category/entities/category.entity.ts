@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { Program } from 'src/programs/entities/program.entity';
+import { Program } from 'src/program/entities/program.entity';
 import { Session } from 'src/session/entities/session.entity';
 import {
   Column,

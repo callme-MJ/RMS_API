@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AdminProgramsController } from './admin-programs.controller';
-import { ProgramsService } from './programs.service';
+import { AdminProgramsController } from './admin-program.controller';
+import { ProgramsService } from './program.service';
 
 describe('ProgramsController', () => {
   let controller: AdminProgramsController;

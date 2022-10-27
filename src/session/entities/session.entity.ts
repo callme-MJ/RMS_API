@@ -2,6 +2,14 @@ import { Exclude, Expose } from 'class-transformer';
 import { Category } from 'src/category/entities/category.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/program/entities/program.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from 'typeorm';
 
 export enum SessionStatus {
   INACTIVE,
@@ -29,8 +37,6 @@ export class Session {
     @OneToMany(() => Institute, institute => institute.session)
     institutes: Institute[]
 
-  @OneToMany(() => Institute, (instiute) => instiute.session)
-  institutes: Institute[];
 
   @OneToMany(() => Category, (category) => category.session)
   category: Category[];

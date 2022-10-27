@@ -12,8 +12,10 @@ import { CandidateModule } from './candidate/candidate.module';
 import { CategoryModule } from './category/category.module';
 import { InstituteModule } from './institute/institute.module';
 import { LoginModule } from './login/login.module';
-import { ProgramModule } from './program/program.module';
-import { SessionModule } from './session/session.module';
+import { AdminModule } from './admin/admin.module';
+import { CandidateModule } from './candidate/candidate.module';
+import { CoordinatorModule } from './coordinator/coordinator.module';
+
 
 @Module({
   imports: [
@@ -85,6 +87,7 @@ import { SessionModule } from './session/session.module';
     InstituteModule,
     AdminModule,
     LoginModule,
+    CoordinatorModule
   ],
   controllers: [AppController],
   providers: [AppService],

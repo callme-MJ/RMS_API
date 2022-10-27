@@ -1,34 +1,21 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get, Param,
-  ParseIntPipe, Patch, Post,
-  Query,
-  SerializeOptions,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-  UsePipes,
-  ValidationPipe
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { CandidateService, ICandidateFilter } from '../services/candidate.service';
 
-@UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidates')
-export class AdminCandidatesController {
+@UseGuards(AuthGuard('jwt-coordinator'))
+@Controller('coordinator/candidates')
+export class CoordinatorCandidatesController {
   constructor(
     private readonly candidateService: CandidateService
   ) { }
 
   @Get()
-  async getCandidates(@Query() queryParams: ICandidateFilter) {
+  async getCandidates(@Request() req: any, @Query() queryParams: ICandidateFilter) {
     try {
-      return await this.candidateService.findAllCandidates(queryParams)
+      return await this.candidateService.findAllCandidatesOfInstitute(req.user.id, queryParams);
     } catch (error) {
       throw error;
     }
@@ -39,16 +26,9 @@ export class AdminCandidatesController {
   async createCandidate(
     @Body() payload: CandidateDTO,
     @UploadedFile() photo: Express.Multer.File,
+    @Request() req: any,
   ) {
-    return await this.candidateService.createCandidate(payload, photo,);
-  }
-
-  @SerializeOptions({ groups: ['single'] })
-  @Get(':chestNO')
-  async findCandidateBychestNO(
-    @Param('chestNO', ParseIntPipe) chestNO: number,
-  ) {
-    return await this.candidateService.findCandidateBychestNO(+chestNO);
+    return await this.candidateService.createCandidate(payload, photo, req.user.id);
   }
 
   @Delete(':id')
@@ -66,4 +46,6 @@ export class AdminCandidatesController {
   ) {
     return this.candidateService.updateCandidate(+id, body, photo);
   }
+
+
 }

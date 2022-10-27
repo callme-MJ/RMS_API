@@ -43,7 +43,7 @@ export class Candidate {
   @Column({ type: 'varchar', default: Gender.MALE })
   gender: Gender;
 
-  @ManyToOne(() => Institute, (institute) => institute.candidates)
+  @ManyToOne(() => Institute, (institute) => institute.candidates,{eager:true})
   institute: Institute;
 
   @ManyToOne(() => Category)

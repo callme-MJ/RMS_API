@@ -34,7 +34,7 @@ export class AdminInstitutesController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('coverPhoto'))
   update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() body: UpdateInstituteDTO,
     @UploadedFile() coverPhoto: Express.Multer.File
   ) {

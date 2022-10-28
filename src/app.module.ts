@@ -7,19 +7,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SessionModule } from './session/session.module';
+import { CandidateProgramModule } from './candidate-program/candidate-program.module';
+import { CandidateModule } from './candidate/candidate.module';
 import { CategoryModule } from './category/category.module';
 import { InstituteModule } from './institute/institute.module';
 import { LoginModule } from './login/login.module';
+import { CoordinatorModule } from './coordinator/coordinator.module';
+import { ProgramModule } from './program/program.module';
+import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
-import { CandidateModule } from './candidate/candidate.module';
-import { ProgramsModule } from './programs/programs.module';
+import { UserModule } from './user/user.module';
 
 
 @Module({
   imports: [
-    SessionModule,
-    SessionModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -31,17 +32,17 @@ import { ProgramsModule } from './programs/programs.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: ["dist/**/entities/*.entity{.ts,.js}"],
+        entities: ['dist/**/entities/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: configService.get<boolean>('DB_SYNC'),
-        migrationsTableName: "migrations",
-        migrations: ["dist/src/database/migrations/*.js"],
+        migrationsTableName: 'migrations',
+        migrations: ['dist/src/database/migrations/*.js'],
         cli: {
-          migrationsDir: "src/database/migrations"
+          migrationsDir: 'src/database/migrations',
         },
-        namingStrategy: new SnakeNamingStrategy()
+        namingStrategy: new SnakeNamingStrategy(),
       }),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -55,11 +56,12 @@ import { ProgramsModule } from './programs/programs.module';
           },
         },
         defaults: {
-          from:
-            `${configService.get<string>('MAIL_FROM_NAME')} <${configService.get<string>('MAIL_FROM_ADDRESS')}>`,
+          from: `${configService.get<string>(
+            'MAIL_FROM_NAME',
+          )} <${configService.get<string>('MAIL_FROM_ADDRESS')}>`,
         },
         template: {
-          dir: process.cwd() + "/src/templates/",
+          dir: process.cwd() + '/src/templates/',
           adapter: new HandlebarsAdapter(),
         },
       }),
@@ -76,7 +78,7 @@ import { ProgramsModule } from './programs/programs.module';
         },
         defaultJobOptions: {
           removeOnComplete: true,
-        }
+        },
       }),
       inject: [ConfigService],
     }),
@@ -85,7 +87,11 @@ import { ProgramsModule } from './programs/programs.module';
     InstituteModule,
     AdminModule,
     LoginModule,
-    ProgramsModule
+    CoordinatorModule,
+    ProgramModule,
+    UserModule,
+    CandidateProgramModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

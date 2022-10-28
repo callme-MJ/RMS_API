@@ -7,10 +7,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AdminLoginController } from './admin/login.controller';
 import { JwtAdminStrategy } from './admin/strategies/jwt-admin-strategy';
+import { CoordinatorLoginController } from './coordinator/login.controller';
+import { JwtCoordinatorStrategy } from './coordinator/strategies/jwt-coordinator-strategy';
+import { CoordinatorModule } from 'src/coordinator/coordinator.module';
+import { UserLoginController } from './user/login.controller';
+import { JwtUserStrategy } from './user/strategies/user-jwt-strategy';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     AdminModule,
+    UserModule,
+    CoordinatorModule,
     PassportModule.register({ defaultStrategy: 'jwt-admin', session: false }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
@@ -24,8 +32,10 @@ import { JwtAdminStrategy } from './admin/strategies/jwt-admin-strategy';
   ],
   controllers: [
     LoginController,
-    AdminLoginController
+    AdminLoginController,
+    CoordinatorLoginController,
+    UserLoginController
   ],
-  providers: [LoginService, JwtAdminStrategy]
+  providers: [LoginService, JwtAdminStrategy, JwtCoordinatorStrategy, JwtUserStrategy ]
 })
 export class LoginModule {}

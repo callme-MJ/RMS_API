@@ -1,4 +1,4 @@
-import { Expose } from "class-transformer";
+import { Exclude, Expose } from "class-transformer";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -17,6 +17,9 @@ export class Admin {
     @Column()
     username: string;
 
+    @Exclude()
     @Column()
     password: string;
+
+    
 }

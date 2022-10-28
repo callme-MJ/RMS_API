@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
 import {
@@ -6,8 +7,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne, PrimaryGeneratedColumn,
-  UpdateDateColumn
+  JoinTable,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Institute } from '../../institute/entities/institute.entity';
 import { Photo } from '../interfaces/photo.entitiy';
@@ -28,6 +32,9 @@ export class Candidate {
   @Column()
   class: number;
 
+  // @Column()
+  // class: number;
+
   @Column()
   adno: number;
 
@@ -43,13 +50,23 @@ export class Candidate {
   @Column({ type: 'varchar', default: Gender.MALE })
   gender: Gender;
 
-  @ManyToOne(() => Institute, (institute) => institute.candidates)
+  @ManyToOne(() => Institute, (institute) => institute.candidates,{eager:true})
+  @OneToMany(() => Session, (session) => session.candidates)
+  sessions: Session[];
+
+  @OneToMany(() => CandidateProgram,(candidateProgram) => candidateProgram.candidate,)
+  candidatePrograms: CandidateProgram[];
+
+  @ManyToOne(() => Institute, (institute) => institute.candidates, {eager:true})
+  @JoinTable()
   institute: Institute;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, (category) => category.candidates, {eager:true})
+  @JoinTable()
   category: Category;
 
-  @ManyToOne(() => Session)
+  @Expose({ name: 'session_id' })
+  @ManyToOne(() => Session,(session)=>session.candidates,{eager:true})
   session: Session;
 
   @Expose({ groups: ['single'], name: 'created_at' })

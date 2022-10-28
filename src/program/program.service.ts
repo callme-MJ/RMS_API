@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
 import { SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
@@ -8,6 +9,9 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { Program } from './entities/program.entity';
 
+export interface IProgramFilter extends IFilter {
+  sessionID: number;
+}
 @Injectable()
 export class ProgramsService {
   constructor(
@@ -15,7 +19,7 @@ export class ProgramsService {
     private readonly programRepository: Repository<Program>,
     private readonly categoryService: CategoryService,
     private readonly sessionService: SessionService,
-  ) {}
+  ) { }
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {
     try {
@@ -39,6 +43,7 @@ export class ProgramsService {
 
   public async findAll(sessionID: number = 0): Promise<Program[]> {
     try {
+      // return this.programRepository.find()
       return this.programRepository.find({
         where: {
           session: {
@@ -54,11 +59,24 @@ export class ProgramsService {
 
   public async findOne(id: number): Promise<Program> {
     try {
+      let program = await this.programRepository.findOneBy({ id });
+      // console.log(program);
+
+      // if (!program) throw new NotFoundException('Program not found');
+      // if (!program.session || !program.session.status) return null;
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+  public async findOneByProgramCode(programCode: string): Promise<Program> {
+    try {
       let program: Program = await this.programRepository.findOne({
-        where: { id },
+        where: { programCode },
       });
-      if (!program) throw new NotFoundException('Category not found');
-      if (!program.session || !program.session.status) return null;
+      // console.log(program);
+      // if (!program) throw new NotFoundException('Program not found');
+      // if (!program.session || !program.session.status) return null;
       return program;
     } catch (error) {
       throw error;

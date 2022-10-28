@@ -1,4 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { AdminService } from 'src/admin/admin.service';
 import { LoginDTO } from '../dto/login.dto';
 import { RefreshTokenDTO } from '../dto/refresh-token.dto';
 import { UserTypes } from '../interfaces/user-types.enum';
@@ -7,7 +9,8 @@ import { LoginService } from '../login.service';
 @Controller('admin')
 export class AdminLoginController {
   constructor(
-    private readonly loginService: LoginService
+    private readonly loginService: LoginService,
+    private readonly adminService: AdminService,
   ) { }
 
   @Post('login')
@@ -28,6 +31,14 @@ export class AdminLoginController {
       );
     } catch (error) {
       throw error;
+    }
+  }
+  @UseGuards(AuthGuard('jwt-admin'))
+  @Get('me')
+  async findOne(@Request() req: any) {
+    try { return await this.adminService.findByID(req.user.id); }
+    catch (error) {
+      throw error
     }
   }
 }

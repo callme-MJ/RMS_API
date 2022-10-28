@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
+import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { ValidationException } from 'src/exceptions/validation-exception';
 import { Institute } from 'src/institute/entities/institute.entity';
@@ -25,7 +26,11 @@ export class CandidateService {
   constructor(
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
+    // @InjectRepository(Coordinator)
+    // private readonly coordinatorRepo: Repository<Coordinator>,
+    private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
+    private readonly sessionService: SessionService,
     private readonly instituteService: InstituteService,
     private readonly categoryService: CategoryService
   ) { }
@@ -66,10 +71,18 @@ export class CandidateService {
     }
   }
 
+  async findAllCandidatesOfInstitute(id: number, queryParams: ICandidateFilter) {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    let candidates= await this.candidateRepository.createQueryBuilder('candidates')
+    .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
+    .getMany();
+    return candidates;
+  }
+ 
   findCandidateByID(id: number): Promise<Candidate> {
     try {
       return this.candidateRepository.findOne({
-        where: { id}
+        where: { id }
       });
     } catch (error) {
       throw error;
@@ -87,16 +100,19 @@ export class CandidateService {
   async createCandidate(
     candidateDTO: CandidateDTO,
     photo: Express.Multer.File,
+    id?: number,
   ): Promise<Candidate> {
     await this.checkEligibility(candidateDTO);
 
-    if(candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
+    if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
 
-    const institute: Institute = await this.instituteService.findOne(+candidateDTO.instituteID);
+    let loggedInCoordinator= await this.coordinatorService.findOne(id);
+    if (loggedInCoordinator)
+    id=loggedInCoordinator.institute.id || candidateDTO.instituteID;
+    const institute: Institute = await this.instituteService.findOne(id)
     const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
-
-    if(!institute || !category) throw new ValidationException("Institute or Category can't be empty");
-
+ 
+    if (!institute || !category) throw new ValidationException("Institute or Category can't be empty");
     let chestNO = await this.getchestNO(candidateDTO);
     candidateDTO.chestNO = chestNO;
     const newCandidate = this.candidateRepository.create(candidateDTO);
@@ -124,7 +140,7 @@ export class CandidateService {
 
       if (!candidate) throw new NotFoundException("Candidate not found");
 
-      if(photo) {
+      if (photo) {
         await this.s3Service.deleteFile(candidate.photo);
         await this.uploadPhoto(candidate, photo);
       }
@@ -182,9 +198,9 @@ export class CandidateService {
     }
   }
 
-  private async uploadPhoto(candidate: Candidate, photo: Express.Multer.File) : Promise<Candidate> {
+  private async uploadPhoto(candidate: Candidate, photo: Express.Multer.File): Promise<Candidate> {
     try {
-      if(!candidate || !photo) return;
+      if (!candidate || !photo) return;
 
       const ext: string = photo.originalname.split('.').pop();
       const uploadedImage: ManagedUpload.SendData = await this.s3Service.uploadFile(photo, `candidate-${candidate.id}.${ext}`);
@@ -193,7 +209,7 @@ export class CandidateService {
         key: uploadedImage.Key,
         url: uploadedImage.Location
       }
-      
+
       return await this.candidateRepository.save(candidate);
     } catch (error) {
       throw error;

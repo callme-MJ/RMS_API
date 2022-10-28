@@ -37,7 +37,7 @@ export class CoordinatorCandidatesController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('photo'))
   @UsePipes(ValidationPipe)
   async updateCandidate(
     @Param('id', ParseIntPipe) id: number,

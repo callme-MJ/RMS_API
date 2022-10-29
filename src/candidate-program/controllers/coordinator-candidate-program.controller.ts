@@ -34,11 +34,11 @@ export class CoordinatorCandidateProgramController {
   @Get()
   async getAllCandidteProgramsOfInstitute
     (@Request() req: any, @Query() queryParams: ICandidateFilter) {
-      try {
-        return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(req.user.id, queryParams);
-      } catch (error) {
-        throw error;
-      }
+    try {
+      return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(req.user.id, queryParams);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get(':id')

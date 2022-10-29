@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ProgramsService } from '../program.service';
 
@@ -10,8 +10,8 @@ export class CoordinatorProgramsController {
   ) { }
 
   @Get()
-  findAll() {
-    return this.programsService.findAll();
+  findAll(@Request() req: any) {
+    return this.programsService.findAllForCoordinator(req.user.id);
   }
 
 }

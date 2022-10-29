@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Photo } from 'src/candidate/interfaces/photo.entitiy';
 import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { Session } from 'src/session/entities/session.entity';
@@ -34,8 +35,11 @@ export class Institute {
   @OneToMany(() => Candidate, (candidate) => candidate.institute)
   candidates: Candidate[];
 
+ 
+
   @OneToMany(() => Coordinator, (coordinator) => coordinator.institute)
   coordinators: Coordinator[];
+
 
   @ManyToOne(() => Session, (session) => session.institutes, { eager: true })
   session: Session;

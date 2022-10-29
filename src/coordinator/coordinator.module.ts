@@ -15,7 +15,7 @@ import { CoordinatorService } from './services/coordinator.service';
 @Module({
   imports:[TypeOrmModule.forFeature([Coordinator,Institute,Admin]),
   InstituteModule,
-  AdminModule],
+  AdminModule,],
   controllers: [AdminCoordinatorController],
   providers: [CoordinatorService,S3Service],
   exports:[CoordinatorService]

@@ -8,8 +8,11 @@ export class CreateCandidateProgramDTO {
   programCode: string;
 
   @IsNotEmpty()
-  categoryID: string;
+  categoryID: number;
 
   @IsNotEmpty()
-  name: string;
+  programName: string;
+
+  @IsNotEmpty()
+  instituteID: number;
 }

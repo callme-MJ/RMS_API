@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
+import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/program/entities/program.entity';
 import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -18,10 +19,13 @@ export class CandidateProgram {
   programCode: string;
 
   @Column()
-  categoryID: string;
+  categoryID: number;
+
+ 
+
 
   @Column()
-  name: string;
+  programName: string;
 
   @Column({ nullable: true })
   topic: string;
@@ -55,4 +59,5 @@ export class CandidateProgram {
   @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, { eager: true })
   @JoinTable()
   candidate: Candidate;
+
 }

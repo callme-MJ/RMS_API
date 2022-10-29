@@ -11,7 +11,7 @@ import { CoordinatorModule } from 'src/coordinator/coordinator.module';
 
 @Module({
   imports: [CoordinatorModule,
-    TypeOrmModule.forFeature([Category,Coordinator])
+    TypeOrmModule.forFeature([Category, Coordinator])
   ],
   controllers: [AdminCategoryController, CoordinatorCategoryController],
   providers: [CategoryService],

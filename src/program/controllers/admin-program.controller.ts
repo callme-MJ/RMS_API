@@ -23,9 +23,14 @@ export class AdminProgramsController {
   create(@Body() createProgramDto: CreateProgramDto) {
     return this.programsService.create(createProgramDto);
   }
+
   @Get()
-  findAll(@Query('session_id') sessionID: number = 0) {
-    return this.programsService.findAll(+sessionID);
+  async findAll(@Query() queryParams: IProgramFilter) {
+    try {
+      return this.programsService.findAll(queryParams);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get(':id')

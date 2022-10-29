@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 15;
+      const perPage = 10;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -71,14 +71,44 @@ export class CandidateService {
     }
   }
 
-  async findAllCandidatesOfInstitute(id: number, queryParams: ICandidateFilter) {
-    const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    let candidates= await this.candidateRepository.createQueryBuilder('candidates')
-    .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
-    .getMany();
-    return candidates;
+  async findAllCandidatesOfInstitute(id: number, queryParams: ICandidateFilter): Promise<{ candidates: Candidate[], count: number }> {
+    try {
+      const loggedInCoordinator = await this.coordinatorService.findOne(id);
+      const candidatesQuery = this.candidateRepository.createQueryBuilder(
+        'candidates',
+      );
+
+      const search = queryParams.search;
+      const sort = queryParams.sort;
+      const page = queryParams.page || 1;
+
+      if (search) {
+        candidatesQuery.where(
+          'name LIKE :search OR chestNO LIKE :search',
+          { search: `%${search}%` },
+        );
+      }
+
+      if (queryParams.instituteID) {
+        candidatesQuery.andWhere('institute_id = :institueID', { institueID: queryParams.instituteID });
+      }
+
+      if (sort) {
+        candidatesQuery.orderBy('candidates.name', sort).getMany();
+      }
+
+      const perPage = 10;
+      candidatesQuery.offset((page - 1) * perPage).limit(perPage);
+
+      let candidates = await this.candidateRepository.createQueryBuilder('candidates')
+      .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
+      .getMany();
+    return {candidates, count: candidates.length};
+    } catch (error) {
+      throw error;
+    }
   }
- 
+
   findCandidateByID(id: number): Promise<Candidate> {
     try {
       return this.candidateRepository.findOne({
@@ -106,12 +136,12 @@ export class CandidateService {
 
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
 
-    let loggedInCoordinator= await this.coordinatorService.findOne(id);
+    let loggedInCoordinator = await this.coordinatorService.findOne(id);
     if (loggedInCoordinator)
-    id=loggedInCoordinator.institute.id || candidateDTO.instituteID;
+      id = loggedInCoordinator.institute.id || candidateDTO.instituteID;
     const institute: Institute = await this.instituteService.findOne(id)
     const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
- 
+
     if (!institute || !category) throw new ValidationException("Institute or Category can't be empty");
     let chestNO = await this.getchestNO(candidateDTO);
     candidateDTO.chestNO = chestNO;

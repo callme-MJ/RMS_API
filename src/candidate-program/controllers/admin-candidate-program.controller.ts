@@ -6,12 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CandidateProgramService } from '../candidate-program.service';
+import { ICandidateFilter } from 'src/candidate/services/candidate.service';
+import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
@@ -29,12 +31,12 @@ export class AdminCandidateProgramController {
   }
 
   @Get()
-  findAll() {
-    return this.candidateProgramService.findAll();
+  findAll(@Query() queryParams: ICandidateProgramFIilter) {
+    return this.candidateProgramService.findAll(queryParams);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.candidateProgramService.findOne(+id);
   }
 

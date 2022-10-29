@@ -32,9 +32,6 @@ export class Candidate {
   @Column()
   class: number;
 
-  // @Column()
-  // class: number;
-
   @Column()
   adno: number;
 
@@ -50,6 +47,9 @@ export class Candidate {
   @Column({ type: 'varchar', default: Gender.MALE })
   gender: Gender;
 
+  @Column()
+  categoryID: number;
+
   @ManyToOne(() => Institute, (institute) => institute.candidates,{eager:true})
   @OneToMany(() => Session, (session) => session.candidates)
   sessions: Session[];
@@ -61,7 +61,7 @@ export class Candidate {
   @JoinTable()
   institute: Institute;
 
-  @ManyToOne(() => Category, (category) => category.candidates, {eager:true})
+  @ManyToOne(() => Category, (category) => category.candidates, { eager: true } )
   @JoinTable()
   category: Category;
 

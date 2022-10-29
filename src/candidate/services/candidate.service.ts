@@ -211,12 +211,23 @@ export class CandidateService {
     try {
       let { adno, instituteID } = candidateDTO;
       const candidate = await this.candidateRepository.findOneBy({ adno });
-      let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
-        .where('institute_id = :instituteID', { instituteID})
-        .andWhere('adno = :adno', { adno })
-        .getOne();
-      console.log(duplicate);
-      if (duplicate) {
+      let duplicate = await this.candidateRepository.find({
+        relations: {
+          institute: true
+        },
+        where: {
+          institute: {
+            id: instituteID
+          },
+          adno: adno
+        },
+      })
+     // let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
+       // .where('institute_id = :instituteID', { instituteID})
+        //.andWhere('adno = :adno', { adno })
+        //.getOne();
+      //console.log(duplicate);
+      if (duplicate.length>0) {
         throw new ValidationException(
           'This candidate has already been registered',
         );

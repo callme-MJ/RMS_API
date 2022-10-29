@@ -213,8 +213,8 @@ export class CandidateService {
 
       let duplicate = await this.candidateRepository
         .createQueryBuilder('candidates')
-        .where('adno = :adno', { adno })
-        .andWhere('institute_id = :instituteID', { instituteID })
+        .where('institute_id = :instituteID', { instituteID })
+        .andWhere('adno = :adno', { adno })
         .getOne();
 
       if (duplicate) {

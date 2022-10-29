@@ -222,7 +222,7 @@ export class CandidateService {
       let { adno, instituteID } = candidateDTO;
       const candidate = await this.candidateRepository.findOneBy({ adno });
       let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
-        .where('institute_id = :instituteID', { instituteID: candidate.institute.id })
+        .where('institute_id = :instituteID', { instituteID})
         .andWhere('adno = :adno', { adno })
         .getOne();
       console.log(duplicate);

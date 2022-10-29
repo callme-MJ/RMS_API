@@ -207,16 +207,15 @@ export class CandidateService {
     }
   }
 
-  async checkEligibility(candidateDTO: CandidateDTO) {
+ async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
-
-      let duplicate = await this.candidateRepository
-        .createQueryBuilder('candidates')
-        .where('institute_id = :instituteID', { instituteID })
+      const candidate = await this.candidateRepository.findOneBy({ adno });
+      let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
+        .where('institute_id = :instituteID', { instituteID})
         .andWhere('adno = :adno', { adno })
         .getOne();
-
+      console.log(duplicate);
       if (duplicate) {
         throw new ValidationException(
           'This candidate has already been registered',

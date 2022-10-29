@@ -60,8 +60,8 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 100;
-      candidatesQuery.offset((page - 1) * perPage).limit(perPage);
+      // const perPage = 100;
+      // candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
 
@@ -220,8 +220,9 @@ export class CandidateService {
   async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
+      const candidate = await this.candidateRepository.findOneBy({ adno });
       let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
-        .where('institute_id = :instituteID', { instituteID })
+        .where('institute_id = :instituteID', { instituteID: candidate.institute.id })
         .andWhere('adno = :adno', { adno })
         .getOne();
       console.log(duplicate);

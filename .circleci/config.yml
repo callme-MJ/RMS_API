@@ -1,0 +1,11 @@
+version: 2.1
+workflows:
+  deployment:
+    jobs:
+      - deploy
+jobs:
+  deploy:
+    machine: true
+    resource_class: sibaq-devs/rms-api
+    steps:
+      - run: bash /root/sibaq-deploy-scripts/api.sh

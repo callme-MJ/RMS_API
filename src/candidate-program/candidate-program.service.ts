@@ -38,8 +38,8 @@ export class CandidateProgramService {
         createCandidateProgramDTO.programCode,
       );
 
-      if (!candidate || !program)
-        throw new NotFoundException('Candidate or Program not found');
+      if (!candidate)
+        throw new NotFoundException('Candidate not found');
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
       newCandidateProgram.candidate = candidate;
@@ -138,8 +138,8 @@ export class CandidateProgramService {
   public async checkEligibility(newCandidateProgram): Promise<boolean> {
     try {
       const { chestNO, programCode } = newCandidateProgram;
-      const sessionID = newCandidateProgram.program.sessionID;
-      console.log(sessionID);
+      // const sessionID = newCandidateProgram.program.sessionID;
+      // console.log(sessionID);
 
       const candidateProgram = await this.candidateProgramRepository
         .createQueryBuilder('candidateProgram')
@@ -251,11 +251,9 @@ export class CandidateProgramService {
         })
         .select('program.curb_group')
         .getRawOne();
-      console.log("hi2");
-      console.log(curbGroupData);
+
 
       let result = Object.values(JSON.parse(JSON.stringify(curbGroupData)));
-      console.log(result);
 
       let curbGroup = result[0];
 
@@ -276,7 +274,6 @@ export class CandidateProgramService {
         })
         .select('program.max_count_curb')
         .getRawOne();
-      console.log("hi3");
 
       let result1 = Object.values(JSON.parse(JSON.stringify(maxCurbGroupData)));
       let maxCurbGroup = result1[0];
@@ -295,7 +292,6 @@ export class CandidateProgramService {
         //.andWhere('session.id = :sessionID', { sessionID })
         .select('program.language_group')
         .getRawOne();
-      console.log("hi4");
 
       let result2 = Object.values(
         JSON.parse(JSON.stringify(languageGroupData)),

@@ -212,7 +212,7 @@ export class CandidateService {
       let { adno, instituteID } = candidateDTO;
 
       let duplicate = await this.candidateRepository
-        .createQueryBuilder('candidate')
+        .createQueryBuilder('candidates')
         .where('adno = :adno', { adno })
         .andWhere('institute_id = :instituteID', { instituteID })
         .getOne();

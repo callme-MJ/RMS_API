@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 10;
+      const perPage = 1000;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -212,7 +212,7 @@ export class CandidateService {
       let { adno, instituteID } = candidateDTO;
 
       let duplicate = await this.candidateRepository
-        .createQueryBuilder('candidate')
+        .createQueryBuilder('candidates')
         .where('adno = :adno', { adno })
         .andWhere('institute_id = :instituteID', { instituteID })
         .getOne();

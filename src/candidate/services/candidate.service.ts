@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 10;
+      const perPage = 100;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -161,7 +161,8 @@ export class CandidateService {
 
     const candidate: Candidate = await this.candidateRepository.save(newCandidate);
 
-    return await this.uploadPhoto(candidate, photo);
+    return await this.uploadPhoto(candidate, photo)
+      ;
   }
 
   async deleteCandidate(id: number) {

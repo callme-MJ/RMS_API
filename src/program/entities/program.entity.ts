@@ -79,12 +79,12 @@ export class Program {
 
   @Column({ nullable: true })
   maxSelection: number;
-  
+
   @Exclude()
-  @Column()
+  @Column({ nullable: true })
   categoryByFeatures: string;
 
-  @Column()
+  @Column({ nullable: true })
   skill: string;
 
   @OneToMany(() => CandidateProgram, (candidateProgram) => candidateProgram.program)

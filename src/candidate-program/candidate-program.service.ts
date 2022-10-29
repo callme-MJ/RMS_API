@@ -52,7 +52,7 @@ export class CandidateProgramService {
     }
   }
 
-  public async findAll(queryParams:ICandidateProgramFIilter): Promise<CandidateProgram[]> {
+  public async findAll(queryParams: ICandidateProgramFIilter): Promise<CandidateProgram[]> {
     const candidateprogramsQuery = this.candidateProgramRepository.createQueryBuilder(
       'candidates',
     );
@@ -71,7 +71,7 @@ export class CandidateProgramService {
       candidateprogramsQuery.orderBy('candidates.name', sort).getMany();
     }
 
-    const perPage = 15;
+    const perPage = 10;
     candidateprogramsQuery.offset((page - 1) * perPage).limit(perPage);
     try {
       let candidatePrograms = await this.candidateProgramRepository.find({

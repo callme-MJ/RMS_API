@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 10;
+      const perPage = 100;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -101,9 +101,9 @@ export class CandidateService {
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       let candidates = await this.candidateRepository.createQueryBuilder('candidates')
-      .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
-      .getMany();
-    return {candidates, count: candidates.length};
+        .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
+        .getMany();
+      return { candidates, count: candidates.length };
     } catch (error) {
       throw error;
     }
@@ -152,7 +152,8 @@ export class CandidateService {
 
     const candidate: Candidate = await this.candidateRepository.save(newCandidate);
 
-    return await this.uploadPhoto(candidate, photo);
+    return await this.uploadPhoto(candidate, photo)
+      ;
   }
 
   async deleteCandidate(id: number) {

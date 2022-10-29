@@ -101,9 +101,9 @@ export class CandidateService {
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       let candidates = await this.candidateRepository.createQueryBuilder('candidates')
-      .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
-      .getMany();
-    return {candidates, count: candidates.length};
+        .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
+        .getMany();
+      return { candidates, count: candidates.length };
     } catch (error) {
       throw error;
     }
@@ -127,13 +127,22 @@ export class CandidateService {
     }
   }
 
+  findCandidateByInstituteID(id: number): Promise<Candidate[]> {
+    try {
+      return this.candidateRepository.find({
+        where: { institute: { id } }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createCandidate(
     candidateDTO: CandidateDTO,
     photo: Express.Multer.File,
     id?: number,
   ): Promise<Candidate> {
     await this.checkEligibility(candidateDTO);
-
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
 
     let loggedInCoordinator = await this.coordinatorService.findOne(id);
@@ -210,13 +219,11 @@ export class CandidateService {
   async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
-
-      let duplicate = await this.candidateRepository
-        .createQueryBuilder('candidate')
-        .where('adno = :adno', { adno })
-        .andWhere('institute_id = :instituteID', { instituteID })
+      let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
+        .where('institute_id = :instituteID', { instituteID })
+        .andWhere('adno = :adno', { adno })
         .getOne();
-
+      console.log(duplicate);
       if (duplicate) {
         throw new ValidationException(
           'This candidate has already been registered',

@@ -43,19 +43,13 @@ export class CandidateProgramService {
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
       newCandidateProgram.candidate = candidate;
-      // await dataSource
-      //   .createQueryBuilder()
-      //   .update(User)
-      //   .set({ firstName: "Timber", lastName: "Saw" })
-      //   .where("id = :id", { id: 1 })
-      //   .execute()
       await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-      .update(CandidateProgram)
-      .set({categoryID: candidate.categoryID})
-      .where('candidate.id = :candidateId', { candidateId: candidate.id })
-      .execute()
-      
-      newCandidateProgram.categoryID=candidate.categoryID;
+        .update(CandidateProgram)
+        .set({ categoryID: candidate.categoryID })
+        .where('candidate.id = :candidateId', { candidateId: candidate.id })
+        .execute()
+
+      newCandidateProgram.categoryID = candidate.categoryID;
       newCandidateProgram.program = program;
       await this.candidateProgramRepository.save(newCandidateProgram);
       await this.checkEligibility(newCandidateProgram);

@@ -60,8 +60,8 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      // const perPage = 100;
-      // candidatesQuery.offset((page - 1) * perPage).limit(perPage);
+      const perPage = 1000;
+      candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
 
@@ -142,15 +142,15 @@ export class CandidateService {
     photo: Express.Multer.File,
     id?: number,
   ): Promise<Candidate> {
-    
+   
+
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
     
     let loggedInCoordinator = await this.coordinatorService.findOne(id);
     if (loggedInCoordinator)
-    id = loggedInCoordinator.institute.id || candidateDTO.instituteID;
-    candidateDTO.instituteID = id;
+      id = loggedInCoordinator.institute.id || candidateDTO.instituteID;
+       candidateDTO.instituteID = id;
     await this.checkEligibility(candidateDTO);
-      console.log(loggedInCoordinator.institute.id, candidateDTO.instituteID);
     const institute: Institute = await this.instituteService.findOne(id)
     const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
 
@@ -220,11 +220,10 @@ export class CandidateService {
     }
   }
 
-  async checkEligibility(candidateDTO: CandidateDTO) {
+ async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
       const candidate = await this.candidateRepository.findOneBy({ adno });
-
       let duplicate = await this.candidateRepository.find({
         relations: {
           institute: true
@@ -236,13 +235,12 @@ export class CandidateService {
           adno: adno
         },
       })
-
-      // let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
-      //   .where('institute_id = :instituteID', { instituteID})
-      //   .andWhere('adno = :adno', { adno })
-      //   .getOne();
-      console.log(adno, instituteID, duplicate);
-      if ( duplicate.length >0) {
+     // let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
+       // .where('institute_id = :instituteID', { instituteID})
+        //.andWhere('adno = :adno', { adno })
+        //.getOne();
+      //console.log(duplicate);
+      if (duplicate.length>0) {
         throw new ValidationException(
           'This candidate has already been registered',
         );

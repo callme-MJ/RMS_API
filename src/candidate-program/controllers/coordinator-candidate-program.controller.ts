@@ -49,7 +49,7 @@ export class CoordinatorCandidateProgramController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateCandidateProgramDto: UpdateCandidateProgramDTO,
+    @Body() updateCandidateProgramDto: CreateCandidateProgramDTO,
   ) {
     return this.candidateProgramService.update(+id, updateCandidateProgramDto);
   }

@@ -21,7 +21,7 @@ export class CandidateProgram {
   @Column()
   categoryID: number;
 
- 
+
 
 
   @Column()

@@ -15,9 +15,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
+import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-admin'))
+// @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidate-programs')
 export class AdminCandidateProgramController {
   constructor(
@@ -43,7 +44,7 @@ export class AdminCandidateProgramController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateCandidateProgramDto: UpdateCandidateProgramDTO,
+    @Body() updateCandidateProgramDto: CreateCandidateProgramDTO,
   ) {
     return this.candidateProgramService.update(+id, updateCandidateProgramDto);
   }
@@ -52,4 +53,16 @@ export class AdminCandidateProgramController {
   remove(@Param('id') id: number) {
     return this.candidateProgramService.remove(+id);
   }
+
+  // @Post('topic')
+  // @UsePipes(ValidationPipe)
+  // createTopic(@Body() createTopicProgramDto: CreateTopicProgramDTO) {
+  //   return this.candidateProgramService.createTopic(createTopicProgramDto);
+  // }
+
+  // @Get('topic')
+  // findTopic(@Query() queryParams: ICandidateProgramFIilter) {
+  //   return this.candidateProgramService.findTopic(queryParams);
+  // }
+
 }

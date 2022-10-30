@@ -18,7 +18,7 @@ import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { CandidateService, ICandidateFilter } from '../services/candidate.service';
 
-@UseGuards(AuthGuard('jwt-admin'))
+// @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidates')
 export class AdminCandidatesController {
   constructor(

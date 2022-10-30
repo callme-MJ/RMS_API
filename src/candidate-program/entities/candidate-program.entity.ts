@@ -2,7 +2,13 @@ import { Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/program/entities/program.entity';
-import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
@@ -20,9 +26,6 @@ export class CandidateProgram {
 
   @Column()
   categoryID: number;
-
-
-
 
   @Column()
   programName: string;
@@ -52,12 +55,15 @@ export class CandidateProgram {
   @Column({ nullable: true })
   isSelected: number;
 
-  @ManyToOne(() => Program, (program) => program.candidatePrograms, { eager: true })
+  @ManyToOne(() => Program, (program) => program.candidatePrograms, {
+    eager: true,
+  })
   @JoinTable()
   program: Program;
 
-  @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, { eager: true })
+  @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
+    eager: true,cascade: ['update']
+  })
   @JoinTable()
   candidate: Candidate;
-
 }

@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 1000;
+      const perPage = 15;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();

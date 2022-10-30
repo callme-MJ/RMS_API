@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { updateLocale } from 'moment';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
@@ -149,12 +150,18 @@ export class CandidateProgramService {
         await this.candidateService.findCandidateBychestNO(
           updateCandidateProgramDto.chestNO,
         );
+      const program: Program = await this.programsService.findOneByProgramCode(
+        updateCandidateProgramDto.programCode,
+      );
 
       const newCandidateProgram = await this.candidateProgramRepository.save({
         ...candidateProgram,
         ...updateCandidateProgramDto,
         candidate: candidate,
+        program: program,
+        categoryID: candidate.categoryID,
       });
+      // await updateAll();
 
       try {
         await this.checkEligibility(newCandidateProgram);
@@ -220,7 +227,6 @@ export class CandidateProgramService {
         })
         .select('program.group_count')
         .getRawOne();
-      console.log('hi1');
 
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
@@ -377,4 +383,17 @@ export class CandidateProgramService {
       throw error;
     }
   }
+
+  // public async updateAll() {
+  //   try {
+  //     const candidate=
+  //     await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+  //     .update()
+  //     .set({
+  //       candidate: candidate,
+  //     });
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 }

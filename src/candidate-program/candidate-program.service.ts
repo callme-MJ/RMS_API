@@ -134,7 +134,7 @@ export class CandidateProgramService {
 
   public async update(
     id: number,
-    updateCandidateProgramDto: CreateCandidateProgramDTO,
+    updateCandidateProgramDto: UpdateCandidateProgramDTO,
   ) {
     try {
       const candidateProgram = await this.candidateProgramRepository.findOneBy({
@@ -145,23 +145,23 @@ export class CandidateProgramService {
           'Candidate has not applied for this program',
         );
 
-        await this.create(updateCandidateProgramDto);
-        await this.remove(id);
-    } catch (error) {}
-    // let candidate= await this.candidateRepository.findOneBy({id});
-    // let candidateProgram = await this.candidateProgramRepository.findOneBy({
-    //   id,
-    // });
-    // if (!candidateProgram)
-    //   throw new NotFoundException('Candidate has not applied for this program');
+      const candidate: Candidate =
+        await this.candidateService.findCandidateBychestNO(
+          updateCandidateProgramDto.chestNO,
+        );
 
-    //  let newCandidateProgram= await this.candidateProgramRepository.update(id, updateCandidateProgramDto);
-    // // let newCandidateProgram = await this.candidateRepository.save({ ...candidateProgram, ...UpdateCandidateProgramDTO });
-    // candidateProgram = await this.candidateProgramRepository.findOneBy({
-    //   id,
-    // });
-    // candidateProgram.candidate = candidate;
-    // return newCandidateProgram;
+      const newCandidateProgram = await this.candidateProgramRepository.save({
+        ...candidateProgram,
+        ...updateCandidateProgramDto,
+        candidate: candidate,
+      });
+
+      try {
+        await this.checkEligibility(newCandidateProgram);
+      } catch (error) {
+        throw error;
+      }
+    } catch (error) {}
   }
 
   public async remove(id: number) {

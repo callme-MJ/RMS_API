@@ -60,7 +60,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 1000;
+      const perPage = 15;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -82,6 +82,7 @@ export class CandidateService {
       const sort = queryParams.sort;
       const page = queryParams.page || 1;
 
+
       if (search) {
         candidatesQuery.where(
           'name LIKE :search OR chestNO LIKE :search',
@@ -97,7 +98,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 10;
+      const perPage = queryParams.perPage || 15;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       let candidates = await this.candidateRepository.createQueryBuilder('candidates')

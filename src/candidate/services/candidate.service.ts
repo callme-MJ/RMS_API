@@ -132,13 +132,15 @@ export class CandidateService {
     photo: Express.Multer.File,
     id?: number,
   ): Promise<Candidate> {
-    await this.checkEligibility(candidateDTO);
+   
 
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
 
     let loggedInCoordinator = await this.coordinatorService.findOne(id);
     if (loggedInCoordinator)
       id = loggedInCoordinator.institute.id || candidateDTO.instituteID;
+       candidateDTO.instituteID = id;
+    await this.checkEligibility(candidateDTO);
     const institute: Institute = await this.instituteService.findOne(id)
     const category: Category = await this.categoryService.findOne(+candidateDTO.categoryID);
 
@@ -207,17 +209,27 @@ export class CandidateService {
     }
   }
 
-  async checkEligibility(candidateDTO: CandidateDTO) {
+ async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
-
-      let duplicate = await this.candidateRepository
-        .createQueryBuilder('candidates')
-        .where('adno = :adno', { adno })
-        .andWhere('institute_id = :instituteID', { instituteID })
-        .getOne();
-
-      if (duplicate) {
+      const candidate = await this.candidateRepository.findOneBy({ adno });
+      let duplicate = await this.candidateRepository.find({
+        relations: {
+          institute: true
+        },
+        where: {
+          institute: {
+            id: instituteID
+          },
+          adno: adno
+        },
+      })
+     // let duplicate = await this.candidateRepository.createQueryBuilder('candidates')
+       // .where('institute_id = :instituteID', { instituteID})
+        //.andWhere('adno = :adno', { adno })
+        //.getOne();
+      //console.log(duplicate);
+      if (duplicate.length>0) {
         throw new ValidationException(
           'This candidate has already been registered',
         );

@@ -67,6 +67,12 @@ export class CandidateProgram {
   @JoinTable()
   candidate: Candidate;
 
+  @ManyToOne(() => Institute, (institute) => institute.candidatePrograms, {
+    eager: true,cascade: ['update']
+  })
+  @JoinTable()
+  institute: Institute;
+
   // @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
   //   eager: true,cascade: ['update']
   // })

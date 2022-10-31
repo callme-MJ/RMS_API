@@ -79,4 +79,24 @@ export class CoordinatorCandidateProgramController {
     }
   }
 
+  // @Get("/registerablePrograms/all")
+  // async getAllCandidteProgramsOfInstituteByTopic
+  //   (@Request() req: any, @Query() queryParams: ICandidateFilter) {
+  //   try {
+  //     return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(req.user.id, queryParams);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  
+
+  // }
+  @Get("/registerablePrograms/all")
+  async getAllCandidteProgramsOfInstituteByTopic
+    (@Request() req: any, @Query() queryParams: ICandidateFilter) {
+    try {
+      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(req.user.id, queryParams);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

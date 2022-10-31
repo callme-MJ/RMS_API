@@ -476,4 +476,18 @@ export class CandidateProgramService {
     return output;
 
   }
+
+  public async findAllCandidateProgramsOfInstituteByTopic(id: number, queryParams: ICandidateFIilter): Promise<CandidateProgram[]> {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :true', { true: "true" })
+      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
+      .getMany()
+    console.log(registerablePrograms);
+    return registerablePrograms;
+  }
+
+  
 }

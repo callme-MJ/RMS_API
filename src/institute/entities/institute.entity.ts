@@ -40,6 +40,9 @@ export class Institute {
   @OneToMany(() => Coordinator, (coordinator) => coordinator.institute)
   coordinators: Coordinator[];
 
+  @OneToMany(() => CandidateProgram, (candidateProgram) => candidateProgram.institute)
+  candidatePrograms: CandidateProgram[];
+
 
   @ManyToOne(() => Session, (session) => session.institutes, { eager: true })
   session: Session;

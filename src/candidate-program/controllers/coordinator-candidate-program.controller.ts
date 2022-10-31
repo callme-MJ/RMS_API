@@ -14,9 +14,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { identity } from 'rxjs';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import { CandidateProgramService } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
+import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
 @UseGuards(AuthGuard('jwt-coordinator'))
@@ -99,4 +101,14 @@ export class CoordinatorCandidateProgramController {
       throw error;
     }
   }
+
+  @Post('/topics')
+  async addTopicsToCandidateProgram(@Body() createTopicProgramDTO: CreateTopicProgramDTO,@Param('id')id: number) {
+    try {
+      return await this.candidateProgramService.addTopicsToCandidateProgram(id,createTopicProgramDTO);
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }

@@ -482,12 +482,30 @@ export class CandidateProgramService {
     let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
+      .where('program.isRegisterable = :status', { status: "true" })
       .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
       .getMany()
     console.log(registerablePrograms);
     return registerablePrograms;
   }
 
-  
+  public async addTopicsToCandidateProgram(id: number, createTopicDTO: CreateTopicProgramDTO) {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :true', { true: "true" })
+      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
+      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicDTO.chestNO })
+      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+      .getOne();
+    if (!candidateProgram) {
+      throw new NotFoundException('Candidate not enrolled in this program');
+    }
+    candidateProgram.topic = createTopicDTO.topic;
+    candidateProgram.link = createTopicDTO.link;
+    const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
+    return updatedCandidateProgram;
+  }
+
 }

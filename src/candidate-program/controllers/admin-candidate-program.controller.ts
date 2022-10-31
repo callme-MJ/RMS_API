@@ -12,13 +12,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { get } from 'http';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-// @UseGuards(AuthGuard('jwt-admin'))
+@UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidate-programs')
 export class AdminCandidateProgramController {
   constructor(
@@ -53,6 +54,15 @@ export class AdminCandidateProgramController {
   remove(@Param('id') id: number) {
     return this.candidateProgramService.remove(+id);
   }
+
+  // @Get("/candidateCard/:id")
+  // async getAllCandidteProgramsOfInstitute(@Param('id')id: number) {
+  //   try {
+  //     return await this.candidateProgramService.findCandidateProgramsByChestNO(id);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   // @Post('topic')
   // @UsePipes(ValidationPipe)

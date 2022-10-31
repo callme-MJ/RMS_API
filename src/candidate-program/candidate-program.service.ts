@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { updateLocale } from 'moment';
+import { IcalAttachment } from 'nodemailer/lib/mailer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
@@ -384,16 +385,95 @@ export class CandidateProgramService {
     }
   }
 
-  // public async updateAll() {
-  //   try {
-  //     const candidate=
-  //     await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-  //     .update()
-  //     .set({
-  //       candidate: candidate,
-  //     });
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  public async updateAll() {
+    try {
+      const candidatePrograms = await this.candidateProgramRepository
+        .createQueryBuilder('candidateProgram')
+        .update(CandidateProgram);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findCandidateProgramsByChestNO(chestNO: number, coordinatorID: number) {
+    const loggedInCoordinator = await this.coordinatorService.findOne(
+      coordinatorID,
+    );
+    console.log(loggedInCoordinator.institute.id);
+    const programsOFCandidate = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .select('candidate.name')
+      .addSelect('candidate.photo')
+      .addSelect('program.name')
+      .addSelect('candidate.chestNO')
+      .addSelect('institute.name')
+      .addSelect('category.name')
+      .where('candidatePrograms.chestNO = :chestNO', { chestNO })
+      .andWhere('institute.id = :id', { id: loggedInCoordinator.institute.id })
+      .getRawMany();
+    const result = [];
+    programsOFCandidate.forEach((program) => {
+      result.push(program.program_name);
+    });
+    const searchCandidate = {
+      chestNO: programsOFCandidate[0].candidate_chest_no,
+      name: programsOFCandidate[0].candidate_name,
+      institute: programsOFCandidate[0].institute_name,
+      photo: programsOFCandidate[0].candidate_photo,
+      category: programsOFCandidate[0].category_name,
+      programs: result,
+    };
+    return searchCandidate;
+  }
+
+  async findCandidateProgramsByInstitute(coordinatorID: number) {
+    const loggedInCoordinator = await this.coordinatorService.findOne(
+      coordinatorID,
+    );
+    const programsOFCandidate = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .select('candidate.name')
+      .addSelect('candidate.photo')
+      .addSelect('program.name')
+      .addSelect('candidate.chestNO')
+      .addSelect('institute.name')
+      .addSelect('category.name')
+      .where('institute.id = :id', { id: loggedInCoordinator.institute.id })
+      .getRawMany();
+    const result = [];
+    console.log(programsOFCandidate);
+
+    programsOFCandidate.forEach((program) => {
+      result.push(program.program_name);
+    });
+
+    var output = [];
+
+    programsOFCandidate.forEach(function (item) {
+      var existing = output.filter(function (v, i) {
+        return v.candidate_chest_no == item.candidate_chest_no;
+      });
+      if (existing.length) {
+        var existingIndex = output.indexOf(existing[0]);
+        output[existingIndex].program_name = output[
+          existingIndex
+        ].program_name.concat(item.program_name);
+      } else {
+        if (typeof item.program_name == 'string')
+          item.program_name = [item.program_name];
+        output.push(item);
+      }
+    });
+
+    return output;
+
+  }
 }

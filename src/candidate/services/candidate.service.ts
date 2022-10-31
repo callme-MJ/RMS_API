@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
+import { updateLocale } from 'moment';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
@@ -190,7 +191,6 @@ export class CandidateService {
       }
 
       // TODO: Handle updated session, category and institute here
-
       await this.candidateRepository.save({ ...candidate, ...payload });
 
       return true;

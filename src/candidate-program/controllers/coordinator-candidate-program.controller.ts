@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Request,
   UseGuards,
   UsePipes,
@@ -58,4 +59,24 @@ export class CoordinatorCandidateProgramController {
   remove(@Param('id') id: number) {
     return this.candidateProgramService.remove(+id);
   }
+
+  @Get("/candidates/all")
+  async getAllcandidateProgramsOfInsititute(@Request() req:any){
+    try {
+      return await this.candidateProgramService.findCandidateProgramsByInstitute(req.user.id);
+    } catch (error) {
+      
+    }
+  }
+
+  @Get("/candidateCard/:id")
+  async getAllCandidteProgramsOfByChestNO(@Request()req:any, @Param('id')id: number) {
+    try {
+      console.log(req.user.id)
+      return await this.candidateProgramService.findCandidateProgramsByChestNO(id,req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }

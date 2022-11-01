@@ -60,18 +60,18 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  @Get('registerablePrograms')
-  async getAllRegisterablePrograms(
-    @Query() queryParams: ICandidateProgramFIilter,
-  ) {
-    try {
-      return await this.candidateProgramService.findAllRegisterablePrograms(
-        queryParams,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
+  // @Get('registerablePrograms')
+  // async getAllRegisterablePrograms(
+  //   @Query() queryParams: ICandidateProgramFIilter,
+  // ) {
+  //   try {
+  //     return await this.candidateProgramService.findAllRegisterablePrograms(
+  //       queryParams,
+  //     );
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
   @Get('/candidates/all')
   async getAllcandidateProgramsOfInsititute() {
     try {

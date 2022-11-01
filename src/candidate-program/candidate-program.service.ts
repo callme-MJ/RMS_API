@@ -360,32 +360,7 @@ export class CandidateProgramService {
     }
   }
 
-  public async createTopic(createTopicDTO: CreateTopicProgramDTO) {
-    try {
-      const candidateProgram = await this.candidateProgramRepository.findOne({
-        where: {
-          chestNO: createTopicDTO.chestNO,
-          programCode: createTopicDTO.programCode,
-        },
-      });
-      if (!candidateProgram) {
-        throw new NotFoundException('Candidate not enrolled in this program');
-      }
-      // const newTopic = await this.candidateProgramRepository.createQueryBuilder()
-      // .update(CandidateProgram)
-      // .set({topic: createTopicDTO.topic, link: createTopicDTO.link})
-      // .
-      // const newTopic = await this.topicRepository.create(createTopicDTO);
-      // let candidateProgram=await this.candidateProgramRepository.createQueryBuilder('candidateProgram')
-      // .update(CandidateProgram)
-      // .set({topic:createTopicDTO.topic,link:createTopicDTO.link})
-      // .where('id = :id', { id: createTopicDTO.id })
-      // .execute();
-    } catch (error) {
-      throw error;
-    }
-  }
-
+  
   public async updateAll() {
     try {
       const candidatePrograms = await this.candidateProgramRepository
@@ -537,18 +512,37 @@ export class CandidateProgramService {
     return registerablePrograms;
   }
 
-  public async findAllRegisterablePrograms(
-    queryParams: ICandidateFIilter,
-  ): Promise<CandidateProgram[]> {
-    let registerablePrograms = await this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :status', { status: 'true' })
-      .getMany();
-    console.log(registerablePrograms);
-    return registerablePrograms;
-  }
+  // public async findAllRegisterablePrograms(
+  //   queryParams: ICandidateFIilter,
+  // ): Promise<CandidateProgram[]> {
+  //   let registerablePrograms = await this.candidateProgramRepository
+  //     .createQueryBuilder('candidatePrograms')
+  //     .leftJoinAndSelect('candidatePrograms.program', 'program')
+  //     .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+  //     .where('program.isRegisterable = :status', { status: 'true' })
+  //     .getMany();
+  //   console.log(registerablePrograms);
+  //   return registerablePrograms;
+  // }
+
+  // public async findAllCandidateProgramsOfInstitute(
+  //   id: number,
+  //   queryParams: ICandidateFIilter,
+  // ): Promise<CandidateProgram[]> {
+  //   const loggedInCoordinator = await this.coordinatorService.findOne(id);
+  //   let candidatePrograms = await this.candidateProgramRepository
+  //     .createQueryBuilder('candidatePrograms')
+  //     .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+  //     .where('candidate.institute.id = :instituteId', {
+  //       instituteId: loggedInCoordinator.institute.id,
+  //     })
+  //     .getMany();
+
+  //   return candidatePrograms;
+  // }
+
+
+
 
   public async addTopicsToCandidateProgram(
     id: number,

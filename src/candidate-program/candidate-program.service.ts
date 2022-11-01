@@ -523,7 +523,7 @@ export class CandidateProgramService {
 
     // candidateProgram.topic = createTopicDTO.topic;
     // candidateProgram.link = createTopicDTO.link;
-    // candidateProgram.status = Status.Pending;
+    candidateProgram.status = Status.Pending;
     // sameProgram.forEach(async (program) => {
     //   program.topic = createTopicDTO.topic;
     //   program.link = createTopicDTO.link;

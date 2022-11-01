@@ -513,22 +513,22 @@ export class CandidateProgramService {
     if (!candidateProgram) {
       throw new NotFoundException('Candidate not enrolled in this program');
     }
-    const sameProgram= await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
-      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
-      .getMany();
+    // const sameProgram= await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    //   .leftJoinAndSelect('candidatePrograms.program', 'program')
+    //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+    //   .where('program.isRegisterable = :true', { true: "true" })
+    //   .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
+    //   .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+    //   .getMany();
 
-    candidateProgram.topic = createTopicDTO.topic;
-    candidateProgram.link = createTopicDTO.link;
-    candidateProgram.status = Status.Pending;
-    sameProgram.forEach(async (program) => {
-      program.topic = createTopicDTO.topic;
-      program.link = createTopicDTO.link;
-      await this.candidateProgramRepository.save(program);
-    })
+    // candidateProgram.topic = createTopicDTO.topic;
+    // candidateProgram.link = createTopicDTO.link;
+    // candidateProgram.status = Status.Pending;
+    // sameProgram.forEach(async (program) => {
+    //   program.topic = createTopicDTO.topic;
+    //   program.link = createTopicDTO.link;
+    //   await this.candidateProgramRepository.save(program);
+    // })
     const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
     return updatedCandidateProgram;
   }

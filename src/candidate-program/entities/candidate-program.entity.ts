@@ -1,15 +1,22 @@
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/program/entities/program.entity';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-
+export enum Status {
+  Pending = 'P',
+  Approved = 'A',
+  Rejected = 'R',
+}
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
   @PrimaryGeneratedColumn({
@@ -36,8 +43,8 @@ export class CandidateProgram {
   @Column({ nullable: true })
   link: string;
 
-  @Column({ nullable: true })
-  staus: string;
+  @Column({ type: 'varchar', default: Status.Pending })
+  status: Status;
 
   @Column({ nullable: true })
   position: string;
@@ -62,20 +69,26 @@ export class CandidateProgram {
   program: Program;
 
   @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
-    eager: true,cascade: ['update']
+    eager: true,
   })
   @JoinTable()
   candidate: Candidate;
 
   @ManyToOne(() => Institute, (institute) => institute.candidatePrograms, {
-    eager: true,cascade: ['update']
+    eager: true,
   })
   @JoinTable()
   institute: Institute;
 
-  // @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
-  //   eager: true,cascade: ['update']
-  // })
-  // @JoinTable()
-  // candidate: Candidate;
+  @Expose({ groups: ['single'], name: 'created_at' })
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Expose({ groups: ['single'], name: 'updated_at' })
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Exclude()
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

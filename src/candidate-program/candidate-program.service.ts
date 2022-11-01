@@ -11,6 +11,7 @@ import { ProgramsService } from 'src/program/program.service';
 import { SessionStatus } from 'src/session/entities/session.entity';
 import { Repository } from 'typeorm';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
+import { CreateTopicStatusDTO } from './dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
 import { CandidateProgram } from './entities/candidate-program.entity';
@@ -502,8 +503,37 @@ export class CandidateProgramService {
     if (!candidateProgram) {
       throw new NotFoundException('Candidate not enrolled in this program');
     }
+    const sameProgram= await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :true', { true: "true" })
+      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
+      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+      .getMany();
+
     candidateProgram.topic = createTopicDTO.topic;
     candidateProgram.link = createTopicDTO.link;
+    sameProgram.forEach(async (program) => {
+      program.topic = createTopicDTO.topic;
+      program.link = createTopicDTO.link;
+      await this.candidateProgramRepository.save(program);
+    })
+    const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
+    return updatedCandidateProgram;
+  }
+
+  public async updateStatusOfRegisterablePrograms(id: number, createTopicStatusDTO: CreateTopicStatusDTO) {
+    const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :true', { true: "true" })
+      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
+      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
+      .getOne();
+    if (!candidateProgram) {
+      throw new NotFoundException('Candidate not enrolled in this program');
+    }
+    candidateProgram.status = createTopicStatusDTO.status;
     const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
     return updatedCandidateProgram;
   }

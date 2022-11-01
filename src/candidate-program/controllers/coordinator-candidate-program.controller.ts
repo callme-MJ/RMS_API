@@ -26,7 +26,7 @@ import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 export class CoordinatorCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
-  ) { }
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -35,10 +35,15 @@ export class CoordinatorCandidateProgramController {
   }
 
   @Get()
-  async getAllCandidteProgramsOfInstitute
-    (@Request() req: any, @Query() queryParams: ICandidateFilter) {
+  async getAllCandidteProgramsOfInstitute(
+    @Request() req: any,
+    @Query() queryParams: ICandidateFilter,
+  ) {
     try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(req.user.id, queryParams);
+      return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(
+        req.user.id,
+        queryParams,
+      );
     } catch (error) {
       throw error;
     }
@@ -62,53 +67,58 @@ export class CoordinatorCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  @Get("/candidates/all")
-  async getAllcandidateProgramsOfInsititute(@Request() req:any){
+  @Get('/candidates/all')
+  async getAllcandidateProgramsOfInsititute(@Request() req: any) {
     try {
-      return await this.candidateProgramService.findCandidateProgramsByInstitute(req.user.id);
-    } catch (error) {
-      
-    }
+      return await this.candidateProgramService.findCandidateProgramsByInstitute(
+        req.user.id,
+      );
+    } catch (error) {}
   }
 
-  @Get("/candidateCard/:id")
-  async getAllCandidteProgramsOfByChestNO(@Request()req:any, @Param('id')id: number) {
+  @Get('/candidateCard/:id')
+  async getAllCandidteProgramsOfByChestNO(
+    @Request() req: any,
+    @Param('id') id: number,
+  ) {
     try {
-      console.log(req.user.id)
-      return await this.candidateProgramService.findCandidateProgramsByChestNO(id,req.user.id);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  // @Get("/registerablePrograms/all")
-  // async getAllCandidteProgramsOfInstituteByTopic
-  //   (@Request() req: any, @Query() queryParams: ICandidateFilter) {
-  //   try {
-  //     return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(req.user.id, queryParams);
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  
-
-  // }
-  @Get("/registerablePrograms/all")
-  async getAllCandidteProgramsOfInstituteByTopic
-    (@Request() req: any, @Query() queryParams: ICandidateFilter) {
-    try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(req.user.id, queryParams);
+      console.log(req.user.id);
+      return await this.candidateProgramService.findCandidateProgramsByChestNO(
+        id,
+        req.user.id,
+      );
     } catch (error) {
       throw error;
     }
   }
 
-  @Post('/topics')
-  async addTopicsToCandidateProgram(@Body() createTopicProgramDTO: CreateTopicProgramDTO,@Param('id')id: number) {
+  @Get('/registerablePrograms/all')
+  async getAllCandidteProgramsOfInstituteByTopic(
+    @Request() req: any,
+    @Query() queryParams: ICandidateFilter,
+  ) {
     try {
-      return await this.candidateProgramService.addTopicsToCandidateProgram(id,createTopicProgramDTO);
+      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
+        req.user.id,
+        queryParams,
+      );
     } catch (error) {
       throw error;
     }
   }
 
+  @Post('/registerablePrograms')
+  async addTopicsToCandidateProgram(
+    @Body() createTopicProgramDTO: CreateTopicProgramDTO,
+    @Param('id') id: number,
+  ) {
+    try {
+      return await this.candidateProgramService.addTopicsToCandidateProgram(
+        id,
+        createTopicProgramDTO,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
 }

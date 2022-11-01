@@ -16,6 +16,7 @@ import { get } from 'http';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
+import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
@@ -55,24 +56,16 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  // @Get("/candidateCard/:id")
-  // async getAllCandidteProgramsOfInstitute(@Param('id')id: number) {
-  //   try {
-  //     return await this.candidateProgramService.findCandidateProgramsByChestNO(id);
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
-  // @Post('topic')
-  // @UsePipes(ValidationPipe)
-  // createTopic(@Body() createTopicProgramDto: CreateTopicProgramDTO) {
-  //   return this.candidateProgramService.createTopic(createTopicProgramDto);
-  // }
-
-  // @Get('topic')
-  // findTopic(@Query() queryParams: ICandidateProgramFIilter) {
-  //   return this.candidateProgramService.findTopic(queryParams);
-  // }
+  @Post('registerablePrograms/:id')
+  @UsePipes(ValidationPipe)
+  updateStatusOfRegisterablePrograms(
+    @Param('id') id: number,
+    @Body() createStatusTopicDto: CreateTopicStatusDTO,
+  ) {
+    return this.candidateProgramService.updateStatusOfRegisterablePrograms(
+      id,
+      createStatusTopicDto,
+    );
+  }
 
 }

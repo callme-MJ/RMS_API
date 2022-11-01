@@ -1,5 +1,4 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { Status } from '../entities/candidate-program.entity';
 
 export class CreateTopicStatusDTO {
   @IsNotEmpty()
@@ -23,7 +22,7 @@ export class CreateTopicStatusDTO {
   @IsNotEmpty()
   link: string;
 
-  @IsNotEmpty()
-  @IsEnum(Status)
-  status:Status;
+//   @IsNotEmpty()
+//   @IsEnum(Status)
+//   status:Status;
 }

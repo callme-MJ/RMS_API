@@ -15,21 +15,18 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { get } from 'http';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
-import {
-  CandidateProgramService,
-  ICandidateProgramFIilter,
-} from '../candidate-program.service';
+import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidate-programs')
-export class AdminCandidateProgramController {
+@UseGuards(AuthGuard('jwt-user'))
+@Controller('user/candidate-programs')
+export class ControllerCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
-  ) {}
+  ) { }
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -60,23 +57,19 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  @Get('registerablePrograms')
-  async getAllRegisterablePrograms(
-    @Query() queryParams: ICandidateProgramFIilter,
+  @Get('/registerablePrograms/all')
+  async getAllCandidteProgramsOfInstituteByTopic(
+    @Request() req: any,
+    @Query() queryParams: ICandidateFilter,
   ) {
     try {
-      return await this.candidateProgramService.findAllRegisterablePrograms(
+      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
+        req.user.id,
         queryParams,
       );
     } catch (error) {
       throw error;
     }
-  }
-  @Get('/candidates/all')
-  async getAllcandidateProgramsOfInsititute() {
-    try {
-      return await this.candidateProgramService.findCandidatePrograms();
-    } catch (error) {}
   }
 
   // @Post('registerablePrograms/:id')
@@ -90,4 +83,5 @@ export class AdminCandidateProgramController {
   //     createStatusTopicDto,
   //   );
   // }
+
 }

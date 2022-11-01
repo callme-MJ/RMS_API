@@ -56,6 +56,19 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
+
+  @Get('registerablePrograms')
+  async getAllRegisterablePrograms(
+    @Query() queryParams: ICandidateProgramFIilter,
+  ) {
+    try {
+      return await this.candidateProgramService.findAllRegisterablePrograms(queryParams);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
   @Post('registerablePrograms/:id')
   @UsePipes(ValidationPipe)
   updateStatusOfRegisterablePrograms(

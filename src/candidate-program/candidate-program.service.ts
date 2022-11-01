@@ -490,6 +490,16 @@ export class CandidateProgramService {
     return registerablePrograms;
   }
 
+  public async findAllRegisterablePrograms( queryParams: ICandidateFIilter): Promise<CandidateProgram[]> {
+    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :status', { status: "true" })
+      .getMany()
+    console.log(registerablePrograms);
+    return registerablePrograms;
+  }
+
   public async addTopicsToCandidateProgram(id: number, createTopicDTO: CreateTopicProgramDTO) {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
     const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')

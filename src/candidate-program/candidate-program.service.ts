@@ -563,66 +563,27 @@ export class CandidateProgramService {
       .andWhere('candidate.institute.id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
-      // .andWhere('candidatePrograms.chestNO = :chestNO', {
-      //   chestNO: createTopicDTO.chestNO,
-      // })
-      // .andWhere('candidatePrograms.programCode = :programCode', {
-      //   programCode: createTopicDTO.programCode,
-      // })
-      .getOne();
-    if (!candidateProgram) {
-      throw new NotFoundException('Candidate not enrolled in this program');
-    }
-    const sameProgram = await this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: 'true' })
-      .andWhere('candidate.institute.id = :instituteId', {
-        instituteId: loggedInCoordinator.institute.id,
+      .andWhere('candidatePrograms.chestNO = :chestNO', {
+        chestNO: createTopicDTO.chestNO,
       })
       .andWhere('candidatePrograms.programCode = :programCode', {
         programCode: createTopicDTO.programCode,
       })
-      .getMany();
+      .getOne();
+    if (!candidateProgram) {
+      throw new NotFoundException('Candidate not enrolled in this program');
+    }
+  
 
     candidateProgram.topic = createTopicDTO.topic;
     candidateProgram.link = createTopicDTO.link;
     candidateProgram.status = Status.Pending;
-    sameProgram.forEach(async (program) => {
-      program.topic = createTopicDTO.topic;
-      program.link = createTopicDTO.link;
-      await this.candidateProgramRepository.save(program);
-    });
+    
     const updatedCandidateProgram = await this.candidateProgramRepository.save(
       candidateProgram,
     );
     return updatedCandidateProgram;
   }
 
-  // public async updateStatusOfRegisterablePrograms(
-  //   id: number,
-  //   createTopicStatusDTO: CreateTopicStatusDTO,
-  // ) {
-  //   const candidateProgram = await this.candidateProgramRepository
-  //     .createQueryBuilder('candidatePrograms')
-  //     .leftJoinAndSelect('candidatePrograms.program', 'program')
-  //     .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-  //     .where('program.isRegisterable = :true', { true: 'true' })
-  //     .andWhere('candidatePrograms.chestNO = :chestNO', {
-  //       chestNO: createTopicStatusDTO.chestNO,
-  //     })
-  //     .andWhere('candidatePrograms.programCode = :programCode', {
-  //       programCode: createTopicStatusDTO.programCode,
-  //     })
-  //     .getOne();
-  //   if (!candidateProgram) {
-  //     throw new NotFoundException('Candidate not enrolled in this program');
-  //   }
-  //   candidateProgram.status = createTopicStatusDTO.status;
-  //   const updatedCandidateProgram = await this.candidateProgramRepository.save(
-  //     candidateProgram,
-  //   );
-  //   return updatedCandidateProgram;
-  // }
+  
 }

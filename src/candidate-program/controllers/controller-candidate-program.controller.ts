@@ -21,9 +21,9 @@ import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidate-programs')
-export class AdminCandidateProgramController {
+@UseGuards(AuthGuard('jwt-user'))
+@Controller('user/candidate-programs')
+export class ControllerCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
   ) { }

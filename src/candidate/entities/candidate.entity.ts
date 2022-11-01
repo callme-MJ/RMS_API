@@ -28,7 +28,7 @@ export class Candidate {
 
   @Column()
   name: string;
-
+  
   @Column()
   class: number;
 

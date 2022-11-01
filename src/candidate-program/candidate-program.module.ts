@@ -7,13 +7,14 @@ import { CandidateProgramService } from './candidate-program.service';
 import { CandidateProgram } from './entities/candidate-program.entity';
 import { CoordinatorCandidateProgramController } from './controllers/coordinator-candidate-program.controller';
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
+import { Candidate } from 'src/candidate/entities/candidate.entity';
 
 @Module({
   imports: [
     CandidateModule,
     ProgramModule,
     CoordinatorModule,
-    TypeOrmModule.forFeature([CandidateProgram]),
+    TypeOrmModule.forFeature([CandidateProgram,Candidate]),
   ],
   controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController],
   providers: [CandidateProgramService],

@@ -92,31 +92,10 @@ export class CoordinatorCandidateProgramController {
     }
   }
 
-  @Get('/registerablePrograms/all')
-  async getAllCandidteProgramsOfInstituteByTopic(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
-  ) {
+  @Get('topics')
+  async getAlltopics(@Request() req: any) {
     try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
-        req.user.id,
-        queryParams,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('/registerablePrograms')
-  async addTopicsToCandidateProgram(
-    @Body() createTopicProgramDTO: CreateTopicProgramDTO,
-    @Param('id') id: number,
-  ) {
-    try {
-      return await this.candidateProgramService.addTopicsToCandidateProgram(
-        id,
-        createTopicProgramDTO,
-      );
+      return await this.candidateProgramService.findAllTopics(req.user.id);
     } catch (error) {
       throw error;
     }

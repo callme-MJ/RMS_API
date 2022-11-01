@@ -148,4 +148,13 @@ export class ProgramsService {
       throw error;
     }
   }
+
+  // public async findProgramsByTopic(id:number){
+  //   try{
+      
+  //     return await this.
+  //   }catch(error){
+  //     throw error;
+  //   }
+  // }
 }

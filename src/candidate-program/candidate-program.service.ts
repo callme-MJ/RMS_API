@@ -521,8 +521,8 @@ export class CandidateProgramService {
     //   .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
     //   .getMany();
 
-    // candidateProgram.topic = createTopicDTO.topic;
-    // candidateProgram.link = createTopicDTO.link;
+    candidateProgram.topic = createTopicDTO.topic;
+    candidateProgram.link = createTopicDTO.link;
     candidateProgram.status = Status.Pending;
     // sameProgram.forEach(async (program) => {
     //   program.topic = createTopicDTO.topic;

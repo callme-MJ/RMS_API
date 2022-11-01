@@ -14,7 +14,7 @@ import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
 import { CreateTopicStatusDTO } from './dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
-import { CandidateProgram } from './entities/candidate-program.entity';
+import { CandidateProgram, Status } from './entities/candidate-program.entity';
 export interface ICandidateProgramFIilter extends IFilter {
   candidateID: number;
   instituteID: number;
@@ -490,6 +490,16 @@ export class CandidateProgramService {
     return registerablePrograms;
   }
 
+  public async findAllRegisterablePrograms( queryParams: ICandidateFIilter): Promise<CandidateProgram[]> {
+    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :status', { status: "true" })
+      .getMany()
+    console.log(registerablePrograms);
+    return registerablePrograms;
+  }
+
   public async addTopicsToCandidateProgram(id: number, createTopicDTO: CreateTopicProgramDTO) {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
     const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
@@ -513,6 +523,7 @@ export class CandidateProgramService {
 
     candidateProgram.topic = createTopicDTO.topic;
     candidateProgram.link = createTopicDTO.link;
+    candidateProgram.status = Status.Pending;
     sameProgram.forEach(async (program) => {
       program.topic = createTopicDTO.topic;
       program.link = createTopicDTO.link;

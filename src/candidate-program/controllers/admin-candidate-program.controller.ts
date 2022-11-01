@@ -57,16 +57,13 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  @Get('/registerablePrograms/all')
-  async getAllCandidteProgramsOfInstituteByTopic(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
+
+  @Get('registerablePrograms')
+  async getAllRegisterablePrograms(
+    @Query() queryParams: ICandidateProgramFIilter,
   ) {
     try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
-        req.user.id,
-        queryParams,
-      );
+      return await this.candidateProgramService.findAllRegisterablePrograms(queryParams);
     } catch (error) {
       throw error;
     }

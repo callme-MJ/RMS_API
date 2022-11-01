@@ -507,8 +507,8 @@ export class CandidateProgramService {
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
       .where('program.isRegisterable = :true', { true: "true" })
       .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
-      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicDTO.chestNO })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+      // .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicDTO.chestNO })
+      // .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
       .getOne();
     if (!candidateProgram) {
       throw new NotFoundException('Candidate not enrolled in this program');
@@ -538,8 +538,8 @@ export class CandidateProgramService {
   //     .leftJoinAndSelect('candidatePrograms.program', 'program')
   //     .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
   //     .where('program.isRegisterable = :true', { true: "true" })
-  //     .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
-  //     .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
+  //     // .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
+  //     // .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
   //     .getOne();
   //   if (!candidateProgram) {
   //     throw new NotFoundException('Candidate not enrolled in this program');

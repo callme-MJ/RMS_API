@@ -8,15 +8,6 @@ export class CreateTopicProgramDTO {
   programCode: string;
 
   @IsNotEmpty()
-  categoryID: number;
-
-  @IsNotEmpty()
-  programName: string;
-
-  @IsNotEmpty()
-  instituteID: number;
-
-  @IsNotEmpty()
   topic: string;
 
   @IsNotEmpty()

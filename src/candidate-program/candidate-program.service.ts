@@ -475,50 +475,115 @@ export class CandidateProgramService {
     });
 
     return output;
+  }
+  async findCandidatePrograms() {
+   
+    const programsOFCandidate = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .select('candidate.name')
+      .addSelect('candidate.photo')
+      .addSelect('program.name')
+      .addSelect('candidate.chestNO')
+      .addSelect('institute.name')
+      .addSelect('category.name')
+      .getRawMany();
+    const result = [];
+    console.log(programsOFCandidate);
 
+    programsOFCandidate.forEach((program) => {
+      result.push(program.program_name);
+    });
+
+    var output = [];
+
+    programsOFCandidate.forEach(function (item) {
+      var existing = output.filter(function (v, i) {
+        return v.candidate_chest_no == item.candidate_chest_no;
+      });
+      if (existing.length) {
+        var existingIndex = output.indexOf(existing[0]);
+        output[existingIndex].program_name = output[
+          existingIndex
+        ].program_name.concat(item.program_name);
+      } else {
+        if (typeof item.program_name == 'string')
+          item.program_name = [item.program_name];
+        output.push(item);
+      }
+    });
+
+    return output;
   }
 
-  public async findAllCandidateProgramsOfInstituteByTopic(id: number, queryParams: ICandidateFIilter): Promise<CandidateProgram[]> {
+  public async findAllCandidateProgramsOfInstituteByTopic(
+    id: number,
+    queryParams: ICandidateFIilter,
+  ): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    let registerablePrograms = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :status', { status: "true" })
-      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
-      .getMany()
+      .where('program.isRegisterable = :status', { status: 'true' })
+      .andWhere('candidate.institute.id = :instituteId', {
+        instituteId: loggedInCoordinator.institute.id,
+      })
+      .getMany();
     console.log(registerablePrograms);
     return registerablePrograms;
   }
 
-  public async findAllRegisterablePrograms( queryParams: ICandidateFIilter): Promise<CandidateProgram[]> {
-    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+  public async findAllRegisterablePrograms(
+    queryParams: ICandidateFIilter,
+  ): Promise<CandidateProgram[]> {
+    let registerablePrograms = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :status', { status: "true" })
-      .getMany()
+      .where('program.isRegisterable = :status', { status: 'true' })
+      .getMany();
     console.log(registerablePrograms);
     return registerablePrograms;
   }
 
-  public async addTopicsToCandidateProgram(id: number, createTopicDTO: CreateTopicProgramDTO) {
+  public async addTopicsToCandidateProgram(
+    id: number,
+    createTopicDTO: CreateTopicProgramDTO,
+  ) {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    const candidateProgram = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
-      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
-      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicDTO.chestNO })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+      .where('program.isRegisterable = :true', { true: 'true' })
+      .andWhere('candidate.institute.id = :instituteId', {
+        instituteId: loggedInCoordinator.institute.id,
+      })
+      // .andWhere('candidatePrograms.chestNO = :chestNO', {
+      //   chestNO: createTopicDTO.chestNO,
+      // })
+      // .andWhere('candidatePrograms.programCode = :programCode', {
+      //   programCode: createTopicDTO.programCode,
+      // })
       .getOne();
     if (!candidateProgram) {
       throw new NotFoundException('Candidate not enrolled in this program');
     }
-    const sameProgram= await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    const sameProgram = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
-      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicDTO.programCode })
+      .where('program.isRegisterable = :true', { true: 'true' })
+      .andWhere('candidate.institute.id = :instituteId', {
+        instituteId: loggedInCoordinator.institute.id,
+      })
+      .andWhere('candidatePrograms.programCode = :programCode', {
+        programCode: createTopicDTO.programCode,
+      })
       .getMany();
 
     candidateProgram.topic = createTopicDTO.topic;
@@ -528,25 +593,36 @@ export class CandidateProgramService {
       program.topic = createTopicDTO.topic;
       program.link = createTopicDTO.link;
       await this.candidateProgramRepository.save(program);
-    })
-    const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
+    });
+    const updatedCandidateProgram = await this.candidateProgramRepository.save(
+      candidateProgram,
+    );
     return updatedCandidateProgram;
   }
 
-  public async updateStatusOfRegisterablePrograms(id: number, createTopicStatusDTO: CreateTopicStatusDTO) {
-    const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+  public async updateStatusOfRegisterablePrograms(
+    id: number,
+    createTopicStatusDTO: CreateTopicStatusDTO,
+  ) {
+    const candidateProgram = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
-      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
+      .where('program.isRegisterable = :true', { true: 'true' })
+      .andWhere('candidatePrograms.chestNO = :chestNO', {
+        chestNO: createTopicStatusDTO.chestNO,
+      })
+      .andWhere('candidatePrograms.programCode = :programCode', {
+        programCode: createTopicStatusDTO.programCode,
+      })
       .getOne();
     if (!candidateProgram) {
       throw new NotFoundException('Candidate not enrolled in this program');
     }
     candidateProgram.status = createTopicStatusDTO.status;
-    const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
+    const updatedCandidateProgram = await this.candidateProgramRepository.save(
+      candidateProgram,
+    );
     return updatedCandidateProgram;
   }
-
 }

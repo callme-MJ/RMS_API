@@ -14,7 +14,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { get } from 'http';
 import { ICandidateFilter } from 'src/candidate/services/candidate.service';
-import { CandidateProgramService, ICandidateProgramFIilter } from '../candidate-program.service';
+import {
+  CandidateProgramService,
+  ICandidateProgramFIilter,
+} from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
@@ -25,7 +28,7 @@ import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 export class AdminCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
-  ) { }
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -56,18 +59,24 @@ export class AdminCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-
   @Get('registerablePrograms')
   async getAllRegisterablePrograms(
     @Query() queryParams: ICandidateProgramFIilter,
   ) {
     try {
-      return await this.candidateProgramService.findAllRegisterablePrograms(queryParams);
+      return await this.candidateProgramService.findAllRegisterablePrograms(
+        queryParams,
+      );
     } catch (error) {
       throw error;
     }
   }
-
+  @Get('/candidates/all')
+  async getAllcandidateProgramsOfInsititute() {
+    try {
+      return await this.candidateProgramService.findCandidatePrograms();
+    } catch (error) {}
+  }
 
   @Post('registerablePrograms/:id')
   @UsePipes(ValidationPipe)
@@ -80,5 +89,4 @@ export class AdminCandidateProgramController {
       createStatusTopicDto,
     );
   }
-
 }

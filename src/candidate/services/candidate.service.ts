@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
+import { updateLocale } from 'moment';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
@@ -60,7 +61,7 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 1000;
+      const perPage = queryParams.perPage || 15;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       const [candidates, count] = await candidatesQuery.getManyAndCount();
@@ -82,6 +83,7 @@ export class CandidateService {
       const sort = queryParams.sort;
       const page = queryParams.page || 1;
 
+
       if (search) {
         candidatesQuery.where(
           'name LIKE :search OR chestNO LIKE :search',
@@ -97,13 +99,13 @@ export class CandidateService {
         candidatesQuery.orderBy('candidates.name', sort).getMany();
       }
 
-      const perPage = 10;
+      const perPage = queryParams.perPage || 15;
       candidatesQuery.offset((page - 1) * perPage).limit(perPage);
 
       let candidates = await this.candidateRepository.createQueryBuilder('candidates')
-      .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
-      .getMany();
-    return {candidates, count: candidates.length};
+        .where('candidates.institute_id = :instituteID', { instituteID: loggedInCoordinator.institute.id })
+        .getMany();
+      return { candidates, count: candidates.length };
     } catch (error) {
       throw error;
     }
@@ -127,6 +129,16 @@ export class CandidateService {
     }
   }
 
+  findCandidateByInstituteID(id: number): Promise<Candidate[]> {
+    try {
+      return this.candidateRepository.find({
+        where: { institute: { id } }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createCandidate(
     candidateDTO: CandidateDTO,
     photo: Express.Multer.File,
@@ -135,7 +147,7 @@ export class CandidateService {
    
 
     if (candidateDTO.gender === Gender.MALE && !photo) throw new ValidationException("Photo is required");
-
+    
     let loggedInCoordinator = await this.coordinatorService.findOne(id);
     if (loggedInCoordinator)
       id = loggedInCoordinator.institute.id || candidateDTO.instituteID;
@@ -154,7 +166,8 @@ export class CandidateService {
 
     const candidate: Candidate = await this.candidateRepository.save(newCandidate);
 
-    return await this.uploadPhoto(candidate, photo);
+    return await this.uploadPhoto(candidate, photo)
+      ;
   }
 
   async deleteCandidate(id: number) {
@@ -178,7 +191,6 @@ export class CandidateService {
       }
 
       // TODO: Handle updated session, category and institute here
-
       await this.candidateRepository.save({ ...candidate, ...payload });
 
       return true;

@@ -3,4 +3,5 @@ export class IFilter {
   search: string;
   filter: string;
   page: number;
+  perPage: number;
 }

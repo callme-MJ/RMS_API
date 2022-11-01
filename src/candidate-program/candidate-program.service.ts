@@ -533,20 +533,20 @@ export class CandidateProgramService {
     return updatedCandidateProgram;
   }
 
-  public async updateStatusOfRegisterablePrograms(id: number, createTopicStatusDTO: CreateTopicStatusDTO) {
-    const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: "true" })
-      .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
-      .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
-      .getOne();
-    if (!candidateProgram) {
-      throw new NotFoundException('Candidate not enrolled in this program');
-    }
-    candidateProgram.status = createTopicStatusDTO.status;
-    const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
-    return updatedCandidateProgram;
-  }
+  // public async updateStatusOfRegisterablePrograms(id: number, createTopicStatusDTO: CreateTopicStatusDTO) {
+  //   const candidateProgram = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+  //     .leftJoinAndSelect('candidatePrograms.program', 'program')
+  //     .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+  //     .where('program.isRegisterable = :true', { true: "true" })
+  //     .andWhere('candidatePrograms.chestNO = :chestNO', { chestNO: createTopicStatusDTO.chestNO })
+  //     .andWhere('candidatePrograms.programCode = :programCode', { programCode: createTopicStatusDTO.programCode })
+  //     .getOne();
+  //   if (!candidateProgram) {
+  //     throw new NotFoundException('Candidate not enrolled in this program');
+  //   }
+  //   candidateProgram.status = createTopicStatusDTO.status;
+  //   const updatedCandidateProgram = await this.candidateProgramRepository.save(candidateProgram);
+  //   return updatedCandidateProgram;
+  // }
 
 }

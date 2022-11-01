@@ -69,16 +69,16 @@ export class AdminCandidateProgramController {
     }
   }
 
-  @Post('registerablePrograms/:id')
-  @UsePipes(ValidationPipe)
-  updateStatusOfRegisterablePrograms(
-    @Param('id') id: number,
-    @Body() createStatusTopicDto: CreateTopicStatusDTO,
-  ) {
-    return this.candidateProgramService.updateStatusOfRegisterablePrograms(
-      id,
-      createStatusTopicDto,
-    );
-  }
+  // @Post('registerablePrograms/:id')
+  // @UsePipes(ValidationPipe)
+  // updateStatusOfRegisterablePrograms(
+  //   @Param('id') id: number,
+  //   @Body() createStatusTopicDto: CreateTopicStatusDTO,
+  // ) {
+  //   return this.candidateProgramService.updateStatusOfRegisterablePrograms(
+  //     id,
+  //     createStatusTopicDto,
+  //   );
+  // }
 
 }

@@ -16,6 +16,7 @@ export enum Status {
   Pending = 'P',
   Approved = 'A',
   Rejected = 'R',
+  NotSubmitted="N"
 }
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
@@ -43,7 +44,7 @@ export class CandidateProgram {
   @Column({ nullable: true })
   link: string;
 
-  @Column({ type: 'varchar', default: Status.Pending })
+  @Column({ type: 'varchar', default: Status.NotSubmitted })
   status: Status;
 
   @Column({ nullable: true })

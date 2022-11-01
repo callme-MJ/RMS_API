@@ -113,7 +113,7 @@ export class CandidateProgramService {
     let candidatePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('candidate.institute.id = :instituteId', {
+      .where('candidatePrograms.institute_id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
       .getMany();
@@ -503,14 +503,15 @@ export class CandidateProgramService {
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :status', { status: 'true' })
-      .andWhere('candidate.institute.id = :instituteId', {
+      .where('candidatePrograms.institute_id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
+      .andWhere('program.isRegisterable = :status', { status: 'true' })
       .getMany();
     console.log(registerablePrograms);
     return registerablePrograms;
   }
+ 
 
   // public async findAllRegisterablePrograms(
   //   queryParams: ICandidateFIilter,
@@ -553,10 +554,10 @@ export class CandidateProgramService {
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('program.isRegisterable = :true', { true: 'true' })
-      .andWhere('candidate.institute.id = :instituteId', {
+      .where('candidatePrograms.institute_id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
+      .andWhere('program.isRegisterable = :true', { true: 'true' })
       .andWhere('candidatePrograms.chestNO = :chestNO', {
         chestNO: createTopicDTO.chestNO,
       })

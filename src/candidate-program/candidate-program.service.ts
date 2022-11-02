@@ -44,7 +44,6 @@ export class CandidateProgramService {
         createCandidateProgramDTO.programCode,
       );
       const loggedInCoordinator = await this.coordinatorService.findOne(id)
-
       if (!candidate) throw new NotFoundException('Candidate not found');
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
@@ -57,7 +56,7 @@ export class CandidateProgramService {
         .execute();
 
       newCandidateProgram.categoryID = candidate.categoryID;
-      newCandidateProgram.institute.id = loggedInCoordinator.institute.id;
+      newCandidateProgram.institute = loggedInCoordinator.institute;
       newCandidateProgram.program = program;
       await this.candidateProgramRepository.save(newCandidateProgram);
       await this.checkEligibility(newCandidateProgram);
@@ -193,11 +192,12 @@ export class CandidateProgramService {
         .leftJoinAndSelect('candidate.institute', 'institute')
         .leftJoinAndSelect('institute.session', 'session');
 
-      const instituteID = await candidateProgram
-        .where('candidate.chestNO = :chestNO', { chestNO })
-        //.andWhere('session.id = :sessionID', { sessionID })
-        .select('institute.id')
-        .getRawOne();
+        const instituteID= newCandidateProgram.institute.id;
+      // const instituteID = await candidateProgram
+      //   .where('candidate.chestNO = :chestNO', { chestNO })
+      //   //.andWhere('session.id = :sessionID', { sessionID })
+      //   .select('institute.id')
+      //   .getRawOne();
 
       const duplicateSingle = await candidateProgram
         .where('institute.id = :instituteID', {

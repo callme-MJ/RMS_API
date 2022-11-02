@@ -1,7 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { updateLocale } from 'moment';
-import { IcalAttachment } from 'nodemailer/lib/mailer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
@@ -11,7 +9,6 @@ import { ProgramsService } from 'src/program/program.service';
 import { SessionStatus } from 'src/session/entities/session.entity';
 import { Repository } from 'typeorm';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
-import { CreateTopicStatusDTO } from './dto/create-status-topic.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
 import { CandidateProgram, Status } from './entities/candidate-program.entity';
@@ -44,7 +41,6 @@ export class CandidateProgramService {
         createCandidateProgramDTO.programCode,
       );
       const loggedInCoordinator = await this.coordinatorService.findOne(id)
-
       if (!candidate) throw new NotFoundException('Candidate not found');
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
@@ -55,11 +51,10 @@ export class CandidateProgramService {
         .set({ categoryID: candidate.categoryID })
         .where('candidate.id = :candidateId', { candidateId: candidate.id })
         .execute();
-
-      newCandidateProgram.categoryID = candidate.categoryID;
-      newCandidateProgram.institute.id = loggedInCoordinator.institute.id;
-      newCandidateProgram.program = program;
-      await this.candidateProgramRepository.save(newCandidateProgram);
+        newCandidateProgram.categoryID = candidate.categoryID;
+        newCandidateProgram.institute = loggedInCoordinator.institute
+        newCandidateProgram.program = program;
+      await this.candidateProgramRepository.save(newCandidateProgram,);
       await this.checkEligibility(newCandidateProgram);
       return newCandidateProgram;
     } catch (error) {
@@ -192,12 +187,13 @@ export class CandidateProgramService {
         .leftJoinAndSelect('program.category', 'category')
         .leftJoinAndSelect('candidate.institute', 'institute')
         .leftJoinAndSelect('institute.session', 'session');
-
-      const instituteID = await candidateProgram
-        .where('candidate.chestNO = :chestNO', { chestNO })
-        //.andWhere('session.id = :sessionID', { sessionID })
-        .select('institute.id')
-        .getRawOne();
+        
+        // const instituteID = await candidateProgram
+        // .where('candidate.chestNO = :chestNO', { chestNO })
+        // //.andWhere('session.id = :sessionID', { sessionID })
+        // .select('institute.id')
+        // .getRawOne();
+        const instituteID = await newCandidateProgram.institute.id
 
       const duplicateSingle = await candidateProgram
         .where('institute.id = :instituteID', {
@@ -212,6 +208,7 @@ export class CandidateProgramService {
         //.andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
+
       const duplicateGroup = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,

@@ -57,20 +57,7 @@ export class ControllerCandidateProgramController {
     return this.candidateProgramService.remove(+id);
   }
 
-  @Get('/registerablePrograms/all')
-  async getAllCandidteProgramsOfInstituteByTopic(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
-  ) {
-    try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
-        req.user.id,
-        queryParams,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
+  
 
   // @Post('registerablePrograms/:id')
   // @UsePipes(ValidationPipe)

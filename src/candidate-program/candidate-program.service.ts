@@ -51,6 +51,7 @@ export class CandidateProgramService {
         .set({ categoryID: candidate.categoryID })
         .where('candidate.id = :candidateId', { candidateId: candidate.id })
         .execute();
+
         newCandidateProgram.categoryID = candidate.categoryID;
         newCandidateProgram.institute = loggedInCoordinator.institute
         newCandidateProgram.program = program;
@@ -222,13 +223,15 @@ export class CandidateProgramService {
         //.andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
-      const groupCountData = await candidateProgram
+
+        const groupCountData = await candidateProgram
         .where('program.programCode = :programCode', {
           programCode,
         })
         .select('program.group_count')
         .getRawOne();
 
+      console.log(groupCountData)
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
 

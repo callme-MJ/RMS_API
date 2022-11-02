@@ -31,11 +31,11 @@ export class ControllerCandidateProgramController {
     private readonly candidateProgramService: CandidateProgramService,
   ) {}
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
-    return this.candidateProgramService.create(createCandidateProgramDto);
-  }
+  // @Post()
+  // @UsePipes(ValidationPipe)
+  // create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
+  //   return this.candidateProgramService.create(createCandidateProgramDto);
+  // }
 
   @Get()
   findAll(@Query() queryParams: ICandidateProgramFIilter) {

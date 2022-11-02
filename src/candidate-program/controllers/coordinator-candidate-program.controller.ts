@@ -5,21 +5,15 @@ import {
   Get,
   Param,
   Patch,
-  Post,
-  Query,
-  Req,
-  Request,
+  Post, Query, Request,
   UseGuards,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { identity } from 'rxjs';
-import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import { CandidateProgramService } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
-import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
 @UseGuards(AuthGuard('jwt-coordinator'))
 @Controller('coordinator/candidate-programs')
@@ -28,10 +22,15 @@ export class CoordinatorCandidateProgramController {
     private readonly candidateProgramService: CandidateProgramService,
   ) {}
 
+  @Get()
+  async getAllCandidateProgramsofInstitute(@Request() req: any,@Query() queryParams: any) {
+    return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(req.user.id,queryParams);
+  }
+
   @Post()
   @UsePipes(ValidationPipe)
-  create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
-    return this.candidateProgramService.create(createCandidateProgramDto);
+  create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO, @Request() req: any) {
+    return this.candidateProgramService.create(createCandidateProgramDto,req.user.id);
   }
 
   @Get(':id')

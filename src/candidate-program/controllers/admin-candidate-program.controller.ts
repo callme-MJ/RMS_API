@@ -31,11 +31,11 @@ export class AdminCandidateProgramController {
     private readonly candidateProgramService: CandidateProgramService,
   ) {}
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
-    return this.candidateProgramService.create(createCandidateProgramDto);
-  }
+  // @Post()
+  // @UsePipes(ValidationPipe)
+  // create(@Body() createCandidateProgramDto: CreateCandidateProgramDTO) {
+  //   return this.candidateProgramService.create(createCandidateProgramDto);
+  // }
 
   @Get()
   findAll(@Query() queryParams: ICandidateProgramFIilter) {
@@ -66,4 +66,25 @@ export class AdminCandidateProgramController {
       return await this.candidateProgramService.findCandidatePrograms();
     } catch (error) {}
   }
+
+  @Get('/topics/all')
+  async getAllTopicsOfInstitute(@Request() req: any) {
+    try {
+      return await this.candidateProgramService.findAllTopics(
+        req.user.id,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // @Post('/topics/:id')
+  // async updateStutusTopic(@Param("id") id: number, @Body() createTopicStatusDTO: CreateTopicStatusDTO) {
+  //   try {
+  //     return await this.candidateProgramService.createTopic(createTopicProgramDto,id);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
 }

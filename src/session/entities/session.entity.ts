@@ -13,6 +13,7 @@ export enum SessionStatus {
 
 @Entity()
 export class Session {
+    [x: string]: any;
   @PrimaryGeneratedColumn()
   id: number;
 

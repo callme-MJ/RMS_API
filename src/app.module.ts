@@ -17,6 +17,7 @@ import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { MediaGalleryModule } from './media-gallery/media-gallery.module';
 
 
 @Module({
@@ -92,6 +93,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     CandidateProgramModule,
     SessionModule,
+    MediaGalleryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -44,8 +44,8 @@ export class Candidate {
   @Column()
   chestNO: number;
 
-  @Column({ nullable: true, type: 'json' })
-  photo: Photo;
+      @Column({ nullable: true, type: 'json' })
+      photo: Photo;
 
   @Column({ type: 'varchar', default: Gender.MALE })
   gender: Gender;

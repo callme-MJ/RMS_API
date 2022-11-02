@@ -524,6 +524,7 @@ export class CandidateProgramService {
     }
     candidateProgram.topic = createTopicProgramDto.topic
     candidateProgram.link = createTopicProgramDto.link
+    candidateProgram.status = Status.Pending;
     await this.candidateProgramRepository.save(candidateProgram)
     return candidateProgram
     

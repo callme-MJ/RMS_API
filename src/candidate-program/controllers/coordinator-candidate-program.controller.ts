@@ -89,7 +89,7 @@ export class CoordinatorCandidateProgramController {
   }
 
   @Post('/topics/:id')
-  async createTopic(@Query("id") id: number, @Body() createTopicProgramDto: CreateTopicProgramDTO) {
+  async createTopic(@Param("id") id: number, @Body() createTopicProgramDto: CreateTopicProgramDTO) {
     try {
       return await this.candidateProgramService.createTopic(createTopicProgramDto,id);
     } catch (error) {

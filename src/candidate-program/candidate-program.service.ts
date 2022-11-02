@@ -518,15 +518,16 @@ export class CandidateProgramService {
 
   public async createTopic(createTopicProgramDto: CreateTopicProgramDTO,id:number)
     : Promise<CandidateProgram> {
+      console.log(id)
     const candidateProgram = await this.candidateProgramRepository.findOneBy({id})
     if(!candidateProgram){
-      throw new NotFoundException('Candidate Program not found')
+      throw new NotFoundException('Candidate not  not registered for this program')
     }
     candidateProgram.topic = createTopicProgramDto.topic
     candidateProgram.link = createTopicProgramDto.link
     candidateProgram.status = Status.Pending;
     await this.candidateProgramRepository.save(candidateProgram)
-    return candidateProgram
+    return candidateProgram;
     
   }
 }

@@ -34,21 +34,6 @@ export class CoordinatorCandidateProgramController {
     return this.candidateProgramService.create(createCandidateProgramDto);
   }
 
-  @Get()
-  async getAllCandidteProgramsOfInstitute(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
-  ) {
-    try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(
-        req.user.id,
-        queryParams,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.candidateProgramService.findOne(+id);
@@ -92,10 +77,21 @@ export class CoordinatorCandidateProgramController {
     }
   }
 
-  @Get('topics')
-  async getAlltopics(@Request() req: any) {
+  @Get('/topics/all')
+  async getAllTopicsOfInstitute(@Request() req: any) {
     try {
-      return await this.candidateProgramService.findAllTopics(req.user.id);
+      return await this.candidateProgramService.findAllTopicsOfInstitute(
+        req.user.id,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/topics/:id')
+  async createTopic(@Query("id") id: number, @Body() createTopicProgramDto: CreateTopicProgramDTO) {
+    try {
+      return await this.candidateProgramService.createTopic(createTopicProgramDto,id);
     } catch (error) {
       throw error;
     }

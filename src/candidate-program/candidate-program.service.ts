@@ -503,16 +503,29 @@ export class CandidateProgramService {
   //   .getMany();
   // }
 
-  public async findAllTopics(id: number) {
-    const coordinator = await this.coordinatorService.findOne(id);
-    const topics=await this.candidateProgramRepository
-      .createQueryBuilder('candidateProgram')
-      .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
-      .where('candidateProgram.instiute.id = :id', {
-        id: coordinator.institute.id,
-      })
-      // .andWhere('program.isRegisterable" = true')
-      .getMany();
+  public async findAllTopicsOfInstitute(id: number): Promise<CandidateProgram[]> {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    console.log(loggedInCoordinator.institute.id);
+    let registerablePrograms = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('program.isRegisterable = :status', { status: "true" })
+      .andWhere('candidate.institute.id = :instituteId', { instituteId: loggedInCoordinator.institute.id })
+      .getMany()
+    console.log(registerablePrograms);
+    return registerablePrograms;
+  }
+
+  public async createTopic(createTopicProgramDto: CreateTopicProgramDTO,id:number)
+    : Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({id})
+    if(!candidateProgram){
+      throw new NotFoundException('Candidate Program not found')
+    }
+    candidateProgram.topic = createTopicProgramDto.topic
+    candidateProgram.link = createTopicProgramDto.link
+    await this.candidateProgramRepository.save(candidateProgram)
+    return candidateProgram
+    
   }
 }

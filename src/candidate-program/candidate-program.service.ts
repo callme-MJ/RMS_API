@@ -235,7 +235,7 @@ export class CandidateProgramService {
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
 
-      if (duplicateSingle > 1 || duplicateGroup > groupCount) {
+      if (duplicateSingle > 1 ) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
           'Institute already enrolled in this program',

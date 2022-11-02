@@ -34,21 +34,6 @@ export class CoordinatorCandidateProgramController {
     return this.candidateProgramService.create(createCandidateProgramDto);
   }
 
-  @Get()
-  async getAllCandidteProgramsOfInstitute(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
-  ) {
-    try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstitute(
-        req.user.id,
-        queryParams,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.candidateProgramService.findOne(+id);
@@ -92,31 +77,21 @@ export class CoordinatorCandidateProgramController {
     }
   }
 
-  @Get('/registerablePrograms/all')
-  async getAllCandidteProgramsOfInstituteByTopic(
-    @Request() req: any,
-    @Query() queryParams: ICandidateFilter,
-  ) {
+  @Get('/topics/all')
+  async getAllTopicsOfInstitute(@Request() req: any) {
     try {
-      return await this.candidateProgramService.findAllCandidateProgramsOfInstituteByTopic(
+      return await this.candidateProgramService.findAllTopicsOfInstitute(
         req.user.id,
-        queryParams,
       );
     } catch (error) {
       throw error;
     }
   }
 
-  @Post('/registerablePrograms')
-  async addTopicsToCandidateProgram(
-    @Body() createTopicProgramDTO: CreateTopicProgramDTO,
-    @Param('id') id: number,
-  ) {
+  @Post('/topics/:id')
+  async createTopic(@Query("id") id: number, @Body() createTopicProgramDto: CreateTopicProgramDTO) {
     try {
-      return await this.candidateProgramService.addTopicsToCandidateProgram(
-        id,
-        createTopicProgramDTO,
-      );
+      return await this.candidateProgramService.createTopic(createTopicProgramDto,id);
     } catch (error) {
       throw error;
     }

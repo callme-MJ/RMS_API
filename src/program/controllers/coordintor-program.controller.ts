@@ -11,7 +11,10 @@ export class CoordinatorProgramsController {
 
   @Get()
   findAll(@Request() req: any) {
+    console.log(req.user.id);
     return this.programsService.findAllForCoordinator(req.user.id);
   }
+
+  
 
 }

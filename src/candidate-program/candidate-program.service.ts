@@ -31,7 +31,7 @@ export class CandidateProgramService {
     private readonly coordinatorService: CoordinatorService,
     private readonly programsService: ProgramsService,
   ) {}
-  public async create(createCandidateProgramDTO: CreateCandidateProgramDTO  ,id:number) {
+  public async create(createCandidateProgramDTO: CreateCandidateProgramDTO  ,id?:number) {
     try {
       const candidate: Candidate =
         await this.candidateService.findCandidateBychestNO(
@@ -209,7 +209,7 @@ export class CandidateProgramService {
         //.andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
-
+        console.log(duplicateSingle)
       const duplicateGroup = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,
@@ -235,7 +235,7 @@ export class CandidateProgramService {
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
 
-      if (duplicateSingle > 1 ) {
+      if (duplicateSingle > 1 || duplicateGroup > groupCount) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
           'Institute already enrolled in this program',

@@ -91,13 +91,13 @@ export class LoginService {
         throw new NotFoundException('User does not exist');
       }
       // const isPasswordCorrect = (credentials.password === user.password)
-      // const isPasswordCorrect = await bcrypt.compare(
-      //   credentials.password,
-      //   user.password,
-      // );
-      // if (!isPasswordCorrect) {
-      //   throw new ValidationException('Invalid username or password');
-      // }
+      const isPasswordCorrect = await bcrypt.compare(
+        credentials.password,
+        user.password,
+      );
+      if (!isPasswordCorrect) {
+        throw new ValidationException('Invalid username or password');
+      }
 
       return this.getTokens(user);
     } catch (error) {

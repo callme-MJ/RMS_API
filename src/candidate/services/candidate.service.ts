@@ -9,6 +9,7 @@ import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { ValidationException } from 'src/exceptions/validation-exception';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteService } from 'src/institute/institute.service';
+import { Session } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
@@ -27,8 +28,8 @@ export class CandidateService {
   constructor(
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
-    // @InjectRepository(Coordinator)
-    // private readonly coordinatorRepo: Repository<Coordinator>,
+    @InjectRepository(Session)
+    private readonly SessionRepository: Repository<Session>,
     private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
     private readonly sessionService: SessionService,
@@ -158,7 +159,7 @@ export class CandidateService {
 
     if (!institute || !category) throw new ValidationException("Institute or Category can't be empty");
     let chestNO = await this.getchestNO(candidateDTO);
-    candidateDTO.chestNO = chestNO;
+    const prefix = this.SessionRepository.findOneBy({id:institute.session.id}).then(session => session.chestNoPrefix);
     const newCandidate = this.candidateRepository.create(candidateDTO);
     newCandidate.category = category;
     newCandidate.institute = institute;

@@ -12,10 +12,11 @@ import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { AdminService } from 'src/admin/admin.service';
 import { Admin } from 'src/admin/entities/admin.entity';
 import { ControllerCandidatesController } from './controllers/controller-candidate.controller';
+import { Session } from 'src/session/entities/session.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Candidate,Coordinator,Admin]),
+    TypeOrmModule.forFeature([Candidate,Coordinator,Admin,Session]),
     CategoryModule,
     InstituteModule,
   ],

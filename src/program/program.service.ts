@@ -84,11 +84,23 @@ export class ProgramsService {
     }
   }
 
-  public async findAllForCoordinator(session:number): Promise<Program[]> {
+  public async findAllForCoordinator(id:number): Promise<Program[]> {
     try {
-      const coordinator = await this.coordinatorService.findOne(session);
+      const coordinator = await this.coordinatorService.findOne(id);
       const sessionID = coordinator.session.id;
       // return this.programRepository.find()
+      if(coordinator.institute.id == 41 || coordinator.institute.id == 42)
+      {
+        return this.programRepository.find({
+          where: {
+            session: {
+              id: sessionID,
+              status: SessionStatus.ACTIVE,
+            },
+            categoryByFeatures: "Y",
+          },
+        });
+      }
       return this.programRepository.find({
         where: {
           session: {
@@ -101,6 +113,7 @@ export class ProgramsService {
       throw error;
     }
   }
+  
 
   public async findOne(id: number): Promise<Program> {
     try {

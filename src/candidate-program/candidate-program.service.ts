@@ -4,9 +4,10 @@ import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
+import { Institute } from 'src/institute/entities/institute.entity';
 import { Program } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
-import { SessionStatus } from 'src/session/entities/session.entity';
+import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { Repository } from 'typeorm';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
@@ -31,16 +32,20 @@ export class CandidateProgramService {
     private readonly coordinatorService: CoordinatorService,
     private readonly programsService: ProgramsService,
   ) {}
-  public async create(createCandidateProgramDTO: CreateCandidateProgramDTO  ,id?:number) {
+  public async create(
+    createCandidateProgramDTO: CreateCandidateProgramDTO,
+    id?: number,
+  ) {
     try {
+      const loggedInCoordinator = await this.coordinatorService.findOne(id);
+      const session: Session =loggedInCoordinator.institute.session;
       const candidate: Candidate =
         await this.candidateService.findCandidateBychestNO(
-          createCandidateProgramDTO.chestNO,
+          createCandidateProgramDTO.chestNO,session.id
         );
       const program: Program = await this.programsService.findOneByProgramCode(
         createCandidateProgramDTO.programCode,
       );
-      const loggedInCoordinator = await this.coordinatorService.findOne(id)
       if (!candidate) throw new NotFoundException('Candidate not found');
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
@@ -52,10 +57,11 @@ export class CandidateProgramService {
         .where('candidate.id = :candidateId', { candidateId: candidate.id })
         .execute();
 
-        newCandidateProgram.categoryID = candidate.categoryID;
-        newCandidateProgram.institute = loggedInCoordinator.institute
-        newCandidateProgram.program = program;
-      await this.candidateProgramRepository.save(newCandidateProgram,);
+      newCandidateProgram.categoryID = candidate.categoryID;
+      newCandidateProgram.institute = loggedInCoordinator.institute;
+      newCandidateProgram.program = program;
+      newCandidateProgram.session = session;
+      await this.candidateProgramRepository.save(newCandidateProgram);
       await this.checkEligibility(newCandidateProgram);
       return newCandidateProgram;
     } catch (error) {
@@ -65,9 +71,9 @@ export class CandidateProgramService {
 
   public async findAll(
     queryParams: ICandidateProgramFIilter,
-  ): Promise<CandidateProgram[]> {
+  ): Promise<{ candidateProgram: CandidateProgram[]; count: number }> {
     const candidateprogramsQuery =
-      this.candidateProgramRepository.createQueryBuilder('candidates');
+      this.candidateProgramRepository.createQueryBuilder('candidatePrograms');
 
     const search = queryParams.search;
     const sort = queryParams.sort;
@@ -75,29 +81,24 @@ export class CandidateProgramService {
 
     if (search) {
       candidateprogramsQuery.where(
-        'name LIKE :search OR chestNO LIKE :search',
+        'program_name LIKE :search OR chestNO LIKE :search',
         { search: `%${search}%` },
       );
     }
     if (sort) {
-      candidateprogramsQuery.orderBy('candidates.name', sort).getMany();
+      candidateprogramsQuery.orderBy('candidatePrograms.name', sort).getMany();
     }
 
     const perPage = 10;
     candidateprogramsQuery.offset((page - 1) * perPage).limit(perPage);
     try {
-      let candidatePrograms = await this.candidateProgramRepository.find({
-        where: {
-          candidate: {
-            session: {
-              id: queryParams.sessionID,
-              status: SessionStatus.ACTIVE,
-            },
-          },
-        },
-      });
+      const [candidateProgram, count] = await candidateprogramsQuery
+        .where('candidatePrograms.session_id = :sessionID', {
+          sessionID: queryParams.sessionID,
+        })
+        .getManyAndCount();
 
-      return candidatePrograms;
+      return { candidateProgram, count };
     } catch (error) {
       throw error;
     }
@@ -178,24 +179,17 @@ export class CandidateProgramService {
   public async checkEligibility(newCandidateProgram): Promise<boolean> {
     try {
       const { chestNO, programCode } = newCandidateProgram;
-      // const sessionID = newCandidateProgram.program.sessionID;
-      // console.log(sessionID);
 
       const candidateProgram = await this.candidateProgramRepository
         .createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
         .leftJoinAndSelect('candidateProgram.program', 'program')
         .leftJoinAndSelect('program.category', 'category')
-        .leftJoinAndSelect('candidate.institute', 'institute')
-        .leftJoinAndSelect('institute.session', 'session');
-        
-        // const instituteID = await candidateProgram
-        // .where('candidate.chestNO = :chestNO', { chestNO })
-        // //.andWhere('session.id = :sessionID', { sessionID })
-        // .select('institute.id')
-        // .getRawOne();
-        const instituteID = await newCandidateProgram.institute.id
+        .leftJoinAndSelect('candidateProgram.institute', 'institute')
+        .leftJoinAndSelect('candidateProgram.session', 'session');
 
+      const instituteID = await newCandidateProgram.institute.id;
+      const sessionID= await newCandidateProgram.session.id;
       const duplicateSingle = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,
@@ -206,10 +200,8 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
-        console.log(duplicateSingle)
       const duplicateGroup = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,
@@ -224,17 +216,16 @@ export class CandidateProgramService {
         .select('candidateProgram.id')
         .getCount();
 
-        const groupCountData = await candidateProgram
+      const groupCountData = await candidateProgram
         .where('program.programCode = :programCode', {
           programCode,
         })
         .select('program.group_count')
         .getRawOne();
 
-      console.log(groupCountData)
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
-
+      console.log(duplicateSingle, duplicateGroup);
       if (duplicateSingle > 1 || duplicateGroup > groupCount) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
@@ -249,7 +240,7 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
       if (single > 6) {
@@ -269,7 +260,7 @@ export class CandidateProgramService {
         .andWhere('program.mode = :mode', {
           mode: 'stage',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -306,7 +297,7 @@ export class CandidateProgramService {
         .andWhere('program.curb_group = :curbGroup', {
           curbGroup,
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -331,7 +322,6 @@ export class CandidateProgramService {
         .where('program.program_code = :programCode', {
           programCode,
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
         .select('program.language_group')
         .getRawOne();
 
@@ -347,6 +337,7 @@ export class CandidateProgramService {
         .andWhere('program.language_group = :languageGroup', {
           languageGroup,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -376,7 +367,6 @@ export class CandidateProgramService {
     const loggedInCoordinator = await this.coordinatorService.findOne(
       coordinatorID,
     );
-    console.log(loggedInCoordinator.institute.id);
     const programsOFCandidate = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
@@ -426,7 +416,6 @@ export class CandidateProgramService {
       .where('institute.id = :id', { id: loggedInCoordinator.institute.id })
       .getRawMany();
     const result = [];
-    console.log(programsOFCandidate);
 
     programsOFCandidate.forEach((program) => {
       result.push(program.program_name);
@@ -467,7 +456,6 @@ export class CandidateProgramService {
       .addSelect('category.name')
       .getRawMany();
     const result = [];
-    console.log(programsOFCandidate);
 
     programsOFCandidate.forEach((program) => {
       result.push(program.program_name);
@@ -498,7 +486,6 @@ export class CandidateProgramService {
     id: number,
   ): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    console.log(loggedInCoordinator.institute.id);
     let registerablePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
@@ -508,7 +495,6 @@ export class CandidateProgramService {
         instituteId: loggedInCoordinator.institute.id,
       })
       .getMany();
-    console.log(registerablePrograms);
     return registerablePrograms;
   }
 
@@ -533,16 +519,12 @@ export class CandidateProgramService {
 
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    console.log(loggedInCoordinator.institute.id);
     let registerablePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
       .where('program.isRegisterable = :status', { status: 'true' })
       .getMany();
-    console.log(registerablePrograms);
     return registerablePrograms;
   }
-
-
 }

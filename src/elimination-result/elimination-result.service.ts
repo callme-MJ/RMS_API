@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import { ProgramsService } from 'src/program/program.service';
 import { CreateEliminationResultDto } from './dto/create-elimination-result.dto';
 import { UpdateEliminationResultDto } from './dto/update-elimination-result.dto';
@@ -7,6 +8,7 @@ import { UpdateEliminationResultDto } from './dto/update-elimination-result.dto'
 export class EliminationResultService {
   constructor(
     private readonly programService:ProgramsService,
+    private readonly candidateProgramService:CandidateProgramService,
   ){}
 
   create(createEliminationResultDto: CreateEliminationResultDto) {
@@ -18,8 +20,12 @@ export class EliminationResultService {
     return `This action returns all eliminationResult`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eliminationResult`;
+  findCandidatesOfProgram(code:string)  {
+    try {
+      return this.candidateProgramService.findCandidatesOfProgram(code)
+    } catch (error) {
+      throw error
+    }
   }
 
   update(id: number, updateEliminationResultDto: UpdateEliminationResultDto) {

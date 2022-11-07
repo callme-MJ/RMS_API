@@ -69,6 +69,12 @@ export class CandidateProgramService {
     }
   }
 
+  findCandidatesOfProgram(code:string){
+    this.candidateProgramRepository.find({
+      where:{programCode:code}
+    })
+  }
+
   public async findAll(
     queryParams: ICandidateProgramFIilter,
   ): Promise<{candidatePrograms:CandidateProgram[];count:number}> {

@@ -73,13 +73,11 @@ export class CandidateProgram {
   @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
     eager: true,
   })
-  @JoinTable()
   candidate: Candidate;
 
   @ManyToOne(() => Institute, (institute) => institute.candidatePrograms, {
     eager: true,
   })
-  @JoinTable()
   institute: Institute;
 
   @ManyToOne(() => Session, (session) => session.candidatePrograms, {

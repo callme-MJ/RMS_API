@@ -14,7 +14,7 @@ export class EliminationResultController {
 
   @Get()
   findAll() {
-    return this.eliminationResultService.findAll();
+    return this.eliminationResultService.findAllEliminationProgram();
   }
 
   @Get(':id')

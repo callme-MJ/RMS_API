@@ -84,6 +84,16 @@ export class ProgramsService {
     }
   }
 
+  public async findEliminationPrograms(){
+    try {
+      return this.programRepository.find({
+        where:{categoryByFeatures :'Y'}
+      })
+    } catch (error) {
+      throw error
+    }
+  }
+
   public async findAllForCoordinator(id:number): Promise<Program[]> {
     try {
       const coordinator = await this.coordinatorService.findOne(id);

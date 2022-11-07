@@ -4,6 +4,7 @@ import { UpdateEliminationResultDto } from './dto/update-elimination-result.dto'
 
 @Injectable()
 export class EliminationResultService {
+  
   create(createEliminationResultDto: CreateEliminationResultDto) {
     return 'This action adds a new eliminationResult';
   }

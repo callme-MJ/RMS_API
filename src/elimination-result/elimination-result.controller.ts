@@ -13,7 +13,7 @@ export class EliminationResultController {
   }
 
   @Get()
-  findAll() {
+  findAllEliminationProgram() {
     return this.eliminationResultService.findAll();
   }
 

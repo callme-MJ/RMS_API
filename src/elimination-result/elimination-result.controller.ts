@@ -13,8 +13,8 @@ export class EliminationResultController {
   }
 
   @Get()
-  findAllEliminationProgram() {
-    return this.eliminationResultService.findAll();
+  findAll() {
+    return this.eliminationResultService.findAllEliminationProgram();
   }
 
   @Get(':id')

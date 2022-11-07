@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { ProgramsService } from 'src/program/program.service';
 import { CreateEliminationResultDto } from './dto/create-elimination-result.dto';
 import { UpdateEliminationResultDto } from './dto/update-elimination-result.dto';
 
 @Injectable()
 export class EliminationResultService {
-  
+  constructor(
+    private readonly programService:ProgramsService,
+  ){}
+
   create(createEliminationResultDto: CreateEliminationResultDto) {
     return 'This action adds a new eliminationResult';
   }
 
-  findAll() {
+  findAllEliminationProgram() {
+   return this.programService.findEliminationPrograms
     return `This action returns all eliminationResult`;
   }
 

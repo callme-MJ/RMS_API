@@ -87,7 +87,7 @@ export class ProgramsService {
   public async findEliminationPrograms(){
     try {
       return this.programRepository.find({
-        where:{categoryByFeatures :'Y'}
+        where:{categoryByFeatures :'W'}
       })
     } catch (error) {
       throw error

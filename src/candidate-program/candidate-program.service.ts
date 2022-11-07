@@ -267,7 +267,7 @@ export class CandidateProgramService {
       if (stage > 4) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
-          'Candidate already enrolled in 4 stage program',
+          'Candidate already enrolled in more than 4 stage program',
         );
       }
 
@@ -275,7 +275,7 @@ export class CandidateProgramService {
       if (nonStage > 4) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
-          'Candidate already enrolled in more than 4 non-stage program',
+          'Candidate already enrolled in 4 non-stage program',
         );
       }
 

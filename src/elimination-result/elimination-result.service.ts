@@ -14,7 +14,7 @@ export class EliminationResultService {
   }
 
   findAllEliminationProgram() {
-   return this.programService.findEliminationPrograms
+   return this.programService.findEliminationPrograms();
     return `This action returns all eliminationResult`;
   }
 

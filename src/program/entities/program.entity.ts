@@ -80,7 +80,6 @@ export class Program {
   @Column({ nullable: true })
   maxSelection: number;
 
-  @Exclude()
   @Column({ nullable: true })
   categoryByFeatures: string;
 

@@ -17,6 +17,7 @@ import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { EliminationResultModule } from './elimination-result/elimination-result.module';
 
 
 @Module({
@@ -92,6 +93,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     CandidateProgramModule,
     SessionModule,
+    EliminationResultModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -71,7 +71,7 @@ export class CandidateProgramService {
 
   public async findAll(
     queryParams: ICandidateProgramFIilter,
-  ): Promise<{ candidateProgram: CandidateProgram[]; count: number }> {
+  ): Promise<{candidatePrograms:CandidateProgram[];count:number}> {
     const candidateprogramsQuery =
       this.candidateProgramRepository.createQueryBuilder('candidatePrograms');
 
@@ -92,13 +92,16 @@ export class CandidateProgramService {
     const perPage = 10;
     candidateprogramsQuery.offset((page - 1) * perPage).limit(perPage);
     try {
-      const [candidateProgram, count] = await candidateprogramsQuery
-        .where('candidatePrograms.session_id = :sessionID', {
-          sessionID: queryParams.sessionID,
+      let candidatePrograms = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('candidatePrograms.session_id = :sessionID', {
+        sessionID: queryParams.sessionID,
         })
-        .getManyAndCount();
+      .getMany();
 
-      return { candidateProgram, count };
+    return {candidatePrograms,count:candidatePrograms.length};
+      
     } catch (error) {
       throw error;
     }

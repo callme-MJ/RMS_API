@@ -17,9 +17,9 @@ export class EliminationResultController {
     return this.eliminationResultService.findAllEliminationProgram();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eliminationResultService.findOne(+id);
+  @Get('candidate')
+  findOne(@Param('code') code: string) {
+    return this.eliminationResultService.findCandidatesOfProgram(code);
   }
 
   @Patch(':id')

@@ -8,6 +8,7 @@ import { CandidateProgram } from './entities/candidate-program.entity';
 import { CoordinatorCandidateProgramController } from './controllers/coordinator-candidate-program.controller';
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
+import { ControllerCandidateProgramController } from './controllers/controller-candidate-program.controller';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { Candidate } from 'src/candidate/entities/candidate.entity';
     CoordinatorModule,
     TypeOrmModule.forFeature([CandidateProgram,Candidate]),
   ],
-  controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController],
+  controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController,ControllerCandidateProgramController],
   providers: [CandidateProgramService],
   exports: [CandidateProgramService]
 })

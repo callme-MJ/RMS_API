@@ -17,6 +17,7 @@ import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { MulterModule } from '@nestjs/platform-express';
 import { EliminationResultModule } from './elimination-result/elimination-result.module';
 
 
@@ -83,6 +84,10 @@ import { EliminationResultModule } from './elimination-result/elimination-result
       }),
       inject: [ConfigService],
     }),
+    
+   MulterModule.register({
+  dest: './upload',
+}),
     CategoryModule,
     CandidateModule,
     InstituteModule,
@@ -93,7 +98,7 @@ import { EliminationResultModule } from './elimination-result/elimination-result
     UserModule,
     CandidateProgramModule,
     SessionModule,
-    EliminationResultModule,
+    EliminationResultModule
   ],
   controllers: [AppController],
   providers: [AppService],

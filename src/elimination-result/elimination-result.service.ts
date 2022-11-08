@@ -52,7 +52,6 @@ export class EliminationResultService {
   async findCandidatesOfProgram(code:string)  {
     try {
       const candidate = await this.candidateProgramService.findCandidatesOfProgram(code)
-      console.log(candidate)
       return candidate
     } catch (error) {
       throw error

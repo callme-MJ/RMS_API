@@ -31,6 +31,10 @@ export class AdminEliminationResultController {
     const candidate = await this.eliminationResultService.findCandidatesOfProgram(code);
     return candidate
   }
+  @Get('selection/:code')
+  async findSelected(@Param('code') code: string) {
+    return await this.eliminationResultService.findSelected(code)
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEliminationResultDto: UpdateEliminationResultDto) {

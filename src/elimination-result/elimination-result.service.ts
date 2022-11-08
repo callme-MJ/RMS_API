@@ -66,6 +66,22 @@ export class EliminationResultService {
     }
   }
 
+  async findPoints(chessNO:number,programCode:string){
+    try {
+      const result = await this.eliminationResultRepo.findOne({
+        where: {
+          chestNO: chessNO,
+          programCode: programCode
+        }
+      })
+      if(!result) throw new NotFoundException('Result not found')
+      return result
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
   update(id: number, updateEliminationResultDto: UpdateEliminationResultDto) {
     return `This action updates a #${id} eliminationResult`;
   }

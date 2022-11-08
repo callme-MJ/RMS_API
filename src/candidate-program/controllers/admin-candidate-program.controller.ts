@@ -10,19 +10,15 @@ import {
   Request,
   UseGuards,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { get } from 'http';
-import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import {
   CandidateProgramService,
-  ICandidateProgramFIilter,
+  ICandidateProgramFIilter
 } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
-import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
-import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/candidate-programs')
@@ -61,9 +57,9 @@ export class AdminCandidateProgramController {
   }
 
   @Get('/candidates/all')
-  async getAllcandidateProgramsOfInsititute() {
+  async getAllcandidatePrograms(@Query() queryParams: ICandidateProgramFIilter) {
     try {
-      return await this.candidateProgramService.findCandidatePrograms();
+      return await this.candidateProgramService.findCandidatePrograms(queryParams);
     } catch (error) {}
   }
 

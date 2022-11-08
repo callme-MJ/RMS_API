@@ -453,19 +453,21 @@ export class CandidateProgramService {
 
     return output;
   }
-  async findCandidatePrograms() {
+  async findCandidatePrograms(queryParams: any) {
     const programsOFCandidate = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
       .leftJoinAndSelect('candidate.institute', 'institute')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('candidatePrograms.session', 'session')
       .select('candidate.name')
       .addSelect('candidate.photo')
       .addSelect('program.name')
       .addSelect('candidate.chestNO')
       .addSelect('institute.name')
       .addSelect('category.name')
+      .where("session.id = :id", { id: queryParams.sessionID })
       .getRawMany();
     const result = [];
 

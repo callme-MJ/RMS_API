@@ -10,19 +10,23 @@ import {
   Request,
   UseGuards,
   UsePipes,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { get } from 'http';
+import { ICandidateFilter } from 'src/candidate/services/candidate.service';
 import {
   CandidateProgramService,
-  ICandidateProgramFIilter
+  ICandidateProgramFIilter,
 } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
 import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
+import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
+import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-admin'))
-@Controller('admin/candidate-programs')
-export class AdminCandidateProgramController {
+@UseGuards(AuthGuard('jwt-user'))
+@Controller('user/candidate-programs')
+export class ControllerCandidateProgramController {
   constructor(
     private readonly candidateProgramService: CandidateProgramService,
   ) {}
@@ -55,32 +59,4 @@ export class AdminCandidateProgramController {
   remove(@Param('id') id: number) {
     return this.candidateProgramService.remove(+id);
   }
-
-  @Get('/candidates/all')
-  async getAllcandidatePrograms(@Query() queryParams: ICandidateProgramFIilter) {
-    try {
-      return await this.candidateProgramService.findCandidatePrograms(queryParams);
-    } catch (error) {}
-  }
-
-  @Get('/topics/all')
-  async getAllTopicsOfInstitute(@Request() req: any) {
-    try {
-      return await this.candidateProgramService.findAllTopics(
-        req.user.id,
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('/topics/:id')
-  async updateStutusTopic(@Param("id") id: number, @Body() createTopicStatusDTO: CreateTopicStatusDTO) {
-    try {
-      return await this.candidateProgramService.createTopic(createTopicStatusDTO,id);
-    } catch (error) {
-      throw error;
-    }
-  }
-
 }

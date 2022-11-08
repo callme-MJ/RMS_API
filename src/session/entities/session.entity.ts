@@ -5,6 +5,7 @@ import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Program } from 'src/program/entities/program.entity';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 
 export enum SessionStatus {
   INACTIVE,
@@ -38,6 +39,9 @@ export class Session {
     
     @OneToMany(() => Candidate, candidate => candidate.session)
     candidates: Candidate[]
+
+    @OneToMany(() => CandidateProgram, candidateProgram => candidateProgram.session)
+    candidatePrograms: CandidateProgram[]
 
     @OneToMany(() => Coordinator, coordinator => coordinator.session)
     coordinators: Coordinator[]

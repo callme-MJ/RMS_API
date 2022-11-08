@@ -37,7 +37,7 @@ export class MediaGallery {
   id: number;
 
   @Column()
-  name: string;
+  content: string;
 
  
 

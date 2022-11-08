@@ -32,9 +32,6 @@ export class Candidate {
   @Column()
   class: number;
 
-  // @Column()
-  // class: number;
-
   @Column()
   adno: number;
 
@@ -50,23 +47,27 @@ export class Candidate {
   @Column({ type: 'varchar', default: Gender.MALE })
   gender: Gender;
 
-  @ManyToOne(() => Institute, (institute) => institute.candidates,{eager:true})
-  @OneToMany(() => Session, (session) => session.candidates)
-  sessions: Session[];
+  @Column()
+  categoryID: number;
 
-  @OneToMany(() => CandidateProgram,(candidateProgram) => candidateProgram.candidate,)
+  @OneToMany(
+    () => CandidateProgram,
+    (candidateProgram) => candidateProgram.candidate,
+  )
   candidatePrograms: CandidateProgram[];
 
-  @ManyToOne(() => Institute, (institute) => institute.candidates, {eager:true})
+  @ManyToOne(() => Institute, (institute) => institute.candidates, {
+    eager: true,
+  })
   @JoinTable()
   institute: Institute;
 
-  @ManyToOne(() => Category, (category) => category.candidates, {eager:true})
+  @ManyToOne(() => Category, (category) => category.candidates, { eager: true })
   @JoinTable()
   category: Category;
 
-  @Expose({ name: 'session_id' })
-  @ManyToOne(() => Session,(session)=>session.candidates,{eager:true})
+  @Expose({ name: 'session' })
+  @ManyToOne(() => Session, (session) => session.candidates, { eager: true })
   session: Session;
 
   @Expose({ groups: ['single'], name: 'created_at' })

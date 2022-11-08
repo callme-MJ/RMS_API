@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Session } from 'src/session/entities/session.entity';
@@ -20,6 +20,13 @@ export class Program {
   name: string;
 
   @Column()
+  categoryID: number;
+
+
+  @Column()
+  sessionID: number;
+
+  @Column()
   status: string;
 
   @Column()
@@ -31,52 +38,52 @@ export class Program {
   @Column()
   type: string;
 
-  @Column()
+  @Column({ nullable: true })
   groupCount: number;
 
-  @Column()
+  @Column({ nullable: true })
   date: string;
 
-  @Column()
+  @Column({ nullable: true })
   time: string;
 
-  @Column()
+  @Column({ nullable: true })
   venue: number;
 
-  @Column()
+  @Column({ nullable: true })
   curbGroup: string;
 
-  @Column()
+  @Column({ nullable: true })
   maxCountCurb: number;
 
-  @Column()
+  @Column({ nullable: true })
   languageGroup: string;
 
-  @Column()
+  @Column({ nullable: true })
   isRegisterable: string;
 
-  @Column()
+  @Column({ nullable: true })
   isStarred: string;
 
-  @Column()
+  @Column({ nullable: true })
   duration: number;
 
-  @Column()
+  @Column({ nullable: true })
   conceptNote: string;
 
-  @Column()
+  @Column({ nullable: true })
   resultEntered: string;
 
-  @Column()
+  @Column({ nullable: true })
   resultPublished: string;
 
-  @Column()
+  @Column({ nullable: true })
   maxSelection: number;
 
-  @Column()
+  @Column({ nullable: true })
   categoryByFeatures: string;
 
-  @Column()
+  @Column({ nullable: true })
   skill: string;
 
   @OneToMany(() => CandidateProgram, (candidateProgram) => candidateProgram.program)

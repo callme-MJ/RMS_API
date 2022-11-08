@@ -47,8 +47,9 @@ export class AdminCandidatesController {
   @Get(':chestNO')
   async findCandidateBychestNO(
     @Param('chestNO', ParseIntPipe) chestNO: number,
+    @Query() queryParams: ICandidateFilter
   ) {
-    return await this.candidateService.findCandidateBychestNO(+chestNO);
+    return await this.candidateService.findCandidateBychestNO(+chestNO,queryParams.sessionID);
   }
 
   @Delete(':id')

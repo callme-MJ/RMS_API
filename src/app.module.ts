@@ -19,6 +19,7 @@ import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { MediaGalleryModule } from './media-gallery/media-gallery.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { EliminationResultModule } from './elimination-result/elimination-result.module';
 
 
 @Module({
@@ -99,6 +100,7 @@ import { MulterModule } from '@nestjs/platform-express';
     CandidateProgramModule,
     SessionModule,
     MediaGalleryModule,
+    EliminationResultModule,
   ],
   controllers: [AppController],
   providers: [AppService],

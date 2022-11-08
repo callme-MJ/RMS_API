@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateCandidateProgramDTO {
+export class CreateTopicProgramDTO {
   @IsNotEmpty()
   chestNO: number;
 
@@ -8,11 +8,8 @@ export class CreateCandidateProgramDTO {
   programCode: string;
 
   @IsNotEmpty()
-  categoryID: number;
+  topic: string;
 
   @IsNotEmpty()
-  programName: string;
-
-  @IsNotEmpty()
-  instituteID: number;
+  link: string;
 }

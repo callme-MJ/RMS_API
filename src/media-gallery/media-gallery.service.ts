@@ -26,6 +26,8 @@ export class MediaGalleryService {
 
       if(!image) throw new ValidationException("image is required");
 
+      // const newPhoto = await this.mediaGalleryRepository.create(payload)
+
       const mediagallery: MediaGallery = await this.mediaGalleryRepository.save({ ...payload, session });
       
       return await this.uploadPhoto(mediagallery, image);

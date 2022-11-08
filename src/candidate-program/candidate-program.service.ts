@@ -12,7 +12,11 @@ import { Repository } from 'typeorm';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
-import { CandidateProgram, Status } from './entities/candidate-program.entity';
+import {
+  CandidateProgram,
+  SelectionStatus,
+  Status,
+} from './entities/candidate-program.entity';
 export interface ICandidateProgramFIilter extends IFilter {
   candidateID: number;
   instituteID: number;
@@ -100,7 +104,7 @@ export class CandidateProgramService {
     const perPage = 10;
     candidateprogramsQuery.offset((page - 1) * perPage).limit(perPage);
     try {
-      let candidatePrograms= this.candidateProgramRepository.find({
+      let candidatePrograms = this.candidateProgramRepository.find({
         where: {
           session: {
             id: queryParams.sessionID,
@@ -467,7 +471,7 @@ export class CandidateProgramService {
       .addSelect('candidate.chestNO')
       .addSelect('institute.name')
       .addSelect('category.name')
-      .where("session.id = :id", { id: queryParams.sessionID })
+      .where('session.id = :id', { id: queryParams.sessionID })
       .getRawMany();
     const result = [];
 
@@ -531,8 +535,7 @@ export class CandidateProgramService {
     return candidateProgram;
   }
 
-
-  public async updateSelection(id: number,result:boolean): Promise<CandidateProgram> {
+  public async updateSelection(id: number): Promise<CandidateProgram> {
     const candidateProgram = await this.candidateProgramRepository.findOneBy({
       id,
     });
@@ -541,14 +544,12 @@ export class CandidateProgramService {
         'Candidate not  not registered for this program',
       );
     }
-    candidateProgram.isSelected = result
+    candidateProgram.isSelected = SelectionStatus.TRUE;
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }
 
-  public async selectCandidate(){
-
-  }
+  public async selectCandidate() {}
 
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);

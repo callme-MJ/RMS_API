@@ -40,8 +40,8 @@ export class EliminationResultService {
     }
   }
 
-  async updateSelection(id:number,result:boolean){
-    return this.candidateProgramService.updateSelection(id,result)
+  async updateSelection(id:number){
+    return this.candidateProgramService.updateSelection(id)
   }
 
   findAllEliminationProgram() {

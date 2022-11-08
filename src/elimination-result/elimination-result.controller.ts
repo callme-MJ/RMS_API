@@ -13,10 +13,10 @@ export class EliminationResultController {
     return this.eliminationResultService.create(createEliminationResultDto);
   }
 
-  @Post('selection')
+  @Post('/selection/:id')
   @UsePipes(ValidationPipe)
-  updateSelection(@Body()result:boolean,@Param('id')id:number) {
-    return this.eliminationResultService.updateSelection(id,result);
+  updateSelection(@Param('id')id:number) {
+    return this.eliminationResultService.updateSelection(id);
   }
 
   @Get()

@@ -38,14 +38,15 @@ export class MediaGalleryService {
 
   public async findAll(sessionID: number = 0): Promise<MediaGallery[]> {
     try {
-      return this.mediaGalleryRepository.find({
-        where: {
-          session: {
-            id: sessionID,
-            status: SessionStatus.ACTIVE
-          }
-        }
-      });
+      return this.mediaGalleryRepository.find();
+      // {
+      //   where: {
+      //     session: {
+      //       id: sessionID,
+      //       status: SessionStatus.ACTIVE
+      //     }
+      //   }
+      // }
     } catch (error) {
       throw error;
     }

@@ -21,7 +21,7 @@ export class MediaGalleryController {
 
   @SerializeOptions({ groups: ['collection'] })
   @Get()
-  findAll(@Query('session_id') sessionID: number = 0) {
+  findAll(@Query() sessionID: number = 0) {
     return this.mediaGalleryService.findAll(+sessionID);
   }
 

@@ -78,7 +78,7 @@ export class CandidateProgramService {
     const candidate = await this.candidateProgramRepository.find({
       where: { programCode: code },
     });
-    return candidate.map((candidate) => candidate.candidate.name);
+    return candidate;
   }
 
   public async findAll(

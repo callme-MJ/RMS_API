@@ -62,7 +62,7 @@ export class CandidateProgram {
 
   @Expose({ name: 'is_selected' })
   @Column({ nullable: true })
-  isSelected: number;
+  isSelected: boolean;
 
   @ManyToOne(() => Program, (program) => program.candidatePrograms, {
     eager: true,

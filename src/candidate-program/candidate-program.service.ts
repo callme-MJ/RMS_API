@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
@@ -524,6 +524,25 @@ export class CandidateProgramService {
     candidateProgram.status = Status.Pending;
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
+  }
+
+
+  public async updateSelection(id: number,result:boolean): Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({
+      id,
+    });
+    if (!candidateProgram) {
+      throw new NotFoundException(
+        'Candidate not  not registered for this program',
+      );
+    }
+    candidateProgram.isSelected = result
+    await this.candidateProgramRepository.save(candidateProgram);
+    return candidateProgram;
+  }
+
+  public async selectCandidate(){
+
   }
 
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {

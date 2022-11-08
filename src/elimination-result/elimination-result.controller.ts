@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { EliminationResultService } from './elimination-result.service';
 import { CreateEliminationResultDto } from './dto/create-elimination-result.dto';
 import { UpdateEliminationResultDto } from './dto/update-elimination-result.dto';
@@ -8,8 +8,15 @@ export class EliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   create(@Body() createEliminationResultDto: CreateEliminationResultDto) {
     return this.eliminationResultService.create(createEliminationResultDto);
+  }
+
+  @Post('/selection/:id')
+  @UsePipes(ValidationPipe)
+  updateSelection(@Param('id')id:number) {
+    return this.eliminationResultService.updateSelection(id);
   }
 
   @Get()

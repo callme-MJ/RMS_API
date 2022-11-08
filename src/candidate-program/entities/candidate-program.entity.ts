@@ -19,6 +19,10 @@ export enum Status {
   Rejected = 'R',
   NotSubmitted="N"
 }
+export enum SelectionStatus {
+  TRUE = "True",
+  FALSE = 'False',
+}
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
   @PrimaryGeneratedColumn({
@@ -61,8 +65,8 @@ export class CandidateProgram {
   codeLetter: string;
 
   @Expose({ name: 'is_selected' })
-  @Column({ nullable: true })
-  isSelected: number;
+  @Column({ nullable: true ,default:SelectionStatus.FALSE})
+  isSelected: SelectionStatus;
 
   @ManyToOne(() => Program, (program) => program.candidatePrograms, {
     eager: true,

@@ -4,7 +4,7 @@ import { CategoryService } from '../category.service';
 import { CreateCategoryDTO } from '../dto/create-category.dto';
 import { UpdateCategoryDTO } from '../dto/update-category.dto';
 
-@UseGuards(AuthGuard('jwt-user'))
+// @UseGuards(AuthGuard('jwt-user'))
 @Controller('user/categories')
 export class UserCategoryController {
   constructor(private readonly categoryService: CategoryService) { }
@@ -13,8 +13,8 @@ export class UserCategoryController {
 
   @SerializeOptions({ groups: ['collection'] })
   @Get()
-  findAll(@Request()req: any) {
-    return this.categoryService.findAllForCoordinator(req.user.id);
+  findAll(@Query('session_id') sessionID: number = 0) {
+    return this.categoryService.findAll(+sessionID);
   }
 
   @SerializeOptions({ groups: ['single'] })

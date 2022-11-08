@@ -79,15 +79,15 @@ export class CandidateProgramService {
       where: { programCode: code },
     });
     const candidate = data.map((candidate)=>candidate.candidate)
-    console.log('====================================');
-    console.log(candidate);
-    console.log('====================================');
     return candidate;
   }
   
   public async findSelected(code: string) {
     return this.candidateProgramRepository.find({
-      where:{isSelected:SelectionStatus.TRUE}
+      where:{
+        programCode: code,
+        isSelected: SelectionStatus.TRUE
+      }
     })
   }
 

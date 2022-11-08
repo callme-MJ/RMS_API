@@ -58,6 +58,13 @@ export class EliminationResultService {
     }
   }
   
+  async findSelected(code:string){
+    try {
+      return await this.candidateProgramService.findSelected(code)
+    } catch (error) {
+      throw error
+    }
+  }
 
   update(id: number, updateEliminationResultDto: UpdateEliminationResultDto) {
     return `This action updates a #${id} eliminationResult`;

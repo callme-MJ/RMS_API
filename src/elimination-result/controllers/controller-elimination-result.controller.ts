@@ -32,6 +32,11 @@ export class ControllerEliminationResultController {
     return candidate
   }
 
+  @Get('selection/:code')
+  async findSelected(@Param('code')code:string){
+    return await this.eliminationResultService.findSelected(code)
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEliminationResultDto: UpdateEliminationResultDto) {
     return this.eliminationResultService.update(+id, updateEliminationResultDto);

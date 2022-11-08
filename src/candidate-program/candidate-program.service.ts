@@ -75,10 +75,20 @@ export class CandidateProgramService {
   }
 
   async findCandidatesOfProgram(code: string) {
-    const candidate = await this.candidateProgramRepository.find({
+    const data = await this.candidateProgramRepository.find({
       where: { programCode: code },
     });
+    const candidate = data.map((candidate)=>candidate.candidate)
+    console.log('====================================');
+    console.log(candidate);
+    console.log('====================================');
     return candidate;
+  }
+  
+  public async findSelected(code: string) {
+    return this.candidateProgramRepository.find({
+      where:{isSelected:SelectionStatus.TRUE}
+    })
   }
 
   public async findAll(
@@ -560,4 +570,5 @@ export class CandidateProgramService {
       .getMany();
     return registerablePrograms;
   }
+
 }

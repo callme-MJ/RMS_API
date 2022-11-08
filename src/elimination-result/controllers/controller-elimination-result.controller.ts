@@ -4,8 +4,7 @@ import { CreateEliminationResultDto } from '../dto/create-elimination-result.dto
 import { UpdateEliminationResultDto } from '../dto/update-elimination-result.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-
-@Controller('elimination-result')
+@Controller('user/elimination-result')
 @UseGuards(AuthGuard('jwt-user'))
 export class EliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }

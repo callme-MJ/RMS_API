@@ -6,25 +6,22 @@ import {
   Param,
   Patch,
   Post,
-  Query,
-  Request,
-  UseGuards,
+  Query, UseGuards,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { get } from 'http';
-import { ICandidateFilter } from 'src/candidate/services/candidate.service';
+import { Role } from 'src/login/interfaces/user-roles.enum';
+import { Roles } from 'src/login/user/decorators/roles.decorators';
+import { RolesGuard } from 'src/login/user/guards/roles.guard';
 import {
   CandidateProgramService,
-  ICandidateProgramFIilter,
+  ICandidateProgramFIilter
 } from '../candidate-program.service';
 import { CreateCandidateProgramDTO } from '../dto/create-candidate-program.dto';
-import { CreateTopicStatusDTO } from '../dto/create-status-topic.dto';
-import { CreateTopicProgramDTO } from '../dto/create-topic-program.dto';
-import { UpdateCandidateProgramDTO } from '../dto/update-candidate-program.dto';
 
-@UseGuards(AuthGuard('jwt-user'))
+@UseGuards(AuthGuard('jwt-user'),RolesGuard)
+@Roles(Role.CONTROLLER)
 @Controller('user/candidate-programs')
 export class ControllerCandidateProgramController {
   constructor(

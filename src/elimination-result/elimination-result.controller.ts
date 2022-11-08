@@ -24,7 +24,7 @@ export class EliminationResultController {
     return this.eliminationResultService.findAllEliminationProgram();
   }
 
-  @Get('candidate/:code')
+  @Get('candidates/:code')
   async findOne(@Param('code') code: string) {
     const candidate = await this.eliminationResultService.findCandidatesOfProgram(code);
     return candidate

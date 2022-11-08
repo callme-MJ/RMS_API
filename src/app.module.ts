@@ -18,6 +18,7 @@ import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { MediaGalleryModule } from './media-gallery/media-gallery.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
@@ -83,6 +84,10 @@ import { MediaGalleryModule } from './media-gallery/media-gallery.module';
       }),
       inject: [ConfigService],
     }),
+    
+   MulterModule.register({
+  dest: './upload',
+}),
     CategoryModule,
     CandidateModule,
     InstituteModule,

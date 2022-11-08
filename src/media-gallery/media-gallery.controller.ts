@@ -5,7 +5,7 @@ import { UpdateMediaGalleryDto } from './dto/update-media-gallery.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt-admin'))
+@UseGuards(AuthGuard('jwt-user'))
 @Controller('media/gallery')
 export class MediaGalleryController {
   constructor(private readonly mediaGalleryService: MediaGalleryService) { }

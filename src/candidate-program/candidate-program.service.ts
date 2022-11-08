@@ -112,7 +112,6 @@ export class CandidateProgramService {
           },
         },
       });
-      // let candidatePrograms = await this.candidateProgramRepository.find()
 
       return candidatePrograms;
     } catch (error) {

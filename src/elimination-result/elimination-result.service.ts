@@ -49,13 +49,16 @@ export class EliminationResultService {
     return `This action returns all eliminationResult`;
   }
 
-  findCandidatesOfProgram(code:string)  {
+  async findCandidatesOfProgram(code:string)  {
     try {
-      return this.candidateProgramService.findCandidatesOfProgram(code)
+      const candidate = await this.candidateProgramService.findCandidatesOfProgram(code)
+      console.log(candidate)
+      return candidate
     } catch (error) {
       throw error
     }
   }
+  
 
   update(id: number, updateEliminationResultDto: UpdateEliminationResultDto) {
     return `This action updates a #${id} eliminationResult`;

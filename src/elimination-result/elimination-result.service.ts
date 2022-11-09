@@ -29,13 +29,15 @@ export class EliminationResultService {
           programCode: createEliminationResultDto.programCode,
         },
       });
-      const candidateProgram = await this.CandidateProgramRepo.findOneBy({
+      const candidateProgram = await this.CandidateProgramRepo.findOne({
+        where: {
           chestNO: createEliminationResultDto.chestNO,
           programCode: createEliminationResultDto.programCode,
+        },
       });
       if (eliminationResult.length > 0)
         throw new NotFoundException('Result already exists');
-      if (candidateProgram)
+      if (!candidateProgram)
         throw new NotFoundException(
           'Candidate not found as registered for this program',
         );
@@ -52,13 +54,13 @@ export class EliminationResultService {
       );
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
-      newResult.insstituteID = candidate.institute.id;
+      newResult.instituteID = candidate.institute.id;
       newResult.programName = program.name;
       newResult.candidateProgram = candidateProgram;
-      newResult.totalPoint =
+      newResult.totalPoint = 
         createEliminationResultDto.pointOne +
         createEliminationResultDto.pointTwo +
-        createEliminationResultDto.pointThree;
+        createEliminationResultDto.pointThree ;
 
       await this.eliminationResultRepo.save(newResult);
       return newResult;

@@ -19,10 +19,10 @@ export enum Status {
   Pending = 'P',
   Approved = 'A',
   Rejected = 'R',
-  NotSubmitted="N"
+  NotSubmitted = 'N',
 }
 export enum SelectionStatus {
-  TRUE = "True",
+  TRUE = 'True',
   FALSE = 'False',
 }
 @Entity({ name: 'candidate_program' })
@@ -67,7 +67,7 @@ export class CandidateProgram {
   codeLetter: string;
 
   @Expose({ name: 'is_selected' })
-  @Column({ nullable: true ,default:SelectionStatus.FALSE})
+  @Column({ nullable: true, default: SelectionStatus.FALSE })
   isSelected: SelectionStatus;
 
   @ManyToOne(() => Program, (program) => program.candidatePrograms, {
@@ -91,10 +91,6 @@ export class CandidateProgram {
   })
   @JoinTable()
   session: Session;
-
-  @OneToOne(() => EliminationResult, (eliminationResult) => eliminationResult.candidateProgram )
-  @JoinTable()
-  eliminationResult:EliminationResult;
 
   @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()

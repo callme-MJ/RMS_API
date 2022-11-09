@@ -109,6 +109,6 @@ export class EliminationResultService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} eliminationResult`;
+    return this.eliminationResultRepo.delete(id);
   }
 }

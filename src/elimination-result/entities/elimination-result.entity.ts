@@ -24,6 +24,9 @@ programCode: string;
 candidateName: string;
 
 @Column()
+programName: string;
+
+@Column()
 pointOne: number;
 
 @Column({ nullable: true })

@@ -20,6 +20,15 @@ export class EliminationResultService {
 
   async create(createEliminationResultDto: CreateEliminationResultDto) {
     try {
+      const eliminationResult = await this.eliminationResultRepo.find({
+        where: {
+          chestNO: createEliminationResultDto.chestNO,
+          programCode: createEliminationResultDto.programCode
+        }
+      })
+      if (eliminationResult.length > 0) {
+        throw new NotFoundException('Result already exist')
+      }
       const candidate = await this.candidateService.findCandidateBychestNO(createEliminationResultDto.chestNO)
       const program = await this.programService.findOneByProgramCode(createEliminationResultDto.programCode)
       if (!candidate) throw new NotFoundException('Candidate not found');
@@ -27,14 +36,14 @@ export class EliminationResultService {
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.insstituteID = candidate.institute.id;
+      newResult.programName = program.name;
       newResult.totalPoint =
         createEliminationResultDto.pointOne +
         createEliminationResultDto.pointTwo +
         createEliminationResultDto.pointThree;
+      
       await this.eliminationResultRepo.save(newResult)
       return newResult;
-
-
     } catch (error) {
       throw error
     }
@@ -67,6 +76,7 @@ export class EliminationResultService {
 
   async findPoints(chestNO: number, programCode: string) {
     try {
+      if (!chestNO || !programCode) throw new NotFoundException('data not found')
       const result = await this.eliminationResultRepo.findOne({
         where: {
           chestNO: chestNO,
@@ -81,13 +91,11 @@ export class EliminationResultService {
     }
   }
 
-  async findPointsByProgramCode(programCode: string) {
+  async findPointsByProgramCode(param: string) {
     try {
-      const result = await this.eliminationResultRepo.find({
-        where: {
-          programCode: programCode
-        }
-      })
+      const result = await this.eliminationResultRepo.find({ 
+        where: { programCode: param}
+       })
       if (!result) throw new NotFoundException('Result not found')
       return result
 

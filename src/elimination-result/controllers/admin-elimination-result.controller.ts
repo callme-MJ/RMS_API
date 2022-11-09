@@ -36,6 +36,17 @@ export class AdminEliminationResultController {
     return await this.eliminationResultService.findSelected(code)
   }
 
+  @Get('points')
+  async findPoints(@Body() body: any) {
+    return await this.eliminationResultService.findPoints(body.chestNO, body.programCode)
+  }
+
+  @Get('points/:code')
+  async findPointsByProgramCode(@Body() body: any) {
+    return await this.eliminationResultService.findPointsByProgramCode(body.programCode)
+  }
+
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEliminationResultDto: UpdateEliminationResultDto) {
     return this.eliminationResultService.update(+id, updateEliminationResultDto);

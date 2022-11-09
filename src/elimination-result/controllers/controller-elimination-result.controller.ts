@@ -3,9 +3,13 @@ import { EliminationResultService } from '../elimination-result.service';
 import { CreateEliminationResultDto } from '../dto/create-elimination-result.dto';
 import { UpdateEliminationResultDto } from '../dto/update-elimination-result.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/login/user/guards/roles.guard';
+import { Roles } from 'src/login/user/decorators/roles.decorators';
+import { Role } from 'src/login/interfaces/user-roles.enum';
 
 @Controller('user/elimination-result')
-@UseGuards(AuthGuard('jwt-user'))
+@UseGuards(AuthGuard('jwt-user'),RolesGuard)
+@Roles(Role.CONTROLLER)
 export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
 
@@ -39,7 +43,12 @@ export class ControllerEliminationResultController {
 
   @Get('points')
   async findPoints(@Body() body: any) {
-    return await this.eliminationResultService.findPoints(body.chessNO, body.programCode)
+    return await this.eliminationResultService.findPoints(body.chestNO, body.programCode)
+  }
+
+  @Get('points/:code')
+  async findPointsByProgramCode(@Body() body: any) {
+    return await this.eliminationResultService.findPointsByProgramCode(body.programCode)
   }
 
   @Patch(':id')

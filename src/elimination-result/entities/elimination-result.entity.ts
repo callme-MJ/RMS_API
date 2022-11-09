@@ -30,10 +30,10 @@ export class EliminationResult {
   @Column()
   pointOne: number;
 
-  @Column({ nullable: true })
+  @Column({default: 0})
   pointTwo: number;
 
-  @Column({ nullable: true })
+  @Column({default: 0})
   pointThree: number;
 
   @Column()

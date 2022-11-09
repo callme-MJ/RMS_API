@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { CandidateProgram } from "src/candidate-program/entities/candidate-program.entity";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "elimination_result" })
 export class EliminationResult {
@@ -41,6 +42,8 @@ totalPoint: number;
 @Column({nullable:true})
 remarks: string;
 
+@OneToOne(() => CandidateProgram, (candidateProgram) => candidateProgram.eliminationResult)
+candidateProgram: CandidateProgram;
 
 
 }

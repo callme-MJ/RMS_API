@@ -7,10 +7,11 @@ import { CandidateProgramModule } from 'src/candidate-program/candidate-program.
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EliminationResult } from './entities/elimination-result.entity';
 import { AdminEliminationResultController } from './controllers/admin-elimination-result.controller';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 
 @Module({
   imports: [CandidateModule, ProgramModule, CandidateProgramModule,
-    TypeOrmModule.forFeature([EliminationResult]),
+    TypeOrmModule.forFeature([EliminationResult,CandidateProgram]),
   ],
   controllers: [ControllerEliminationResultController,AdminEliminationResultController],
   providers: [EliminationResultService]

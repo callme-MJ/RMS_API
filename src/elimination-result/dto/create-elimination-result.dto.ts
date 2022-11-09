@@ -16,4 +16,5 @@ export class CreateEliminationResultDto {
 
   pointThree: number;
 
+
 }

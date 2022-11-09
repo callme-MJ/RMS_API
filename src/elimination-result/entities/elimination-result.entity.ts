@@ -42,7 +42,7 @@ export class EliminationResult {
   @Column({ nullable: true })
   remarks: string;
 
-  @OneToOne( type => CandidateProgram)
+  @OneToOne( type => CandidateProgram ,{eager:true})
   @JoinColumn()
   candidateProgram: CandidateProgram;
 }

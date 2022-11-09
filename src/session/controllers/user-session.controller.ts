@@ -12,7 +12,7 @@ import { CreateSessionDTO } from '../dto/create-session.dto';
 import { Session } from '../entities/session.entity';
 import { SessionService } from '../session.service';
 
-@UseGuards(AuthGuard('jwt-use'))
+@UseGuards(AuthGuard('jwt-user'))
 @Controller('user/sessions')
 export class UserSessionController {
   constructor(private readonly sessionService: SessionService) { }

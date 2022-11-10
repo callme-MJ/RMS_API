@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { EliminationResultService } from '../elimination-result.service';
 
 @Controller('public/elimination-result')
-export class AdminEliminationResultController {
+export class EliminationResultController {
   constructor(
     private readonly eliminationResultService: EliminationResultService,
   ) {}

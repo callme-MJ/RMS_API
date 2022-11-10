@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('elimination-result')
 @UseGuards(AuthGuard('jwt-user'))
-export class EliminationResultController {
+export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
 
   @Post()

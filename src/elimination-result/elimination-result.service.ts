@@ -103,8 +103,8 @@ export class EliminationResultService {
 
   async findPoints(chestNO: number, programCode: string) {
     try {
-      if (!chestNO || !programCode)
-        throw new NotFoundException('data not found');
+      // if (!chestNO || !programCode)
+      //   throw new NotFoundException('data not found');
       const result = await this.eliminationResultRepo.findOne({
         where: {
           chestNO: chestNO,

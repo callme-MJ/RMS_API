@@ -88,28 +88,27 @@ export class CandidateProgramService {
   }
 
   public async findSelected(code: string) {
-    // return this.candidateProgramRepository.find({
-    //   where:{
-    //     programCode: code,
-    //     isSelected: SelectionStatus.TRUE
-    //   },
-    //   relations: ['program'],
+    return this.candidateProgramRepository.find({
+      where:{
+        programCode: code,
+        isSelected: SelectionStatus.TRUE
+      },
 
-    // })
-    return this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .where('program.code = :code', { code })
-      .andWhere('candidatePrograms.isSelected = :isSelected', {
-        isSelected: SelectionStatus.TRUE,
-      })
-      .andWhere('program.resultEntered = :resultEntered', {
-        resultEntered: EnteringStatus.TRUE,
-      })
-      .andWhere('program.resultPublished = :resultPublished', {
-        resultPublished: PublishingStatus.TRUE,
-      })
-      .getMany();
+    })
+    // return this.candidateProgramRepository
+    //   .createQueryBuilder('candidatePrograms')
+    //   .leftJoinAndSelect('candidatePrograms.program', 'program')
+    //   .where('candidatePrograms.programCode = :programCode',{programCode:code})
+    //   .andWhere('candidatePrograms.isSelected = :isSelected', {
+    //     isSelected: SelectionStatus.TRUE,
+    //   })
+    //   .andWhere('program.resultEntered = :resultEntered', {
+    //     resultEntered: EnteringStatus.TRUE,
+    //   })
+    //   .andWhere('program.resultPublished = :resultPublished', {
+    //     resultPublished: PublishingStatus.TRUE,
+    //   })
+    //   .getMany();
   }
 
   public async findAll(

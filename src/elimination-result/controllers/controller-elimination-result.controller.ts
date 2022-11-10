@@ -8,8 +8,8 @@ import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { Role } from 'src/login/interfaces/user-roles.enum';
 
 @Controller('user/elimination-result')
-// @UseGuards(AuthGuard('jwt-user'),RolesGuard)
-// @Roles(Role.CONTROLLER)
+@UseGuards(AuthGuard('jwt-user'),RolesGuard)
+@Roles(Role.CONTROLLER)
 export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
 

@@ -25,6 +25,12 @@ export class ControllerEliminationResultController {
     return this.eliminationResultService.updateSelection(id);
   }
 
+  @Delete('/selection/:id')
+  @UsePipes(ValidationPipe)
+  DeleteSelection(@Param('id') id: number) {
+    return this.eliminationResultService.deleteSelection(id);
+  }
+
   @Get()
   findAll() {
     return this.eliminationResultService.findAllEliminationProgram();
@@ -62,4 +68,10 @@ export class ControllerEliminationResultController {
   remove(@Param('id') id: string) {
     return this.eliminationResultService.remove(+id);
   }
+
+  @Post('/publish/:code')
+  async publish(@Param('code') code: string) {
+    return await this.eliminationResultService.publishResult(code)
+  }
+
 }

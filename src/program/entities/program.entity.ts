@@ -8,6 +8,14 @@ import {
   DeleteDateColumn,
   Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
+export enum EnteringStatus {
+  TRUE = 'True',
+  FALSE = 'False',
+}
+export enum PublishingStatus {
+  TRUE = 'True',
+  FALSE = 'False',
+}
 @Entity({ name: 'program' })
 export class Program {
   @PrimaryGeneratedColumn()
@@ -71,11 +79,11 @@ export class Program {
   @Column({ nullable: true })
   conceptNote: string;
 
-  @Column({ nullable: true })
-  resultEntered: string;
+  @Column({default: EnteringStatus.FALSE})
+  resultEntered: EnteringStatus;
 
-  @Column({ nullable: true })
-  resultPublished: string;
+  @Column({default: PublishingStatus.FALSE})
+  resultPublished: PublishingStatus;
 
   @Column({ nullable: true })
   maxSelection: number;

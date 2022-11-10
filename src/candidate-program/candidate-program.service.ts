@@ -534,7 +534,7 @@ export class CandidateProgramService {
     });
     if (!candidateProgram) {
       throw new NotFoundException(
-        'Candidate not  not registered for this program',
+        'Candidate  not registered for this program',
       );
     }
     candidateProgram.topic = createTopicProgramDto.topic;
@@ -550,10 +550,37 @@ export class CandidateProgramService {
     });
     if (!candidateProgram) {
       throw new NotFoundException(
-        'Candidate not  not registered for this program',
+        'Candidate not registered for this program',
       );
     }
+    const program:Program = await this.programsService.findOne(candidateProgram.program.id);
+    const selectedCount = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    .leftJoinAndSelect('candidatePrograms.program', 'program')
+    .select('COUNT(candidatePrograms.id)')
+    .where('program.id = :id', { id: program.id })
+    .andWhere("candidatePrograms.is_selected = 'true'")
+    .getCount();
+    if(selectedCount >= program.maxSelection){
+      throw new NotFoundException('Maximum Selection Reached');
+    }    
+
+    
+
     candidateProgram.isSelected = SelectionStatus.TRUE;
+    await this.candidateProgramRepository.save(candidateProgram);
+    return candidateProgram;
+  }
+
+  public async deleteSelection(id: number): Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({
+      id,
+    });
+    if (!candidateProgram) {
+      throw new NotFoundException(
+        'Candidate  not registered for this program',
+      );
+    }
+    candidateProgram.isSelected = SelectionStatus.FALSE;
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }

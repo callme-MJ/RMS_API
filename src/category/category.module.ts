@@ -8,13 +8,14 @@ import { CoordinatorCategoryController } from './controllers/coordinator-categor
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { Coordinator } from 'src/coordinator/entities/coordinator.entity';
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
+import { PUblicCategoryController } from './controllers/public-category.controller';
 import { UserCategoryController } from './controllers/user-category.controller';
 
 @Module({
   imports: [CoordinatorModule,
     TypeOrmModule.forFeature([Category, Coordinator])
   ],
-  controllers: [AdminCategoryController, CoordinatorCategoryController,UserCategoryController],
+  controllers: [AdminCategoryController, CoordinatorCategoryController,UserCategoryController,PUblicCategoryController],
   providers: [CategoryService],
   exports: [CategoryService]
 })

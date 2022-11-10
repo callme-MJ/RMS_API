@@ -27,16 +27,16 @@ export class EliminationResult {
   @Column()
   programName: string;
 
-  @Column()
+  @Column("decimal", { precision: 5, scale: 2 })
   pointOne: number;
 
-  @Column({default: 0})
+  @Column("decimal", { precision: 5, scale: 2 })
   pointTwo: number;
 
-  @Column({default: 0})
+  @Column("decimal", { precision: 5, scale: 2 })
   pointThree: number;
 
-  @Column()
+  @Column("decimal", { precision: 5, scale: 2 })
   totalPoint: number;
 
   @Column({ nullable: true })

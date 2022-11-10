@@ -9,7 +9,7 @@ import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
-import { Program } from './entities/program.entity';
+import { Program, PublishingStatus } from './entities/program.entity';
 
 export interface IProgramFilter extends IFilter {
   session_id: number;
@@ -88,6 +88,15 @@ export class ProgramsService {
     try {
       return this.programRepository.find({
         where:{categoryByFeatures :'W'}
+      })
+    } catch (error) {
+      throw error
+    }
+  }
+  public async findAllPublishedEliminationProgram(){
+    try {
+      return this.programRepository.find({
+        where:{categoryByFeatures :'W',resultPublished:PublishingStatus.TRUE},
       })
     } catch (error) {
       throw error

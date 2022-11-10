@@ -9,9 +9,10 @@ import { EliminationResult } from './entities/elimination-result.entity';
 import { AdminEliminationResultController } from './controllers/admin-elimination-result.controller';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { PublicEliminationResultController } from './controllers/public-elimination-result.controller';
+import { CategoryModule } from 'src/category/category.module';
 
 @Module({
-  imports: [CandidateModule, ProgramModule, CandidateProgramModule,
+  imports: [CandidateModule, ProgramModule, CandidateProgramModule,CategoryModule,
     TypeOrmModule.forFeature([EliminationResult,CandidateProgram]),
   ],
   controllers: [ControllerEliminationResultController,AdminEliminationResultController,PublicEliminationResultController],

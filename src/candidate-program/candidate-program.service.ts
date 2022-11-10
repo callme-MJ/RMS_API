@@ -95,20 +95,20 @@ export class CandidateProgramService {
       },
 
     })
-    // return this.candidateProgramRepository
-    //   .createQueryBuilder('candidatePrograms')
-    //   .leftJoinAndSelect('candidatePrograms.program', 'program')
-    //   .where('candidatePrograms.programCode = :programCode',{programCode:code})
-    //   .andWhere('candidatePrograms.isSelected = :isSelected', {
-    //     isSelected: SelectionStatus.TRUE,
-    //   })
-    //   .andWhere('program.resultEntered = :resultEntered', {
-    //     resultEntered: EnteringStatus.TRUE,
-    //   })
-    //   .andWhere('program.resultPublished = :resultPublished', {
-    //     resultPublished: PublishingStatus.TRUE,
-    //   })
-    //   .getMany();
+    return this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .where('candidatePrograms.programCode = :programCode',{programCode:code})
+      .andWhere('candidatePrograms.isSelected = :isSelected', {
+        isSelected: SelectionStatus.TRUE,
+      })
+      .andWhere('program.resultEntered = :resultEntered', {
+        resultEntered: EnteringStatus.TRUE,
+      })
+      .andWhere('program.resultPublished = :resultPublished', {
+        resultPublished: PublishingStatus.TRUE,
+      })
+      .getMany();
   }
 
   public async findAll(
@@ -572,15 +572,15 @@ export class CandidateProgramService {
     const program: Program = await this.programsService.findOne(
       candidateProgram.program.id,
     );
-    candidateProgram.isSelected = SelectionStatus.TRUE;
     const selectedCount = await this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .select('COUNT(candidatePrograms.id)')
-      .where('program.id = :id', { id: program.id })
-      .andWhere("candidatePrograms.is_selected = 'true'")
-      .getCount();
-    if (selectedCount > program.maxSelection) {
+    .createQueryBuilder('candidatePrograms')
+    .leftJoinAndSelect('candidatePrograms.program', 'program')
+    .select('COUNT(candidatePrograms.id)')
+    .where('program.id = :id', { id: program.id })
+    .andWhere("candidatePrograms.is_selected = 'true'")
+    .getCount();
+    candidateProgram.isSelected = SelectionStatus.TRUE;
+    if (selectedCount >= program.maxSelection) {
       candidateProgram.isSelected = SelectionStatus.FALSE;
       throw new NotFoundException('Maximum Selection Reached');
     }
@@ -592,8 +592,7 @@ export class CandidateProgramService {
     }
     candidateProgram.round = RoundStatus.Final
 
-    await this.candidateProgramRepository.create(candidateProgram);
-    // await this.candidateProgramRepository.save(candidateProgram);
+    await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }
 

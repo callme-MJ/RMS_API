@@ -7,9 +7,10 @@ export class PublicEliminationResultController {
     private readonly eliminationResultService: EliminationResultService,
   ) {}
 
+
   @Get()
   findAll() {
-    return this.eliminationResultService.findAllEliminationProgram();
+    return this.eliminationResultService.findAllPublishedEliminationProgram();
   }
 
   @Get('selection/:code')

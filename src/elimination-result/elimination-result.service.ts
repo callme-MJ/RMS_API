@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import { CandidateProgram, SelectionStatus } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
+import { CategoryService } from 'src/category/category.service';
 import { EnteringStatus, PublishingStatus } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Repository } from 'typeorm';
@@ -20,6 +21,7 @@ export class EliminationResultService {
     private readonly programService: ProgramsService,
     private readonly candidateService: CandidateService,
     private readonly candidateProgramService: CandidateProgramService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   async create(createEliminationResultDto: CreateEliminationResultDto) {
@@ -60,9 +62,9 @@ export class EliminationResultService {
       newResult.programName = program.name;
       newResult.candidateProgram = candidateProgram;
       newResult.totalPoint = 
-        createEliminationResultDto.pointOne +
-        createEliminationResultDto.pointTwo +
-        createEliminationResultDto.pointThree ;
+      createEliminationResultDto.pointOne +
+      createEliminationResultDto.pointTwo +
+      createEliminationResultDto.pointThree ;
 
       await this.eliminationResultRepo.save(newResult);
       return newResult;
@@ -81,6 +83,9 @@ export class EliminationResultService {
 
   findAllEliminationProgram() {
     return this.programService.findEliminationPrograms();
+  }
+  findAllPublishedEliminationProgram(){
+    return this.programService.findAllPublishedEliminationProgram();
   }
 
   async findCandidatesOfProgram(code: string) {
@@ -166,6 +171,7 @@ export class EliminationResultService {
       throw error;
     }
   }
+  
 
   // async findAllSelectedPrograms() {
   //   try {

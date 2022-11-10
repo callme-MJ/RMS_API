@@ -74,4 +74,7 @@ export class ControllerEliminationResultController {
     return await this.eliminationResultService.publishResult(code)
   }
 
+  
+
+
 }

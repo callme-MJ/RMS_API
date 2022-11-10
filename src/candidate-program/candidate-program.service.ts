@@ -558,6 +558,20 @@ export class CandidateProgramService {
     return candidateProgram;
   }
 
+  public async deleteSelection(id: number): Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({
+      id,
+    });
+    if (!candidateProgram) {
+      throw new NotFoundException(
+        'Candidate not  not registered for this program',
+      );
+    }
+    candidateProgram.isSelected = SelectionStatus.FALSE;
+    await this.candidateProgramRepository.save(candidateProgram);
+    return candidateProgram;
+  }
+
   public async selectCandidate() {}
 
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {

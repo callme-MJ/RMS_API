@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
+import { EnteringStatus, PublishingStatus } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Repository } from 'typeorm';
 import { CreateEliminationResultDto } from './dto/create-elimination-result.dto';
@@ -52,6 +53,7 @@ export class EliminationResultService {
       const newResult: EliminationResult = this.eliminationResultRepo.create(
         createEliminationResultDto,
       );
+      program.resultEntered = EnteringStatus.TRUE;
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.instituteID = candidate.institute.id;
@@ -71,6 +73,10 @@ export class EliminationResultService {
 
   async updateSelection(id: number) {
     return this.candidateProgramService.updateSelection(id);
+  }
+
+  async deleteSelection(id: number) {
+    return this.candidateProgramService.deleteSelection(id);
   }
 
   findAllEliminationProgram() {
@@ -131,4 +137,17 @@ export class EliminationResultService {
   remove(id: number) {
     return this.eliminationResultRepo.delete(id);
   }
+
+  async publishResult(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(programCode);
+      if (!program) throw new NotFoundException('Program not found');
+      program.resultPublished = PublishingStatus.TRUE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }

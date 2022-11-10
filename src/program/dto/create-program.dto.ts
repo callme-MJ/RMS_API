@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { EnteringStatus, PublishingStatus } from '../entities/program.entity';
 export class CreateProgramDto {
   @IsNotEmpty()
   programCode: string;
@@ -58,10 +59,10 @@ export class CreateProgramDto {
   conceptNote: string;
 
   @IsNotEmpty()
-  resultEntered: string;
+  resultEntered: EnteringStatus;
 
   @IsNotEmpty()
-  resultPublished: string;
+  resultPublished: PublishingStatus
 
   @IsNotEmpty()
   maxSelection: number;

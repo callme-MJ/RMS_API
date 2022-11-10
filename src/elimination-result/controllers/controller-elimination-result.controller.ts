@@ -8,8 +8,8 @@ import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { Role } from 'src/login/interfaces/user-roles.enum';
 
 @Controller('user/elimination-result')
-// @UseGuards(AuthGuard('jwt-user'),RolesGuard)
-// @Roles(Role.CONTROLLER)
+@UseGuards(AuthGuard('jwt-user'),RolesGuard)
+@Roles(Role.CONTROLLER)
 export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
 
@@ -23,6 +23,12 @@ export class ControllerEliminationResultController {
   @UsePipes(ValidationPipe)
   updateSelection(@Param('id') id: number) {
     return this.eliminationResultService.updateSelection(id);
+  }
+
+  @Delete('/selection/:id')
+  @UsePipes(ValidationPipe)
+  DeleteSelection(@Param('id') id: number) {
+    return this.eliminationResultService.deleteSelection(id);
   }
 
   @Get()
@@ -62,4 +68,10 @@ export class ControllerEliminationResultController {
   remove(@Param('id') id: string) {
     return this.eliminationResultService.remove(+id);
   }
+
+  @Post('/publish/:code')
+  async publish(@Param('code') code: string) {
+    return await this.eliminationResultService.publishResult(code)
+  }
+
 }

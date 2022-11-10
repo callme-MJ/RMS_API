@@ -10,5 +10,6 @@ export class AdminEliminationResultController {
   @Get()
   findAll() {
     return this.eliminationResultService.findAllSelectedPrograms();
+    
   }
 }

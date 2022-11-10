@@ -5,7 +5,11 @@ import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
 import { Institute } from 'src/institute/entities/institute.entity';
-import { Program } from 'src/program/entities/program.entity';
+import {
+  EnteringStatus,
+  Program,
+  PublishingStatus,
+} from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { Repository } from 'typeorm';
@@ -14,6 +18,7 @@ import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
 import {
   CandidateProgram,
+  RoundStatus,
   SelectionStatus,
   Status,
 } from './entities/candidate-program.entity';
@@ -78,17 +83,33 @@ export class CandidateProgramService {
     const data = await this.candidateProgramRepository.find({
       where: { programCode: code },
     });
-    const candidate = data.map((candidate)=>candidate.candidate)
+    const candidate = data.map((candidate) => candidate.candidate);
     return candidate;
   }
-  
+
   public async findSelected(code: string) {
-    return this.candidateProgramRepository.find({
-      where:{
-        programCode: code,
-        isSelected: SelectionStatus.TRUE
-      }
-    })
+    // return this.candidateProgramRepository.find({
+    //   where:{
+    //     programCode: code,
+    //     isSelected: SelectionStatus.TRUE
+    //   },
+    //   relations: ['program'],
+
+    // })
+    return this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .where('program.code = :code', { code })
+      .andWhere('candidatePrograms.isSelected = :isSelected', {
+        isSelected: SelectionStatus.TRUE,
+      })
+      .andWhere('program.resultEntered = :resultEntered', {
+        resultEntered: EnteringStatus.TRUE,
+      })
+      .andWhere('program.resultPublished = :resultPublished', {
+        resultPublished: PublishingStatus.TRUE,
+      })
+      .getMany();
   }
 
   public async findAll(
@@ -533,9 +554,7 @@ export class CandidateProgramService {
       id,
     });
     if (!candidateProgram) {
-      throw new NotFoundException(
-        'Candidate  not registered for this program',
-      );
+      throw new NotFoundException('Candidate  not registered for this program');
     }
     candidateProgram.topic = createTopicProgramDto.topic;
     candidateProgram.link = createTopicProgramDto.link;
@@ -549,25 +568,33 @@ export class CandidateProgramService {
       id,
     });
     if (!candidateProgram) {
-      throw new NotFoundException(
-        'Candidate not registered for this program',
-      );
+      throw new NotFoundException('Candidate not registered for this program');
     }
-    const program:Program = await this.programsService.findOne(candidateProgram.program.id);
-    const selectedCount = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-    .leftJoinAndSelect('candidatePrograms.program', 'program')
-    .select('COUNT(candidatePrograms.id)')
-    .where('program.id = :id', { id: program.id })
-    .andWhere("candidatePrograms.is_selected = 'true'")
-    .getCount();
-    if(selectedCount >= program.maxSelection){
-      throw new NotFoundException('Maximum Selection Reached');
-    }    
-
-    
-
+    const program: Program = await this.programsService.findOne(
+      candidateProgram.program.id,
+    );
     candidateProgram.isSelected = SelectionStatus.TRUE;
-    await this.candidateProgramRepository.save(candidateProgram);
+    const selectedCount = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .select('COUNT(candidatePrograms.id)')
+      .where('program.id = :id', { id: program.id })
+      .andWhere("candidatePrograms.is_selected = 'true'")
+      .getCount();
+    if (selectedCount > program.maxSelection) {
+      candidateProgram.isSelected = SelectionStatus.FALSE;
+      throw new NotFoundException('Maximum Selection Reached');
+    }
+
+    if (selectedCount == program.maxSelection) {
+      program.resultEntered = EnteringStatus.TRUE;
+    } else {
+      program.resultEntered = EnteringStatus.FALSE;
+    }
+    candidateProgram.round = RoundStatus.Final
+
+    await this.candidateProgramRepository.create(candidateProgram);
+    // await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }
 
@@ -576,9 +603,7 @@ export class CandidateProgramService {
       id,
     });
     if (!candidateProgram) {
-      throw new NotFoundException(
-        'Candidate  not registered for this program',
-      );
+      throw new NotFoundException('Candidate  not registered for this program');
     }
     candidateProgram.isSelected = SelectionStatus.FALSE;
     await this.candidateProgramRepository.save(candidateProgram);
@@ -597,5 +622,4 @@ export class CandidateProgramService {
       .getMany();
     return registerablePrograms;
   }
-
 }

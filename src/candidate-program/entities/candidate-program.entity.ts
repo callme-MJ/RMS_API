@@ -1,3 +1,4 @@
+import { ResourceManagedStatus } from 'aws-sdk/clients/networkfirewall';
 import { Exclude, Expose } from 'class-transformer';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { EliminationResult } from 'src/elimination-result/entities/elimination-result.entity';
@@ -24,6 +25,11 @@ export enum Status {
 export enum SelectionStatus {
   TRUE = 'True',
   FALSE = 'False',
+}
+
+export enum RoundStatus {
+  Elimination = 'Elimination',
+  Final = 'Final',
 }
 @Entity({ name: 'candidate_program' })
 export class CandidateProgram {
@@ -91,6 +97,9 @@ export class CandidateProgram {
   })
   @JoinTable()
   session: Session;
+
+  @Column({ nullable: true })
+  round: RoundStatus;
 
   @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()

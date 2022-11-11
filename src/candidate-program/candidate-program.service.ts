@@ -86,24 +86,24 @@ export class CandidateProgramService {
     const candidate = data.map((candidate) => candidate.candidate);
     return candidate;
   }
-  async findCandidatesOfPublishedProgram(code: string,queryParams:ICandidateProgramFIilter) {
-    const data = await this.candidateProgramRepository
-      .createQueryBuilder('candidatePrpgrams')
-      .leftJoinAndSelect('candidatePrpgrams.program', 'program')
-      .where('candidatePrpgrams.programCode = :programCode', {
+  async findCandidatesOfPublishedProgram(
+    code: string,
+    queryParams: ICandidateProgramFIilter,
+  ) {
+    let candidatePrograms = this.candidateProgramRepository.find({
+      where: {
+        session: {
+          id: queryParams.sessionID,
+          status: SessionStatus.ACTIVE,
+        },
         programCode: code,
-      })
-      .andWhere('candidatePrpgrams.isSelected = :isSelected', {
         isSelected: SelectionStatus.TRUE,
-        })
-      .andWhere('program.resultPublished = :resultPublished', {
-        resultPublished: PublishingStatus.TRUE,
-      })
-      .andWhere('candidatePrograms.sessionID = :sessionID', {
-        sessionID: queryParams.sessionID,
-        })
-      .getMany();
-    return data;
+        program: {
+          resultPublished: PublishingStatus.TRUE,
+        },
+      },
+    });
+    return candidatePrograms;
   }
 
   public async findSelected(code: string) {
@@ -111,24 +111,12 @@ export class CandidateProgramService {
       where: {
         programCode: code,
         isSelected: SelectionStatus.TRUE,
+        program: {
+          resultPublished: PublishingStatus.TRUE,
+          resultEntered: EnteringStatus.TRUE,
+        },
       },
     });
-    return this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.program', 'program')
-      .where('candidatePrograms.programCode = :programCode', {
-        programCode: code,
-      })
-      .andWhere('candidatePrograms.isSelected = :isSelected', {
-        isSelected: SelectionStatus.TRUE,
-      })
-      .andWhere('program.resultEntered = :resultEntered', {
-        resultEntered: EnteringStatus.TRUE,
-      })
-      .andWhere('program.resultPublished = :resultPublished', {
-        resultPublished: PublishingStatus.TRUE,
-      })
-      .getMany();
   }
 
   public async findAll(
@@ -600,7 +588,7 @@ export class CandidateProgramService {
       .andWhere("candidatePrograms.is_selected = 'true'")
       .getCount();
     candidateProgram.isSelected = SelectionStatus.TRUE;
-    console.log(selectedCount);  
+    console.log(selectedCount);
     if (selectedCount >= program.maxSelection) {
       candidateProgram.isSelected = SelectionStatus.FALSE;
       throw new NotFoundException('Maximum Selection Reached');

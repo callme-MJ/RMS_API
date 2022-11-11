@@ -12,7 +12,7 @@ import { UpdateProgramDto } from './dto/update-program.dto';
 import { Program, PublishingStatus } from './entities/program.entity';
 
 export interface IProgramFilter extends IFilter {
-  session_id: number;
+  sessionID: number;
 }
 @Injectable()
 export class ProgramsService {
@@ -44,7 +44,7 @@ export class ProgramsService {
     }
   }
 
-  public async findAll(queryParams: IProgramFilter): Promise<{ programs: Program[], count: number }> {
+  public async findAll(queryParams: IProgramFilter): Promise<Program[]> {
     try {
       const programQuery = this.programRepository.createQueryBuilder(
         'programs',
@@ -65,20 +65,20 @@ export class ProgramsService {
       const perPage = 15;
       programQuery.offset((page - 1) * perPage).limit(perPage);
 
-      const [programs, count] = await programQuery
-      .leftJoinAndSelect('programs.session', 'session')
-      .where('session.id = :sessionID', { sessionID: queryParams.session_id })
-      .andWhere('session.status = :status', { status: SessionStatus.ACTIVE })
-      .getManyAndCount();
-      return { programs, count };
-      // return this.programRepository.find({
-      //   where: {
-      //     session: {
-      //       id: queryParams.sessionID,
-      //       status: SessionStatus.ACTIVE,
-      //     },
-      //   },
-      // });
+      // const [programs, count] = await programQuery
+      // .leftJoinAndSelect('programs.session', 'session')
+      // .where('session.id = :sessionID', { sessionID: queryParams.session_id })
+      // .andWhere('session.status = :status', { status: SessionStatus.ACTIVE })
+      // .getManyAndCount();
+      // return { programs, count };
+      return this.programRepository.find({
+        where: {
+          session: {
+            id: queryParams.sessionID,
+            status: SessionStatus.ACTIVE,
+          },
+        },
+      });
     } catch (error) {
       throw error;
     }

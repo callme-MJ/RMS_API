@@ -3,13 +3,10 @@ import { EliminationResultService } from '../elimination-result.service';
 import { CreateEliminationResultDto } from '../dto/create-elimination-result.dto';
 import { UpdateEliminationResultDto } from '../dto/update-elimination-result.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/login/user/guards/roles.guard';
-import { Roles } from 'src/login/user/decorators/roles.decorators';
-import { Role } from 'src/login/interfaces/user-roles.enum';
 
-@Controller('user/elimination-result')
-@UseGuards(AuthGuard('jwt-user'),RolesGuard)
-@Roles(Role.CONTROLLER)
+
+@Controller('elimination-result')
+@UseGuards(AuthGuard('jwt-user'))
 export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
 
@@ -25,12 +22,6 @@ export class ControllerEliminationResultController {
     return this.eliminationResultService.updateSelection(id);
   }
 
-  @Delete('/selection/:id')
-  @UsePipes(ValidationPipe)
-  DeleteSelection(@Param('id') id: number) {
-    return this.eliminationResultService.deleteSelection(id);
-  }
-
   @Get()
   findAll() {
     return this.eliminationResultService.findAllEliminationProgram();
@@ -42,27 +33,10 @@ export class ControllerEliminationResultController {
     return candidate
   }
 
-  @Get('selection/:code')
-  async findSelected(@Param('code') code: string) {
-    return await this.eliminationResultService.findSelected(code)
-  }
-
-  @Get('points')
-  async findPoints(@Body() body: any) {
-    return await this.eliminationResultService.findPoints(body.chestNO, body.programCode)
-  }
-
-  @Get('points/:code')
-  async findPointsByProgramCode(@Param('code') code: string) {
-    return await this.eliminationResultService.findPointsByProgramCode(code)
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEliminationResultDto: UpdateEliminationResultDto) {
     return this.eliminationResultService.update(+id, updateEliminationResultDto);
   }
-
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

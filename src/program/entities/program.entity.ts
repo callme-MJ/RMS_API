@@ -1,3 +1,4 @@
+import { String } from 'aws-sdk/clients/acm';
 import { Exclude, Expose } from 'class-transformer';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Category } from 'src/category/entities/category.entity';
@@ -79,11 +80,11 @@ export class Program {
   @Column({ nullable: true })
   conceptNote: string;
 
-  @Column({ type: 'varchar', default: EnteringStatus.FALSE })
-  resultEntered: EnteringStatus;
+  @Column({ nullable: true })
+  resultEntered: String;
 
-  @Column({ type: 'varchar', default: PublishingStatus.FALSE })
-  resultPublished: PublishingStatus;
+  @Column({nullable: true})
+  resultPublished: String;
 
   @Column({ nullable: true })
   maxSelection: number;

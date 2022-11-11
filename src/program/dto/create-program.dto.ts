@@ -59,10 +59,10 @@ export class CreateProgramDto {
   conceptNote: string;
 
   @IsNotEmpty()
-  resultEntered: EnteringStatus;
+  resultEntered: string;
 
   @IsNotEmpty()
-  resultPublished: PublishingStatus
+  resultPublished: string;
 
   @IsNotEmpty()
   maxSelection: number;

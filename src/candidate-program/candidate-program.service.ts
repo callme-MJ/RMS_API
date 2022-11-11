@@ -89,9 +89,16 @@ export class CandidateProgramService {
       return candidate;
     }
     if(program.type == 'group'){
-      const data = await this.candidateProgramRepository.find({
-        where: { programCode: code },
-      });
+      // const data = await this.candidateProgramRepository.find({
+      //   where: { programCode: code },
+      // });
+      const data = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .where('candidatePrograms.programCode = :programCode', { programCode: code })
+      .select(['candidatePrograms.id', 'candidatePrograms.candidate', 'candidatePrograms.programCode', 'candidatePrograms.categoryID', 'candidatePrograms.isSelected', 'candidatePrograms.isEligible', 'candidatePrograms.isEntered', 'candidatePrograms.isVerified', 'candidatePrograms.roundStatus', 'candidatePrograms.status', 'candidatePrograms.institute', 'candidatePrograms.session', 'candidatePrograms.program', 'candidatePrograms.createdAt', 'candidatePrograms.updatedAt', 'candidate.id', 'candidate.name', 'candidate.fatherName', 'candidate.mother'])
+      .getMany();
+
+      
       const candidate = data.map((candidate) => candidate.candidate);
       return candidate;
     }

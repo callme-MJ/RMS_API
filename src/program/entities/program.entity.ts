@@ -80,10 +80,10 @@ export class Program {
   @Column({ nullable: true })
   conceptNote: string;
 
-  @Column({ nullable: true,default:EnteringStatus.FALSE })
+  @Column({ nullable: true })
   resultEntered: string;
 
-  @Column({nullable: true,default:PublishingStatus.FALSE})
+  @Column({nullable: true})
   resultPublished: string;
 
   @Column({ nullable: true })

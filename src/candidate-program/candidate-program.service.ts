@@ -80,11 +80,21 @@ export class CandidateProgramService {
   }
 
   async findCandidatesOfProgram(code: string) {
-    const data = await this.candidateProgramRepository.find({
-      where: { programCode: code },
-    });
-    const candidate = data.map((candidate) => candidate.candidate);
-    return candidate;
+    const program = await this.programsService.findOneByProgramCode(code);
+    if (program.type == 'single') {
+      const data = await this.candidateProgramRepository.find({
+        where: { programCode: code },
+      });
+      const candidate = data.map((candidate) => candidate.candidate);
+      return candidate;
+    }
+    if(program.type == 'group'){
+      const data = await this.candidateProgramRepository.find({
+        where: { programCode: code },
+      });
+      const candidate = data.map((candidate) => candidate.candidate);
+      return candidate;
+    }
   }
   async findCandidatesOfPublishedProgram(
     code: string,
@@ -580,10 +590,12 @@ export class CandidateProgramService {
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .select('COUNT(candidatePrograms.id)')
-      .where('program.id = :id', { id: program.id })
+      .where('candidatePrograms.programCode = :programCode', {
+        programCode: program.programCode,
+      })
       .andWhere("candidatePrograms.is_selected = 'true'")
       .getCount();
-    console.log(selectedCount);
+    console.log('selected count  ' + selectedCount);
 
     if (selectedCount >= program.maxSelection) {
       throw new NotFoundException('Maximum Selection Reached');

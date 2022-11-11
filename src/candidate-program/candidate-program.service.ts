@@ -1,5 +1,6 @@
 import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { clearConfigCache } from 'prettier';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
@@ -86,6 +87,7 @@ export class CandidateProgramService {
         where: { programCode: code },
       });
       const candidate = data.map((candidate) => candidate.candidate);
+      console.log(candidate.length);
       return candidate;
     }
     if (program.type == 'group') {

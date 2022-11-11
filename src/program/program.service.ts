@@ -22,7 +22,7 @@ export class ProgramsService {
     private readonly categoryService: CategoryService,
     private readonly coordinatorService: CoordinatorService,
     private readonly sessionService: SessionService,
-  ) { }
+  ) {}
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {
     try {
@@ -46,18 +46,16 @@ export class ProgramsService {
 
   public async findAll(queryParams: IProgramFilter): Promise<Program[]> {
     try {
-      const programQuery = this.programRepository.createQueryBuilder(
-        'programs',
-      );
+      const programQuery =
+        this.programRepository.createQueryBuilder('programs');
       const search = queryParams.search;
       const sort = queryParams.sort;
       const page = queryParams.page || 1;
 
       if (search) {
-        programQuery.where(
-          'name LIKE :search OR programCode LIKE :search',
-          { search: `%${search}%` },
-        );
+        programQuery.where('name LIKE :search OR programCode LIKE :search', {
+          search: `%${search}%`,
+        });
       }
       if (sort) {
         programQuery.orderBy('programs.name', sort).getMany();
@@ -84,39 +82,45 @@ export class ProgramsService {
     }
   }
 
-  public async findEliminationPrograms(){
+  public async findEliminationPrograms() {
     try {
       return this.programRepository.find({
-        where:{categoryByFeatures :'W'}
-      })
+        where: [
+          { categoryByFeatures: 'W' },
+          { categoryByFeatures: 'X' },
+          { categoryByFeatures: 'V' },
+        ],
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
-  public async findAllPublishedEliminationProgram(){
+  public async findAllPublishedEliminationProgram() {
     try {
       return this.programRepository.find({
-        where:{categoryByFeatures :'W',resultPublished:PublishingStatus.TRUE},
-      })
+        where: {
+          categoryByFeatures: 'W',
+          resultPublished: PublishingStatus.TRUE,
+        },
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-  public async findAllForCoordinator(id:number): Promise<Program[]> {
+  public async findAllForCoordinator(id: number): Promise<Program[]> {
     try {
       const coordinator = await this.coordinatorService.findOne(id);
       const sessionID = coordinator.session.id;
       // return this.programRepository.find()
-      if(coordinator.institute.id == 41 || coordinator.institute.id == 42)
-      {
+      if (coordinator.institute.id == 41 || coordinator.institute.id == 42) {
         return this.programRepository.find({
           where: {
             session: {
               id: sessionID,
               status: SessionStatus.ACTIVE,
             },
-            categoryByFeatures: "Y",
+            categoryByFeatures: 'Y',
           },
         });
       }
@@ -132,7 +136,6 @@ export class ProgramsService {
       throw error;
     }
   }
-  
 
   public async findOne(id: number): Promise<Program> {
     try {
@@ -183,7 +186,7 @@ export class ProgramsService {
 
   // public async findProgramsByTopic(id:number){
   //   try{
-      
+
   //     return await this.
   //   }catch(error){
   //     throw error;

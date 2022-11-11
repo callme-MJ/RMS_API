@@ -172,13 +172,20 @@ export class CandidateProgramService {
     queryParams: ICandidateFIilter,
   ): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    let candidatePrograms = await this.candidateProgramRepository
-      .createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('candidatePrograms.institute_id = :instituteId', {
-        instituteId: loggedInCoordinator.institute.id,
-      })
-      .getMany();
+    // let candidatePrograms = await this.candidateProgramRepository
+    //   .createQueryBuilder('candidatePrograms')
+    //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+    //   .where('candidatePrograms.institute_id = :instituteId', {
+    //     instituteId: loggedInCoordinator.institute.id,
+    //   })
+    //   .getMany();
+    let candidatePrograms = await this.candidateProgramRepository.find({
+      where: {
+        institute: {
+          id: loggedInCoordinator.institute.id,
+        },
+      },
+    });
 
     return candidatePrograms;
   }
@@ -599,6 +606,7 @@ export class CandidateProgramService {
       })
       .andWhere("candidatePrograms.is_selected = 'true'")
       .getCount();
+    console.log(program.programCode);
     console.log('selected count  ' + selectedCount);
 
     if (selectedCount >= program.maxSelection) {
@@ -606,6 +614,7 @@ export class CandidateProgramService {
     } else {
       candidateProgram.isSelected = SelectionStatus.TRUE;
     }
+    await this.candidateProgramRepository.save(candidateProgram);
     const selectedCount2 = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
@@ -618,10 +627,10 @@ export class CandidateProgramService {
     } else if (selectedCount2 < program.maxSelection) {
       program.resultEntered = EnteringStatus.FALSE;
     }
+    await this.programsService.update(program.id, program);
     console.log(selectedCount2, program.maxSelection);
-    console.log(program.resultEntered);
+    console.log("program's result is "+program.resultEntered);
     candidateProgram.round = RoundStatus.Final;
-
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }

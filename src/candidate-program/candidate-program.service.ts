@@ -96,7 +96,8 @@ export class CandidateProgramService {
       .groupBy('candidatePrograms.institute.id')
       .getMany();
       const candidate = group.map((candidate) => candidate.candidate);
-      console.log(candidate.length);
+      // console.log(candidate);
+      // console.log(candidate.length);
       return candidate;
     }
   }

@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
+import { CandidateProgramService, ICandidateFIilter, ICandidateProgramFIilter } from 'src/candidate-program/candidate-program.service';
 import { CandidateProgram, SelectionStatus } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CategoryService } from 'src/category/category.service';
@@ -97,6 +97,15 @@ export class EliminationResultService {
       throw error;
     }
   }
+  async findCandidatesOfPublishedProgram(code: string,queryParams:ICandidateProgramFIilter) {
+    try {
+      const candidate =
+        await this.candidateProgramService.findCandidatesOfPublishedProgram(code,queryParams);
+      return candidate;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async findSelected(code: string) {
     try {
@@ -163,7 +172,7 @@ export class EliminationResultService {
     try {
       const program = await this.programService.findOneByProgramCode(programCode);
       if (!program) throw new NotFoundException('Program not found');
-      if(program.resultEntered === EnteringStatus.FALSE) throw new NotFoundException('Result not entered completely');
+      // if(program.resultEntered === EnteringStatus.FALSE) throw new NotFoundException('Result not entered completely');
       program.resultPublished = PublishingStatus.TRUE;
       await this.programService.update(program.id, program);
       return program;

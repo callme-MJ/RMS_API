@@ -8,8 +8,9 @@ export class PublicEliminationResultController {
     private readonly eliminationResultService: EliminationResultService,
   ) {}
 
-  @Get()
-  findAll() {
+
+  @Get("")
+  findAllPublishedPrograms() {
     return this.eliminationResultService.findAllPublishedEliminationProgram();
   }
 

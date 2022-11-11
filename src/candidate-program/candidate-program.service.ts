@@ -111,10 +111,6 @@ export class CandidateProgramService {
       where: {
         programCode: code,
         isSelected: SelectionStatus.TRUE,
-        program: {
-          resultPublished: PublishingStatus.TRUE,
-          resultEntered: EnteringStatus.TRUE,
-        },
       },
     });
   }
@@ -587,18 +583,27 @@ export class CandidateProgramService {
       .where('program.id = :id', { id: program.id })
       .andWhere("candidatePrograms.is_selected = 'true'")
       .getCount();
-    candidateProgram.isSelected = SelectionStatus.TRUE;
     console.log(selectedCount);
-    if (selectedCount >= program.maxSelection) {
-      candidateProgram.isSelected = SelectionStatus.FALSE;
-      throw new NotFoundException('Maximum Selection Reached');
-    }
 
-    if (selectedCount == program.maxSelection) {
-      program.resultEntered = EnteringStatus.TRUE;
+    if (selectedCount >= program.maxSelection) {
+      throw new NotFoundException('Maximum Selection Reached');
     } else {
+      candidateProgram.isSelected = SelectionStatus.TRUE;
+    }
+    const selectedCount2 = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .select('COUNT(candidatePrograms.id)')
+      .where('program.id = :id', { id: program.id })
+      .andWhere("candidatePrograms.is_selected = 'true'")
+      .getCount();
+    if (selectedCount2 == program.maxSelection) {
+      program.resultEntered = EnteringStatus.TRUE;
+    } else if (selectedCount2 < program.maxSelection) {
       program.resultEntered = EnteringStatus.FALSE;
     }
+    console.log(selectedCount2, program.maxSelection);
+    console.log(program.resultEntered);
     candidateProgram.round = RoundStatus.Final;
 
     await this.candidateProgramRepository.save(candidateProgram);

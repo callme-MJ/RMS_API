@@ -5,7 +5,7 @@ import { UpdateEliminationResultDto } from '../dto/update-elimination-result.dto
 import { AuthGuard } from '@nestjs/passport';
 
 
-@Controller('elimination-result')
+@Controller('user/elimination-result')
 @UseGuards(AuthGuard('jwt-user'))
 export class ControllerEliminationResultController {
   constructor(private readonly eliminationResultService: EliminationResultService) { }
@@ -20,6 +20,17 @@ export class ControllerEliminationResultController {
   @UsePipes(ValidationPipe)
   updateSelection(@Param('id') id: number) {
     return this.eliminationResultService.updateSelection(id);
+  }
+
+  @Delete('/selection/:id')
+  @UsePipes(ValidationPipe)
+  deleteSelection(@Param('id') id: number) {
+    return this.eliminationResultService.deleteSelection(id);
+  }
+
+  @Get('selection/:code')
+  async findSelected(@Param('code') code: string) {
+    return await this.eliminationResultService.findSelected(code)
   }
 
   @Get()
@@ -48,6 +59,15 @@ export class ControllerEliminationResultController {
     return await this.eliminationResultService.publishResult(code)
   }
 
+  @Get('points')
+  async findPoints(@Body() body: any) {
+    return await this.eliminationResultService.findPoints(body.chestNO, body.programCode)
+  }
+
+  @Get('points/:code')
+  async findPointsByProgramCode(@Body() body: any) {
+    return await this.eliminationResultService.findPointsByProgramCode(body.programCode)
+  }
   
 
 

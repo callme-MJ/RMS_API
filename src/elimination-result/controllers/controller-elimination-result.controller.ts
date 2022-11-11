@@ -59,6 +59,11 @@ export class ControllerEliminationResultController {
     return await this.eliminationResultService.publishResult(code)
   }
 
+  @Post('/publish/:code')
+  async unpublish(@Param('code') code: string) {
+    return await this.eliminationResultService.unpublishResult(code)
+  }
+
   @Get('points')
   async findPoints(@Body() body: any) {
     return await this.eliminationResultService.findPoints(body.chestNO, body.programCode)

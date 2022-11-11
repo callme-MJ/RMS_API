@@ -180,6 +180,18 @@ export class EliminationResultService {
       throw error;
     }
   }
+  async unpublishResult(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(programCode);
+      if (!program) throw new NotFoundException('Program not found');
+      if(program.resultEntered === EnteringStatus.FALSE) throw new NotFoundException('Result not entered completely');
+      program.resultPublished = PublishingStatus.FALSE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
   
 
   // async findAllSelectedPrograms() {

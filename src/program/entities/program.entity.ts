@@ -81,10 +81,10 @@ export class Program {
   conceptNote: string;
 
   @Column({ nullable: true })
-  resultEntered: String;
+  resultEntered: string;
 
   @Column({nullable: true})
-  resultPublished: String;
+  resultPublished: string;
 
   @Column({ nullable: true })
   maxSelection: number;

@@ -79,10 +79,10 @@ export class Program {
   @Column({ nullable: true })
   conceptNote: string;
 
-  @Column({default: EnteringStatus.FALSE})
+  @Column({default: EnteringStatus.FALSE, nullable: true }) 
   resultEntered: EnteringStatus;
 
-  @Column({default: PublishingStatus.FALSE})
+  @Column({default: PublishingStatus.FALSE,nullable: true })
   resultPublished: PublishingStatus;
 
   @Column({ nullable: true })

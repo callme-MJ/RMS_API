@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
-import { updateLocale } from 'moment';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
@@ -178,9 +177,6 @@ export class CandidateService {
     if (!institute || !category)
       throw new ValidationException("Institute or Category can't be empty");
     let chestNO = await this.getchestNO(candidateDTO);
-    const prefix = this.SessionRepository.findOneBy({
-      id: institute.session.id,
-    }).then((session) => session.chestNoPrefix);
     const newCandidate = this.candidateRepository.create(candidateDTO);
     newCandidate.chestNO = chestNO;
     newCandidate.category = category;

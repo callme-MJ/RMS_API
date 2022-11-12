@@ -4,6 +4,7 @@ import { CandidateProgramService, ICandidateFIilter, ICandidateProgramFIilter } 
 import { CandidateProgram, SelectionStatus } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CategoryService } from 'src/category/category.service';
+import { InstituteService } from 'src/institute/institute.service';
 import { EnteringStatus, PublishingStatus } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Repository } from 'typeorm';
@@ -22,6 +23,7 @@ export class EliminationResultService {
     private readonly candidateService: CandidateService,
     private readonly candidateProgramService: CandidateProgramService,
     private readonly categoryService: CategoryService,
+    private readonly instituteService: InstituteService,
   ) {}
 
   async create(createEliminationResultDto: CreateEliminationResultDto) {
@@ -202,18 +204,7 @@ export class EliminationResultService {
   }
   
 
-  // async findAllSelectedPrograms() {
-  //   try {
-  //     return await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
-  //     .leftJoinAndSelect('candidateProgram.program', 'program')
-  //     .where('program.resultPublished = :resultPublished', { resultPublished: PublishingStatus.TRUE })
-  //     .where('candidateProgram.isSelected = :selected', { selected: SelectionStatus.TRUE })
-  //     .groupBy('program.id')
-  //     .getMany();
-
-
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  findInstitutes(sessionID: number){
+    return this.instituteService.findAll(sessionID);
+  }
 }

@@ -208,6 +208,10 @@ export class EliminationResultService {
     return this.instituteService.findAll(sessionID);
   }
 
+  findInstituteCount(sessionID: number){
+    return this.instituteService.findInstituteCount(sessionID);
+  }
+
   findCategories(sessionID: number){
     return this.categoryService.findAll(sessionID);
   }

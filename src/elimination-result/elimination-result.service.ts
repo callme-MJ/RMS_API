@@ -217,6 +217,7 @@ export class EliminationResultService {
     .select('candidateProgram.institute.id', 'instituteID')
     .addSelect('count(candidateProgram.id)', 'count')
     .addSelect('institute.name', 'instituteName')
+    .addSelect('institute.shortName', 'instituteShortName')
     .groupBy('candidateProgram.institute.id')
     .getRawMany();
     return count;

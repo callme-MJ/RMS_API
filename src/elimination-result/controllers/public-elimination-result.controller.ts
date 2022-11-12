@@ -15,10 +15,10 @@ export class PublicEliminationResultController {
   }
 
   @Get('candidates/:code')
-  async findOne(@Param('code') code: string,@Query()queryParams: ICandidateProgramFIilter,) {
+  async findOne(@Param('code') code: string) {
     const candidate =
       await this.eliminationResultService.findCandidatesOfPublishedProgram(
-        code,queryParams
+        code
       );
     return candidate;
   }

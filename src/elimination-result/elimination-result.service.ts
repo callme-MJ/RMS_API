@@ -97,10 +97,10 @@ export class EliminationResultService {
       throw error;
     }
   }
-  async findCandidatesOfPublishedProgram(code: string,queryParams:ICandidateProgramFIilter) {
+  async findCandidatesOfPublishedProgram(code: string) {
     try {
       const candidate =
-        await this.candidateProgramService.findCandidatesOfPublishedProgram(code,queryParams);
+        await this.candidateProgramService.findCandidatesOfPublishedProgram(code);
       return candidate;
     } catch (error) {
       throw error;

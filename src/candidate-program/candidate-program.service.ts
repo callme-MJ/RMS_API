@@ -105,22 +105,19 @@ export class CandidateProgramService {
   }
   async findCandidatesOfPublishedProgram(
     code: string,
-    queryParams: ICandidateProgramFIilter,
   ) {
-    let candidatePrograms = this.candidateProgramRepository.find({
+    let candidatePrograms =await this.candidateProgramRepository.find({
       where: {
-        session: {
-          id: queryParams.sessionID,
-          status: SessionStatus.ACTIVE,
-        },
         programCode: code,
         isSelected: SelectionStatus.TRUE,
         program: {
-          resultPublished: PublishingStatus.TRUE,
+            resultPublished: PublishingStatus.TRUE,
+          },
         },
-      },
-    });
-    return candidatePrograms;
+      });
+      console.log(candidatePrograms);
+    const candidate = candidatePrograms.map((candidate) => candidate.candidate);
+    return candidate;
   }
 
   public async findSelected(code: string) {

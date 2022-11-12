@@ -207,4 +207,8 @@ export class EliminationResultService {
   findInstitutes(sessionID: number){
     return this.instituteService.findAll(sessionID);
   }
+
+  findCategories(sessionID: number){
+    return this.categoryService.findAll(sessionID);
+  }
 }

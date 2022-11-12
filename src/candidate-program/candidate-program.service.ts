@@ -116,8 +116,7 @@ export class CandidateProgramService {
         },
       });
       console.log(candidatePrograms);
-    const candidate = candidatePrograms.map((candidate) => candidate.candidate);
-    return candidate;
+    return candidatePrograms;
   }
 
   public async findSelected(code: string) {

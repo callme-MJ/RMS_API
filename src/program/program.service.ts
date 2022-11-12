@@ -90,6 +90,7 @@ export class ProgramsService {
           { categoryByFeatures: 'X' },
           { categoryByFeatures: 'V' },
         ],
+        
       });
     } catch (error) {
       throw error;
@@ -99,7 +100,6 @@ export class ProgramsService {
     try {
       return this.programRepository.find({
         where: {
-          categoryByFeatures: 'W',
           resultPublished: PublishingStatus.TRUE,
         },
       });

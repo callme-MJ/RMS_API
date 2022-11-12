@@ -82,26 +82,27 @@ export class CandidateProgramService {
 
   async findCandidatesOfProgram(code: string) {
     const program = await this.programsService.findOneByProgramCode(code);
-    if (program.type == 'single') {
+    // if (program.type == 'single') {
       const data = await this.candidateProgramRepository.find({
         where: { programCode: code },
       });
       const candidate = data.map((candidate) => candidate.candidate);
       console.log(candidate.length);
       return candidate;
-    }
-    if (program.type == 'group') {
+    // }
+    // if (program.type == 'group') {
       
-      const group = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-      .where('candidatePrograms.programCode = :programCode', { programCode: code })
-      .groupBy('candidatePrograms.institute.id')
-      .getMany();
-      const candidate = group.map((candidate) => candidate.candidate);
-      // console.log(candidate);
-      // console.log(candidate.length);
-      return candidate;
-    }
+    //   const group = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
+    //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+    //   .where('candidatePrograms.programCode = :programCode', { programCode: code })
+    //   .select('candidatePrograms.chestNO',"candidatePrograms.")
+    //   .groupBy('candidatePrograms.institute.id')
+    //   .getMany();
+    //   const candidate = group.map((candidate) => candidate.candidate);
+    //   console.log(candidate);
+    //   console.log(candidate.length);
+    //   return candidate;
+    // }
   }
   async findCandidatesOfPublishedProgram(
     code: string,

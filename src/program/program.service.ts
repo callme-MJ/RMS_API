@@ -102,6 +102,9 @@ export class ProgramsService {
         where: {
           resultPublished: PublishingStatus.TRUE,
         },
+        order:{
+          updatedAt: 'DESC'
+        }
       });
     } catch (error) {
       throw error;

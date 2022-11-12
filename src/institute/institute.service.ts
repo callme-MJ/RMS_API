@@ -49,27 +49,7 @@ export class InstituteService {
     }
   }
 
-  public async findInstituteCount(sessionID: number = 0) {
-    try {
-      // return this.instituteRepository.find({
-      //   where: {
-      //     session: {
-      //       id: sessionID,
-      //       status: SessionStatus.ACTIVE
-      //     }
-      //   }
-      // });
-      // return this.instituteRepository.createQueryBuilder("institute")
-      // .leftJoinAndSelect("institute.candidatePrograms", "candidatePrograms")
-      // .leftJoinAndSelect("candidatePrograms.programs", "programs")
-      // .where("session.id = :sessionID", { sessionID })
-      // .andWhere('programs.result_published = :resultPublished', { resultPublished: true })
-      // .groupBy("institute.id")
-      // .getManyandCount();
-    } catch (error) {
-      throw error;
-    }
-  }
+  
 
   public async findOne(id: number): Promise<Institute> {
     try {

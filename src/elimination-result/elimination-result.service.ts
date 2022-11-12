@@ -208,8 +208,18 @@ export class EliminationResultService {
     return this.instituteService.findAll(sessionID);
   }
 
-  findInstituteCount(sessionID: number){
-    return this.instituteService.findInstituteCount(sessionID);
+  async findInstituteCount(sessionID: number){
+    const count= await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.program', 'program')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute')
+    .where('program.resultPublished = :resultPublished', {resultPublished: PublishingStatus.TRUE})
+    .andWhere('candidateProgram.isSelected = :selected', {selected: SelectionStatus.TRUE})
+    .select('candidateProgram.institute.id', 'instituteID')
+    .addSelect('count(candidateProgram.id)', 'count')
+    .addSelect('institute.name', 'instituteName')
+    .groupBy('candidateProgram.institute.id')
+    .getRawMany();
+    return count;
   }
 
   findCategories(sessionID: number){

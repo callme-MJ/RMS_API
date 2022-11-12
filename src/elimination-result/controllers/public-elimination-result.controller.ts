@@ -38,8 +38,8 @@ export class PublicEliminationResultController {
 
   @Get('institutes/count')
   async findInstituteCount(@Query() sessionID: number) {
-    const institute = await this.eliminationResultService.findInstituteCount(sessionID);
-    return institute;
+    const count = await this.eliminationResultService.findInstituteCount(sessionID);
+    return count;
   }
 
   @Get('categories')

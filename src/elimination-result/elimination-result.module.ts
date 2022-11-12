@@ -10,9 +10,10 @@ import { CandidateProgram } from 'src/candidate-program/entities/candidate-progr
 import { PublicEliminationResultController } from './controllers/public-elimination-result.controller';
 import { CategoryModule } from 'src/category/category.module';
 import { ControllerEliminationResultController } from './controllers/controller-elimination-result.controller';
+import { InstituteModule } from 'src/institute/institute.module';
 
 @Module({
-  imports: [CandidateModule, ProgramModule, CandidateProgramModule,CategoryModule,
+  imports: [CandidateModule, ProgramModule,InstituteModule, CandidateProgramModule,CategoryModule,
     TypeOrmModule.forFeature([EliminationResult,CandidateProgram]),
   ],
   controllers: [ControllerEliminationResultController,AdminEliminationResultController,PublicEliminationResultController],

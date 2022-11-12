@@ -106,6 +106,15 @@ export class EliminationResultService {
       throw error;
     }
   }
+  async findSelectedOfInstitute(id: number) {
+    try {
+      const candidate =
+        await this.candidateProgramService.findSelectedOfInstitute(id);
+      return candidate;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async findSelected(code: string) {
     try {

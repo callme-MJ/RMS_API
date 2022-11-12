@@ -116,9 +116,26 @@ export class CandidateProgramService {
           },
         },
       });
-      console.log(candidatePrograms);
     return candidatePrograms;
   }
+
+  async findSelectedOfInstitute(
+    id: number,
+  ) {
+    let candidatePrograms =await this.candidateProgramRepository.find({
+      where: {
+        institute:{
+          id:id
+        },
+        isSelected: SelectionStatus.TRUE,
+        program: {
+            resultPublished: PublishingStatus.TRUE,
+          },
+        },
+      });
+    return candidatePrograms;
+  }
+
 
   public async findSelected(code: string) {
     return this.candidateProgramRepository.find({

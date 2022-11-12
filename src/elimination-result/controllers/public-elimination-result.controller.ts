@@ -22,4 +22,12 @@ export class PublicEliminationResultController {
       );
     return candidate;
   }
+
+  @Get('candidates/institutes/:id')
+  async findSelectedOfInstitute(@Param('id') id: number) {
+    const candidate =
+      await this.eliminationResultService.findSelectedOfInstitute(id);
+    return candidate;
+  }
+
 }

@@ -30,13 +30,12 @@ export class CategoryService {
     }
   }
 
-  public async findAll(sessionID: number = 0): Promise<Category[]> {
+  public async findAll(sessionID: number): Promise<Category[]> {
     try {
       return this.categoryRepository.find({
         where: {
           session: {
-            id: sessionID,
-            status: SessionStatus.ACTIVE,
+            id: 1,
           },
         },
       });

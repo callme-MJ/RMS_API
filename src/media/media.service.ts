@@ -15,23 +15,23 @@ export class MediaService {
     @InjectRepository(News)
     private readonly newsRepo: Repository<News>,
     private readonly s3Service: S3Service,
+  ) {}
 
-  ) { }
+  async create(createNewsDTO: CreateNewsDTO, photo: Express.Multer.File) {
+    const newNews = await this.newsRepo.create(createNewsDTO);
+    await this.newsRepo.save(newNews);
 
-  async create(createNewsDTO: CreateNewsDTO,photo: Express.Multer.File) {
+    await this.uploadPhoto(newNews, photo);
 
-    const newNews=  await this.newsRepo.create(createNewsDTO)
-     await this.newsRepo.save(newNews)
-     await this.uploadPhoto(newNews,photo)
-     return newNews;
+    return newNews;
   }
 
   findAll() {
-    return this.newsRepo.find()
+    return this.newsRepo.find();
   }
 
   findOne(id: number) {
-    return this.newsRepo.findOneBy({id})
+    return this.newsRepo.findOneBy({ id });
   }
 
   update(id: number, updateNewsDTO: UpdateNewsDTO) {
@@ -39,29 +39,27 @@ export class MediaService {
   }
 
   remove(id: number) {
-    return this.newsRepo.delete(id)
+    return this.newsRepo.delete(id);
   }
 
   private async uploadPhoto(
-    news:News,
+    news: News,
     photo: Express.Multer.File,
   ): Promise<News> {
     try {
+      if (!news || !photo) return;
       const ext: string = photo.originalname.split('.').pop();
       const uploadedImage: ManagedUpload.SendData =
-      await this.s3Service.uploadFile(
-        photo,
-        `news-${news.id}.${ext}`,
-        );
-        news.photo = {
-          eTag: uploadedImage.ETag,
-          key: uploadedImage.Key,
-          url: uploadedImage.Location,
-        };
-        
-        await this.newsRepo.save(news);
-        console.log('uploading photo');
-        return news;
+        await this.s3Service.uploadFile(photo, `news-${news.id}.${ext}`);
+      news.photo = {
+        eTag: uploadedImage.ETag,
+        key: uploadedImage.Key,
+        url: uploadedImage.Location,
+      };
+
+      await this.newsRepo.save(news);
+      console.log('uploading photo');
+      return news;
     } catch (error) {
       throw error;
     }

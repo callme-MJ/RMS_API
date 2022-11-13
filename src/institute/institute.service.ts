@@ -49,6 +49,8 @@ export class InstituteService {
     }
   }
 
+  
+
   public async findOne(id: number): Promise<Institute> {
     try {
       const institute: Institute = await this.instituteRepository.findOne({

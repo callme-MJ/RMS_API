@@ -207,4 +207,23 @@ export class EliminationResultService {
   findInstitutes(sessionID: number){
     return this.instituteService.findAll(sessionID);
   }
+
+  async findInstituteCount(sessionID: number){
+    const count= await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.program', 'program')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute')
+    .where('program.resultPublished = :resultPublished', {resultPublished: PublishingStatus.TRUE})
+    .andWhere('candidateProgram.isSelected = :selected', {selected: SelectionStatus.TRUE})
+    .select('candidateProgram.institute.id', 'instituteID')
+    .addSelect('count(candidateProgram.id)', 'count')
+    .addSelect('institute.name', 'instituteName')
+    .addSelect('institute.shortName', 'instituteShortName')
+    .groupBy('candidateProgram.institute.id')
+    .getRawMany();
+    return count;
+  }
+
+  findCategories(sessionID: number){
+    return this.categoryService.findAll(sessionID);
+  }
 }

@@ -73,6 +73,8 @@ export class ControllerEliminationResultController {
   async findPointsByProgramCode(@Param("code") code: any) {
     return await this.eliminationResultService.findPointsByProgramCode(code)
   }
+
+  
   
 
 

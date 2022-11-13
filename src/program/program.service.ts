@@ -101,9 +101,6 @@ export class ProgramsService {
       return this.programRepository.find({
         where: {
           resultPublished: PublishingStatus.TRUE,
-        },
-        order:{
-          updatedAt: 'DESC'
         }
       });
     } catch (error) {

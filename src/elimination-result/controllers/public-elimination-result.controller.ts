@@ -32,8 +32,20 @@ export class PublicEliminationResultController {
 
   @Get('institutes')
   async findInstitutes(@Query() sessionID: number) {
-    const candidate = await this.eliminationResultService.findInstitutes(sessionID);
-    return candidate;
+    const institute = await this.eliminationResultService.findInstitutes(sessionID);
+    return institute;
+  }
+
+  @Get('institutes/count')
+  async findInstituteCount(@Query() sessionID: number) {
+    const count = await this.eliminationResultService.findInstituteCount(sessionID);
+    return count;
+  }
+
+  @Get('categories')
+  async findCategories(@Query() sessionID: number) {
+    const categories = await this.eliminationResultService.findCategories(sessionID);
+    return categories;
   }
 
 

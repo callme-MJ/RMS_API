@@ -676,4 +676,22 @@ export class CandidateProgramService {
       .getMany();
     return registerablePrograms;
   }
+
+  public async getSelectedCandidates(id: number): Promise<CandidateProgram[]> {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    let selectedCandidates = await this.candidateProgramRepository.find({
+      where: {
+        institute:{
+          id: loggedInCoordinator.institute.id
+        },
+        isSelected: SelectionStatus.TRUE,
+        program:{
+          resultPublished:PublishingStatus.TRUE
+        }
+      },
+    })
+    return selectedCandidates;
+  }
+
+ 
 }

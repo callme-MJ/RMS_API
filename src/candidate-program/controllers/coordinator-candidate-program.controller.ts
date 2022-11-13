@@ -95,4 +95,13 @@ export class CoordinatorCandidateProgramController {
       throw error;
     }
   }
+
+  @Get('/selection')
+  async getSelectedCandidates(@Request() req: any) {
+    try {
+      return await this.candidateProgramService.getSelectedCandidates(req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

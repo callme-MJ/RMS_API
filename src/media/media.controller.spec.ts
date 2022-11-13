@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MediaController } from './media.controller';
+import { MediaController } from './user-media.controller';
 import { MediaService } from './media.service';
 
 describe('MediaController', () => {

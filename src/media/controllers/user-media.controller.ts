@@ -9,13 +9,13 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
-import { MediaService } from './media.service';
-import { CreateNewsDTO } from './dto/create-news.dto';
-import { UpdateNewsDTO } from './dto/update-media.dto';
+import { MediaService } from '../media.service';
+import { CreateNewsDTO } from '../dto/create-news.dto';
+import { UpdateNewsDTO } from '../dto/update-media.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user/media')
-export class MediaController {
+export class UserMediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Post('/news')

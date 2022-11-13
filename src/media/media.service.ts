@@ -35,7 +35,7 @@ export class MediaService {
   }
 
   update(id: number, updateNewsDTO: UpdateNewsDTO) {
-    return `This action updates a #${id} media`;
+    return this.newsRepo.update(id, updateNewsDTO);
   }
 
   remove(id: number) {

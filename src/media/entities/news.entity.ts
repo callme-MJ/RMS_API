@@ -9,7 +9,7 @@ export class News {
   @Column()
   heading: string;
 
-  @Column()
+  @Column("longtext")
   content: string;
 
   @Column({ nullable: true, type: 'json' })

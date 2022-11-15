@@ -83,15 +83,15 @@ export class CandidateProgramService {
   async findCandidatesOfProgram(code: string) {
     const program = await this.programsService.findOneByProgramCode(code);
     // if (program.type == 'single') {
-      const data = await this.candidateProgramRepository.find({
-        where: { programCode: code },
-      });
-      const candidate = data.map((candidate) => candidate.candidate);
-      console.log(candidate.length);
-      return candidate;
+    const data = await this.candidateProgramRepository.find({
+      where: { programCode: code },
+    });
+    const candidate = data.map((candidate) => candidate.candidate);
+    console.log(candidate.length);
+    return candidate;
     // }
     // if (program.type == 'group') {
-      
+
     //   const group = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
     //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
     //   .where('candidatePrograms.programCode = :programCode', { programCode: code })
@@ -104,38 +104,33 @@ export class CandidateProgramService {
     //   return candidate;
     // }
   }
-  async findCandidatesOfPublishedProgram(
-    code: string,
-  ) {
-    let candidatePrograms =await this.candidateProgramRepository.find({
+  async findCandidatesOfPublishedProgram(code: string) {
+    let candidatePrograms = await this.candidateProgramRepository.find({
       where: {
         programCode: code,
         isSelected: SelectionStatus.TRUE,
         program: {
-            resultPublished: PublishingStatus.TRUE,
-          },
+          resultPublished: PublishingStatus.TRUE,
         },
-      });
+      },
+    });
     return candidatePrograms;
   }
 
-  async findSelectedOfInstitute(
-    id: number,
-  ) {
-    let candidatePrograms =await this.candidateProgramRepository.find({
+  async findSelectedOfInstitute(id: number) {
+    let candidatePrograms = await this.candidateProgramRepository.find({
       where: {
-        institute:{
-          id:id
+        institute: {
+          id: id,
         },
         isSelected: SelectionStatus.TRUE,
         program: {
-            resultPublished: PublishingStatus.TRUE,
-          },
+          resultPublished: PublishingStatus.TRUE,
         },
-      });
+      },
+    });
     return candidatePrograms;
   }
-
 
   public async findSelected(code: string) {
     return this.candidateProgramRepository.find({
@@ -583,6 +578,7 @@ export class CandidateProgramService {
       .andWhere('candidate.institute.id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
+      .andWhere('candidatePrograms.isSelected = :status', {status: 'true'})
       .getMany();
     return registerablePrograms;
   }
@@ -646,7 +642,7 @@ export class CandidateProgramService {
     }
     await this.programsService.update(program.id, program);
     console.log(selectedCount2, program.maxSelection);
-    console.log("program's result is "+program.resultEntered);
+    console.log("program's result is " + program.resultEntered);
     candidateProgram.round = RoundStatus.Final;
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
@@ -681,17 +677,15 @@ export class CandidateProgramService {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
     let selectedCandidates = await this.candidateProgramRepository.find({
       where: {
-        institute:{
-          id: loggedInCoordinator.institute.id
+        institute: {
+          id: loggedInCoordinator.institute.id,
         },
         isSelected: SelectionStatus.TRUE,
-        program:{
-          resultPublished:PublishingStatus.TRUE
-        }
+        program: {
+          resultPublished: PublishingStatus.TRUE,
+        },
       },
-    })
+    });
     return selectedCandidates;
   }
-
- 
 }

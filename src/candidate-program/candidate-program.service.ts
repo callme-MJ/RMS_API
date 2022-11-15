@@ -578,7 +578,7 @@ export class CandidateProgramService {
       .andWhere('candidate.institute.id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
-      .andWhere('candidatePrograms.isSelected = :status', {status: 'true'})
+      // .andWhere('candidatePrograms.isSelected = :status', {status: 'true'})
       .getMany();
     return registerablePrograms;
   }

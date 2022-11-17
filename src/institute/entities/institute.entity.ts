@@ -35,7 +35,7 @@ export class Institute {
   @OneToMany(() => Candidate, (candidate) => candidate.institute)
   candidates: Candidate[];
 
- 
+
 
   @OneToMany(() => Coordinator, (coordinator) => coordinator.institute)
   coordinators: Coordinator[];

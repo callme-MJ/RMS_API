@@ -10,20 +10,20 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { MediaService } from '../media.service';
-import { CreateNewsDTO } from '../dto/create-news.dto';
+import { CreateMediaDTO } from '../dto/create-media.dto';
 import { UpdateNewsDTO } from '../dto/update-media.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('public/media')
 export class PublicMediaController {
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService) { }
 
-  @Get('/news')
+  @Get('/media')
   findAll() {
     return this.mediaService.findAll();
   }
 
-  @Get('/news/:id')
+  @Get('/media/:id')
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(+id);
   }

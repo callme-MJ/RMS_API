@@ -1,12 +1,14 @@
 import { IsNotEmpty } from 'class-validator';
-import { Photo } from 'src/candidate/interfaces/photo.entitiy';
 
-export class CreateNewsDTO {
+export class CreateMediaDTO {
   @IsNotEmpty()
   heading: string;
 
   @IsNotEmpty()
   content: string;
+
+  @IsNotEmpty()
+  type: string;
 
   @IsNotEmpty()
   imageCaption: string;

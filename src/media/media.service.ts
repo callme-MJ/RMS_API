@@ -5,59 +5,59 @@ import { CandidateProgramService } from 'src/candidate-program/candidate-program
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { S3Service } from 'src/candidate/services/s3.service';
 import { Repository } from 'typeorm';
-import { CreateNewsDTO } from './dto/create-news.dto';
+import { CreateMediaDTO } from './dto/create-media.dto';
 import { UpdateNewsDTO } from './dto/update-media.dto';
-import { News } from './entities/news.entity';
+import { Media } from './entities/media.entity';
 
 @Injectable()
 export class MediaService {
   constructor(
-    @InjectRepository(News)
-    private readonly newsRepo: Repository<News>,
+    @InjectRepository(Media)
+    private readonly mediaRepo: Repository<Media>,
     private readonly s3Service: S3Service,
-  ) {}
+  ) { }
 
-  async create(createNewsDTO: CreateNewsDTO, photo: Express.Multer.File) {
-    const newNews = await this.newsRepo.create(createNewsDTO);
-    await this.newsRepo.save(newNews);
+  async create(createMediaDTO: CreateMediaDTO, file: Express.Multer.File) {
+    const newMedia = this.mediaRepo.create(createMediaDTO);
+    await this.mediaRepo.save(newMedia);
 
-    await this.uploadPhoto(newNews, photo);
+    await this.uploadPhoto(newMedia, file);
 
-    return newNews;
+    return newMedia;
   }
 
   findAll() {
-    return this.newsRepo.find();
+    return this.mediaRepo.find();
   }
 
   findOne(id: number) {
-    return this.newsRepo.findOneBy({ id });
+    return this.mediaRepo.findOneBy({ id });
   }
 
   update(id: number, updateNewsDTO: UpdateNewsDTO) {
-    return this.newsRepo.update(id, updateNewsDTO);
+    return this.mediaRepo.update(id, updateNewsDTO);
   }
 
   remove(id: number) {
-    return this.newsRepo.delete(id);
+    return this.mediaRepo.delete(id);
   }
 
   private async uploadPhoto(
-    news: News,
+    news: Media,
     photo: Express.Multer.File,
-  ): Promise<News> {
+  ): Promise<Media> {
     try {
       if (!news || !photo) return;
       const ext: string = photo.originalname.split('.').pop();
-      const uploadedImage: ManagedUpload.SendData =
-        await this.s3Service.uploadFile(photo, `news-${news.id}.${ext}`);
-      news.photo = {
-        eTag: uploadedImage.ETag,
-        key: uploadedImage.Key,
-        url: uploadedImage.Location,
+      const uploadedFile: ManagedUpload.SendData =
+        await this.s3Service.uploadFile(photo, `mediafile-${news.id}.${ext}`);
+      news.file = {
+        eTag: uploadedFile.ETag,
+        key: uploadedFile.Key,
+        url: uploadedFile.Location,
       };
 
-      await this.newsRepo.save(news);
+      await this.mediaRepo.save(news);
       console.log('uploading photo');
       return news;
     } catch (error) {

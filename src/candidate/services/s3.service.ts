@@ -17,7 +17,7 @@ export class S3Service {
     });
   }
 
- public async uploadFile(file: Express.Multer.File, name: string): Promise<ManagedUpload.SendData> {
+  public async uploadFile(file: Express.Multer.File, name: string): Promise<ManagedUpload.SendData> {
     return await this.s3Upload(
       file,
       name
@@ -25,8 +25,8 @@ export class S3Service {
   }
 
   public async deleteFile(file: Photo): Promise<boolean> {
-    if(!file || !file.key) return false;
-    
+    if (!file || !file.key) return false;
+
     return await this.s3Delete(file.key);
   }
 
@@ -44,7 +44,7 @@ export class S3Service {
     };
 
     try {
-      
+
       // TODO: Resize the image before upload
       return await this.s3.upload(params).promise();
     } catch (error) {

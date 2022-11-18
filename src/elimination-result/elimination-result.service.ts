@@ -208,7 +208,7 @@ export class EliminationResultService {
     return this.instituteService.findAll(sessionID);
   }
 
-  async findInstituteCount(sessionID: number){
+  async findInstituteCount(sessionID: number,id?: number){
     const count= await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
     .leftJoinAndSelect('candidateProgram.program', 'program')
     .leftJoinAndSelect('candidateProgram.institute', 'institute')
@@ -222,6 +222,22 @@ export class EliminationResultService {
     .getRawMany();
     return count;
   }
+  async findInstituteCountByCategory(categoryID: number){
+    const count= await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.program', 'program')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute')
+    .where('program.resultPublished = :resultPublished', {resultPublished: PublishingStatus.TRUE})
+    .andWhere('candidateProgram.isSelected = :selected', {selected: SelectionStatus.TRUE})
+    .andWhere('program.categoryID = :category',{category: categoryID})
+    .select('candidateProgram.institute.id', 'instituteID')
+    .addSelect('count(candidateProgram.id)', 'count')
+    .addSelect('institute.name', 'instituteName')
+    .addSelect('institute.shortName', 'instituteShortName')
+    .groupBy('candidateProgram.institute.id')
+    .getRawMany();
+    return count;
+  }
+
 
   findCategories(sessionID: number){
     return this.categoryService.findAll(sessionID);

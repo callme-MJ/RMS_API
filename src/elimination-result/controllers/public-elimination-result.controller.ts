@@ -42,6 +42,12 @@ export class PublicEliminationResultController {
     return count;
   }
 
+  @Get('institutes/count/:id')
+  async findInstituteCountByCategory(@Param('id') id: number) {
+    const count = await this.eliminationResultService.findInstituteCountByCategory(id)
+    return count;
+  }
+
   @Get('categories')
   async findCategories(@Query() sessionID: number) {
     const categories = await this.eliminationResultService.findCategories(sessionID);

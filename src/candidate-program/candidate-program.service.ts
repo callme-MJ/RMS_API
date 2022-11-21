@@ -171,6 +171,9 @@ export class CandidateProgramService {
             status: SessionStatus.ACTIVE,
           },
         },
+        order:{
+          chestNO: 'ASC'
+        }
       });
 
       return candidatePrograms;

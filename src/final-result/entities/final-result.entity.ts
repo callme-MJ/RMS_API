@@ -30,10 +30,10 @@ export class FinalResult {
   @Column("decimal", { precision: 5, scale: 2 })
   pointOne: number;
 
-  @Column("decimal", { precision: 5, scale: 2 })
+  @Column("decimal", { precision: 5, scale: 2, default:"0"})
   pointTwo: number;
 
-  @Column("decimal", { precision: 5, scale: 2 })
+  @Column("decimal", { precision: 5, scale: 2, default:"0"})
   pointThree: number;
 
   @Column("decimal", { precision: 5, scale: 2 })

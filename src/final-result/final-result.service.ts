@@ -66,9 +66,9 @@ export class FinalResultService {
       createFinalResultDto.pointOne +
       createFinalResultDto.pointTwo +
       createFinalResultDto.pointThree ;
-      const arr = [createFinalResultDto.pointOne,createFinalResultDto.pointTwo,createFinalResultDto.pointThree];
-      const countJudge = (arr.filter(obj => obj > 0).length);
-      newResult.percentage= (newResult.totalPoint/countJudge*100)*100;
+      // const arr = [createFinalResultDto.pointOne,createFinalResultDto.pointTwo,createFinalResultDto.pointThree];
+      // const countJudge = (arr.filter(obj => obj > 0).length);
+      // newResult.percentage= (newResult.totalPoint/countJudge*100)*100;
 
       await this.FinalResultRepo.save(newResult);
       return newResult;

@@ -87,6 +87,12 @@ export class Program {
   resultPublished: string;
 
   @Column({ nullable: true })
+  finalResultEntered: string;
+
+  @Column({nullable: true})
+  finalResultPublished: string;
+
+  @Column({ nullable: true })
   maxSelection: number;
 
   @Column({ nullable: true })

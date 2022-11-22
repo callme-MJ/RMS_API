@@ -111,6 +111,21 @@ export class ProgramsService {
     }
   }
 
+  public async findAllPublishedFinalProgram() {
+    try {
+      return this.programRepository.find({
+        where: {
+          resultPublished: PublishingStatus.TRUE,
+        },
+        order:{
+          updatedAt: 'DESC'
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   public async findAllForCoordinator(id: number): Promise<Program[]> {
     try {
       const coordinator = await this.coordinatorService.findOne(id);

@@ -18,12 +18,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class PublicMediaController {
   constructor(private readonly mediaService: MediaService) { }
 
-  @Get('/media')
+  @Get('')
   findAll() {
     return this.mediaService.findAll();
   }
 
-  @Get('/media/:id')
+  @Get('/:id')
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(+id);
   }

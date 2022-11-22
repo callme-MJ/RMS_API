@@ -18,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/login/user/guards/roles.guard';
 import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { Role } from 'src/login/interfaces/user-roles.enum';
+import { CreateGalleryDTO } from '../dto/create-gallery.dto';
 
 @UseGuards(AuthGuard('jwt-user'), RolesGuard)
 @Roles(Role.CONTROLLER)
@@ -34,14 +35,33 @@ export class UserMediaController {
     return this.mediaService.create(createNewsDTO, file);
   }
 
+  @Post('gallery')
+  @UseInterceptors(FileInterceptor('file'))
+  createGallery(
+    @Body() galleryDto: CreateGalleryDTO,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.mediaService.createGallery(galleryDto, file);
+  }
+
   @Get()
   findAll() {
     return this.mediaService.findAll();
   }
 
+  @Get('gallery')
+  findAllGallery() {
+    return this.mediaService.findAllGallery();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(+id);
+  }
+  
+  @Get('gallery/:id')
+  findOneImage(@Param('id') id: string) {
+    return this.mediaService.findOneImage(+id);
   }
 
   @Patch(':id')
@@ -52,5 +72,10 @@ export class UserMediaController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.mediaService.remove(+id);
+  }
+
+  @Delete('gallery/:id')
+  removeGallery(@Param('id') id: string) {
+    return this.mediaService.removeGallery(+id);
   }
 }

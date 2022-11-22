@@ -21,7 +21,7 @@ import { Role } from 'src/login/interfaces/user-roles.enum';
 import { CreateGalleryDTO } from '../dto/create-gallery.dto';
 
 @UseGuards(AuthGuard('jwt-user'), RolesGuard)
-@Roles(Role.CONTROLLER)
+@Roles(Role.MEDIA)
 @Controller('user/media')
 export class UserMediaController {
   constructor(private readonly mediaService: MediaService) { }

@@ -32,7 +32,7 @@ export class Media {
   @Column({ nullable: true })
   tag: string;
 
-  @Expose({ groups: ['single'], name: 'created_at' })
+  @Expose({ name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
 }

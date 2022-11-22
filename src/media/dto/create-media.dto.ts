@@ -16,5 +16,5 @@ export class CreateMediaDTO {
   @IsNotEmpty()
   tag: string;
 
-  youtube_link: string;
+  youtubeLink: string;
 }

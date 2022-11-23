@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NumberReference } from 'aws-sdk/clients/connect';
-import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
+import { throwError } from 'rxjs';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
@@ -11,6 +10,7 @@ import { Repository } from 'typeorm';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
+import { UpdateSchedule } from './dto/update-schedule';
 import { Program, PublishingStatus } from './entities/program.entity';
 
 export interface IProgramFilter extends IFilter {
@@ -24,7 +24,7 @@ export class ProgramsService {
     private readonly categoryService: CategoryService,
     private readonly coordinatorService: CoordinatorService,
     private readonly sessionService: SessionService,
-  ) {}
+  ) { }
 
   public async create(createProgramDto: CreateProgramDto): Promise<Program> {
     try {
@@ -36,7 +36,7 @@ export class ProgramsService {
       );
       if (!category || !session)
         throw new NotFoundException('Category or Session not found');
-      const program =  this.programRepository.create(createProgramDto);
+      const program = this.programRepository.create(createProgramDto);
       program.session = session;
       program.category = category;
       await this.programRepository.save(program);
@@ -46,12 +46,11 @@ export class ProgramsService {
     }
   }
 
-  public async addSchedule(id:number,schedule: CreateScheduleDto,sessionID:number) {
+  public async addSchedule(id: number, schedule: CreateScheduleDto) {
     try {
-      const program =await this.programRepository.findOne({
-        where:{
-          id :id,
-          sessionID: sessionID
+      const program = await this.programRepository.findOne({
+        where: {
+          id: id
         }
       });
       if (!program) throw new NotFoundException('Program not found');
@@ -59,23 +58,50 @@ export class ProgramsService {
       program.time = schedule.time;
       program.venue = schedule.venue;
       program.duration = schedule.duration;
-      await this.programRepository.save(program);      
+      await this.programRepository.save(program);
       return program;
     } catch (error) {
       throw error;
-    }  
+    }
   }
 
-  public async getSchedule(id:number,sessionID:number){
+  public async findOneSchedule(id: number) {
     try {
-      const program = this.programRepository.findOne({
-        where:{
-          id:id,
-          sessionID:sessionID
+      const program = await this.programRepository.findOne({
+        where: {
+          id: id
         }
-      }) 
+      })
+      const schedule = {
+        date: program.date,
+        time: program.time,
+        venue: program.venue,
+        duration: program.duration,
+        id: program.id,
+        name: program.name,
+        code: program.programCode
+      }
+      return schedule;
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public async findAllSchedule(queryParams:IProgramFilter){
+    try {
+      const program = await this.programRepository.createQueryBuilder("program")
+      .select("program.id","id")
+      .addSelect("program.name","name")
+      .addSelect("program.programCode","code")
+      .addSelect("program.venue","venue")
+      .addSelect("program.duration","duration")
+      .addSelect("program.date","date")
+      .addSelect("program.time","time")
+      .getRawMany()
+
+      console.log(program);
       return program;
-      
     } catch (error) {
       throw error
     }
@@ -127,7 +153,7 @@ export class ProgramsService {
           { categoryByFeatures: 'X' },
           { categoryByFeatures: 'V' },
         ],
-        
+
       });
     } catch (error) {
       throw error;
@@ -139,7 +165,7 @@ export class ProgramsService {
         where: {
           resultPublished: PublishingStatus.TRUE,
         },
-        order:{
+        order: {
           updatedAt: 'DESC'
         }
       });
@@ -209,6 +235,18 @@ export class ProgramsService {
   ): Promise<boolean> {
     try {
       await this.programRepository.update(id, updateProgramDto);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async updateSchedule(
+    id: number,
+    updateScheduleDto: UpdateSchedule,
+  ): Promise<boolean> {
+    try {
+      await this.programRepository.update(id,updateScheduleDto);
       return true;
     } catch (error) {
       throw error;

@@ -10,9 +10,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { MediaService } from '../media.service';
-import { CreateMediaDTO } from '../dto/create-media.dto';
-import { UpdateNewsDTO } from '../dto/update-media.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+
 
 @Controller('public/media')
 export class PublicMediaController {

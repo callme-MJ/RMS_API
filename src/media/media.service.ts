@@ -104,7 +104,6 @@ export class MediaService {
         key: uploadedFile.Key,
         url: uploadedFile.Location,
       };
-
       await this.galleryRepo.save(gallery);
       console.log('uploading photo');
       return gallery;

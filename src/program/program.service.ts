@@ -48,7 +48,12 @@ export class ProgramsService {
 
   public async addSchedule(id:number,schedule: CreateScheduleDto,sessionID:number) {
     try {
-      const program =await this.programRepository.findOneBy({id});
+      const program =await this.programRepository.findOne({
+        where:{
+          id :id,
+          sessionID: sessionID
+        }
+      });
       if (!program) throw new NotFoundException('Program not found');
       program.date = schedule.date;
       program.time = schedule.time;
@@ -61,10 +66,15 @@ export class ProgramsService {
     }  
   }
 
-  public async getSchedule(id:number){
+  public async getSchedule(id:number,sessionID:number){
     try {
-      const program = this.programRepository.findOneBy({id}) 
-      return 
+      const program = this.programRepository.findOne({
+        where:{
+          id:id,
+          sessionID:sessionID
+        }
+      }) 
+      return program;
       
     } catch (error) {
       throw error

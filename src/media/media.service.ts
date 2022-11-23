@@ -32,7 +32,7 @@ export class MediaService {
 
   async createGallery(createGalletyDTO: CreateGalleryDTO, file: Express.Multer.File) {
     const newImage = this.galleryRepo.create(createGalletyDTO);
-    await this.mediaRepo.save(newImage);
+    await this.galleryRepo.save(newImage);
 
     await this.uploadGalleryImage(newImage, file);
 

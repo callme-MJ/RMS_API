@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { query } from 'express';
 import { Role } from 'src/login/interfaces/user-roles.enum';
 import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { RolesGuard } from 'src/login/user/guards/roles.guard';
@@ -18,8 +19,10 @@ export class UserProgramsController {
     }
 
     @Post('schedule/:id')
-    async addSchedule(@Param("id")id:number,@Body() createScheduleDto: CreateScheduleDto) {
-        return await this.programsService.addSchedule(id,createScheduleDto);
+    async addSchedule(@Param("id")id:number,
+    @Body() createScheduleDto: CreateScheduleDto,
+    @Query('sessionID')sessionID:number) {
+        return await this.programsService.addSchedule(id,createScheduleDto,sessionID);
     }
   
     @Get()

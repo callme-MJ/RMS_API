@@ -9,5 +9,8 @@ export class CreateScheduleDto {
 
     @IsNotEmpty()
     venue: number;
+    
+    @IsNotEmpty()
+    duration: number;
   
 }

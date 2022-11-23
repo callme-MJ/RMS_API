@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { NumberReference } from 'aws-sdk/clients/connect';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
@@ -45,18 +46,29 @@ export class ProgramsService {
     }
   }
 
-  public async addSchedule(id:number,schedule: CreateScheduleDto) {
+  public async addSchedule(id:number,schedule: CreateScheduleDto,sessionID:number) {
     try {
       const program =await this.programRepository.findOneBy({id});
       if (!program) throw new NotFoundException('Program not found');
       program.date = schedule.date;
       program.time = schedule.time;
       program.venue = schedule.venue;
+      program.duration = schedule.duration;
       await this.programRepository.save(program);      
       return program;
     } catch (error) {
       throw error;
     }  
+  }
+
+  public async getSchedule(id:number){
+    try {
+      const program = this.programRepository.findOneBy({id}) 
+      return 
+      
+    } catch (error) {
+      throw error
+    }
   }
 
   public async findAll(queryParams: IProgramFilter): Promise<Program[]> {

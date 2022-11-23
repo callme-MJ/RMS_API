@@ -8,6 +8,7 @@ import { SessionStatus } from 'src/session/entities/session.entity';
 import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CreateProgramDto } from './dto/create-program.dto';
+import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { Program, PublishingStatus } from './entities/program.entity';
 
@@ -34,7 +35,7 @@ export class ProgramsService {
       );
       if (!category || !session)
         throw new NotFoundException('Category or Session not found');
-      const program = await this.programRepository.create(createProgramDto);
+      const program =  this.programRepository.create(createProgramDto);
       program.session = session;
       program.category = category;
       await this.programRepository.save(program);
@@ -42,6 +43,20 @@ export class ProgramsService {
     } catch (error) {
       throw error;
     }
+  }
+
+  public async addSchedule(id:number,schedule: CreateScheduleDto) {
+    try {
+      const program =await this.programRepository.findOneBy({id});
+      if (!program) throw new NotFoundException('Program not found');
+      program.date = schedule.date;
+      program.time = schedule.time;
+      program.venue = schedule.venue;
+      await this.programRepository.save(program);      
+      return program;
+    } catch (error) {
+      throw error;
+    }  
   }
 
   public async findAll(queryParams: IProgramFilter): Promise<Program[]> {

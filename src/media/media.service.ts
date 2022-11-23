@@ -25,7 +25,7 @@ export class MediaService {
     const newMedia = this.mediaRepo.create(createMediaDTO);
     await this.mediaRepo.save(newMedia);
 
-    await this.uploadPhoto(newMedia, file);
+    await this.uploadMedia(newMedia, file);
 
     return newMedia;
   }
@@ -67,24 +67,24 @@ export class MediaService {
     return this.galleryRepo.delete(id);
   }
 
-  private async uploadPhoto(
-    news: Media,
+  private async uploadMedia(
+    media: Media,
     photo: Express.Multer.File,
   ): Promise<Media> {
     try {
-      if (!news || !photo) return;
+      if (!media || !photo) return;
       const ext: string = photo.originalname.split('.').pop();
       const uploadedFile: ManagedUpload.SendData =
-        await this.s3Service.uploadFile(photo, `mediafile-${news.id}.${ext}`);
-      news.file = {
+        await this.s3Service.uploadFile(photo, `mediafile-${media.id}.${ext}`);
+      media.file = {
         eTag: uploadedFile.ETag,
         key: uploadedFile.Key,
         url: uploadedFile.Location,
       };
 
-      await this.mediaRepo.save(news);
+      await this.mediaRepo.save(media);
       console.log('uploading photo');
-      return news;
+      return media;
     } catch (error) {
       throw error;
     }

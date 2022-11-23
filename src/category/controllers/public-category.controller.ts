@@ -9,8 +9,8 @@ export class PUblicCategoryController {
 
   @SerializeOptions({ groups: ['collection'] })
   @Get()
-  findAll(@Query('session_id') sessionID: number = 0) {
-    return this.categoryService.findAll(+sessionID);
+  findAll(@Query('session_id') query: any = 0) {
+    return this.categoryService.findAll(query.sessionID);
   }
 
   @SerializeOptions({ groups: ['single'] })

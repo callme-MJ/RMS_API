@@ -1,60 +1,92 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+  Query,
+} from '@nestjs/common';
+import { FinalResultService } from '../final-result.service';
+import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
+import { UpdateFinalMarkDto } from '../dto/update-final-mark.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { IProgramFilter } from 'src/program/program.service';
-import { CreateFinalResultDTO } from '../dto/create-Final-result.dto';
-import { UpdateFinalResultDTO } from '../dto/update-Final-result.dto';
-import { FinalResultService } from '../Final-result.service';
+import { IProgramFilter, ProgramsService } from 'src/program/program.service';
+import { CreateFinalResultDTO } from '../dto/create-final-result.dto';
 
-@Controller('admin/Final-result')
+@Controller('admin/final-result')
 @UseGuards(AuthGuard('jwt-admin'))
 export class AdminFinalResultController {
-  constructor(private readonly FinalResultService: FinalResultService) { }
+  constructor(
+    private readonly finalResultService: FinalResultService,
+    private readonly programService: ProgramsService,
+  ) {}
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  create(@Body() createFinalResultDTO: CreateFinalResultDTO) {
-    return this.FinalResultService.create(createFinalResultDTO);
-  }
-
-  @Post('/selection/:id')
-  @UsePipes(ValidationPipe)
-  updateSelection(@Param('id') id: number) {
-    return this.FinalResultService.updateSelection(id);
-  }
-
-  @Get()
-  findAll(@Query() queryParams: IProgramFilter) {
-    return this.FinalResultService.findAll(queryParams);
+  @Get("/programs")
+  async findAll(@Query() queryParams: IProgramFilter) {
+    try {
+      const programs =  this.programService.findAll(queryParams);
+      console.log((await programs).length)
+      return programs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get('candidates/:code')
   async findOne(@Param('code') code: string) {
-    const candidate = await this.FinalResultService.findCandidatesOfProgram(code);
-    return candidate
+    const candidate = await this.finalResultService.findCandidatesOfProgram(code);
+    return candidate;
   }
-  @Get('selection/:code')
-  async findSelected(@Param('code') code: string) {
-    return await this.FinalResultService.findSelected(code)
-  }
-
-  @Get('points')
-  async findPoints(@Body() body: any) {
-    return await this.FinalResultService.findPoints(body.chestNO, body.programCode)
+  
+  @Post("/marks")
+  @UsePipes(ValidationPipe)
+  create(@Body() createEliminationMarkDto: CreateFinalMarkDto) {
+    return this.finalResultService.entryMarks(createEliminationMarkDto);
   }
 
-  @Get('points/:code')
-  async findPointsByProgramCode(@Body() body: any) {
-    return await this.FinalResultService.findPointsByProgramCode(body.programCode)
+  @Get("/marks")
+  Get() {
+    return this.finalResultService.findAllMarks();
   }
 
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFinalResultDTO: UpdateFinalResultDTO) {
-    return this.FinalResultService.update(+id, updateFinalResultDTO);
+  @Post("/:id")
+  @UsePipes(ValidationPipe)
+  createResult(@Body() CreateFinalResultDTO: CreateFinalResultDTO, @Param('id') id: number) {
+    return this.finalResultService.createResult(CreateFinalResultDTO,id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.FinalResultService.remove(+id);
+  @Get("/:id")
+  getResult(@Param('id') id: number) {
+    return this.finalResultService.getResult(id);
   }
+
+  @Get("/program/:code")
+  getResultOfProgram(@Param('code') code: string) {
+    const result= this.finalResultService.getResultOfProgram(code);
+    
+    return result;
+  }
+
+  @Get("/institutions/all")
+  getTotalOfInstitutions(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutions(queryParams);
+  }
+
+  @Get("/institutions/category/:id")
+  getTotalOfInstitutionsByCategory(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsByCategory(id);
+  }
+
+  @Get("/programs/status")
+  getProgramsStutus(@Query() queryParams: IProgramFilter) {
+    console.log(queryParams)
+    return this.finalResultService.getProgramsStutus(queryParams);
+  }
+
+  
 }

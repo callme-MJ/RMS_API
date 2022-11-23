@@ -1,20 +1,9 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateFinalResultDTO {
-
+  @IsNotEmpty()
+  position: string;
 
   @IsNotEmpty()
-  chestNO: number;
-
-  @IsNotEmpty()
-  programCode: string;
-
-  @IsNotEmpty()
-  pointOne: number;
-
-  pointTwo: number;
-
-  pointThree: number;
-
-
+  grade: string;
 }

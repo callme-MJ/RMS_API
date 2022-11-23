@@ -1,85 +1,91 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseGuards, Query } from '@nestjs/common';
-import { CreateFinalResultDTO } from '../DTO/create-Final-result.DTO';
-import { UpdateFinalResultDTO } from '../DTO/update-Final-result.DTO';
-import { AuthGuard } from '@nestjs/passport';
-import { FinalResultService } from '../Final-result.service';
-import { IProgramFilter } from 'src/program/program.service';
-
-
-@Controller('user/Final-result')
-@UseGuards(AuthGuard('jwt-user'))
-export class ControllerFinalResultController {
-  constructor(private readonly FinalResultService: FinalResultService) { }
-
-  @Post()
-  @UsePipes(ValidationPipe)
-  create(@Body() createFinalResultDTO: CreateFinalResultDTO) {
-    return this.FinalResultService.create(createFinalResultDTO);
-  }
-
-  @Post('/selection/:id')
-  @UsePipes(ValidationPipe)
-  updateSelection(@Param('id') id: number) {
-    return this.FinalResultService.updateSelection(id);
-  }
-
-  @Delete('/selection/:id')
-  @UsePipes(ValidationPipe)
-  deleteSelection(@Param('id') id: number) {
-    return this.FinalResultService.deleteSelection(id);
-  }
-
-  @Get('selection/:code')
-  async findSelected(@Param('code') code: string) {
-    return await this.FinalResultService.findSelected(code)
-  }
-
-  @Get()
-  findAll(@Query() queryParams: IProgramFilter) {
-    return this.FinalResultService.findAll(queryParams);
-  }
-
-  @Get('candidates/:code')
-  async findOne(@Param('code') code: string) {
-    const candidate = await this.FinalResultService.findCandidatesOfProgram(code);
-    return candidate
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFinalResultDTO: UpdateFinalResultDTO) {
-    return this.FinalResultService.update(+id, updateFinalResultDTO);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.FinalResultService.remove(+id);
-  }
-
-  @Post('/publish/:code')
-  async publish(@Param('code') code: string) {
-    return await this.FinalResultService.publishResult(code)
-  }
-
-  @Delete('/publish/:code')
-  async unpublish(@Param('code') code: string) {
-    return await this.FinalResultService.unpublishResult(code)
-  }
-
-  @Get('points')
-  async findPoints(@Body() body: any) {
-    return await this.FinalResultService.findPoints(body.chestNO, body.programCode)
-  }
-
-  @Get('points/:code')
-  async findPointsByProgramCode(@Param("code") code: any) {
-    return await this.FinalResultService.findPointsByProgramCode(code)
-  }
-
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UseGuards,
+    UsePipes,
+    ValidationPipe,
+    Query,
+  } from '@nestjs/common';
+  import { FinalResultService } from '../final-result.service';
+  import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
+  import { UpdateFinalMarkDto } from '../dto/update-final-mark.dto';
+  import { AuthGuard } from '@nestjs/passport';
+  import { IProgramFilter, ProgramsService } from 'src/program/program.service';
+  import { CreateFinalResultDTO } from '../dto/create-final-result.dto';
   
+  @Controller('user/final-result')
+  @UseGuards(AuthGuard('jwt-user'))
+  export class ControllerFinalResultController {
+    constructor(
+      private readonly finalResultService: FinalResultService,
+      private readonly programService: ProgramsService,
+    ) {}
   
-
-
+    @Get("/programs")
+    async findAll(@Query() queryParams: IProgramFilter) {
+      try {
+        const programs =  this.programService.findAll(queryParams);
+        console.log((await programs).length)
+        return programs;
+      } catch (error) {
+        throw error;
+      }
+    }
   
-
-
-}
+    @Get('candidates/:code')
+    async findOne(@Param('code') code: string) {
+      const candidate = await this.finalResultService.findCandidatesOfProgram(code);
+      return candidate;
+    }
+    
+    @Post("/marks")
+    @UsePipes(ValidationPipe)
+    create(@Body() createEliminationMarkDto: CreateFinalMarkDto) {
+      return this.finalResultService.entryMarks(createEliminationMarkDto);
+    }
+  
+    @Get("/marks")
+    Get() {
+      return this.finalResultService.findAllMarks();
+    }
+  
+    @Post("/:id")
+    @UsePipes(ValidationPipe)
+    createResult(@Body() CreateFinalResultDTO: CreateFinalResultDTO, @Param('id') id: number) {
+      return this.finalResultService.createResult(CreateFinalResultDTO,id);
+    }
+  
+    @Get("/:id")
+    getResult(@Param('id') id: number) {
+      return this.finalResultService.getResult(id);
+    }
+  
+    @Get("/program/:code")
+    getResultOfProgram(@Param('code') code: string) {
+      return this.finalResultService.getResultOfProgram(code);
+    }
+  
+    @Get("/institutions/all")
+    getTotalOfInstitutions(@Query() queryParams: IProgramFilter) {
+      return this.finalResultService.getTotalOfInstitutions(queryParams);
+    }
+  
+    @Get("/institutions/category/:id")
+    getTotalOfInstitutionsByCategory(@Param('id') id: number) {
+      return this.finalResultService.getTotalOfInstitutionsByCategory(id);
+    }
+  
+    @Get("/programs/status")
+    getProgramsStutus(@Query() queryParams: IProgramFilter) {
+      console.log(queryParams)
+      return this.finalResultService.getProgramsStutus(queryParams);
+    }
+  
+    
+  }
+  

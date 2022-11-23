@@ -15,10 +15,15 @@ import { ControllerCandidateProgramController } from './controllers/controller-c
     CandidateModule,
     ProgramModule,
     CoordinatorModule,
-    TypeOrmModule.forFeature([CandidateProgram,Candidate]),
+
+    TypeOrmModule.forFeature([CandidateProgram, Candidate]),
   ],
-  controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController,ControllerCandidateProgramController],
+  controllers: [
+    AdminCandidateProgramController,
+    CoordinatorCandidateProgramController,
+    ControllerCandidateProgramController,
+  ],
   providers: [CandidateProgramService],
-  exports: [CandidateProgramService]
+  exports: [CandidateProgramService],
 })
-export class CandidateProgramModule { }
+export class CandidateProgramModule {}

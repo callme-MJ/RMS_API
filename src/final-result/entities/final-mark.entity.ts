@@ -1,8 +1,8 @@
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'Final_result' })
-export class FinalResult {
+@Entity({ name: 'final_mark' })
+export class FinalMark {
   @PrimaryGeneratedColumn({
     type: 'bigint',
     name: 'id',
@@ -30,17 +30,17 @@ export class FinalResult {
   @Column("decimal", { precision: 5, scale: 2 })
   pointOne: number;
 
-  @Column("decimal", { precision: 5, scale: 2, default:"0"})
+  @Column("decimal", { precision: 5, scale: 2 })
   pointTwo: number;
 
-  @Column("decimal", { precision: 5, scale: 2, default:"0"})
+  @Column("decimal", { precision: 5, scale: 2 })
   pointThree: number;
 
   @Column("decimal", { precision: 5, scale: 2 })
   totalPoint: number;
 
   @Column("decimal", { precision: 5, scale: 2 })
-  percentage: number;
+  percetage: number;
 
   @Column({ nullable: true })
   remarks: string;

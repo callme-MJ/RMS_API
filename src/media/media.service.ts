@@ -105,7 +105,7 @@ export class MediaService {
         url: uploadedFile.Location,
       };
 
-      await this.mediaRepo.save(gallery);
+      await this.galleryRepo.save(gallery);
       console.log('uploading photo');
       return gallery;
     } catch (error) {

@@ -17,7 +17,7 @@ import { Files } from "./file.interface";
     @Column()
     tag: string;
 
-    @Column({type:'json'})
+    @Column({type:'json',nullable:true})
     file: Files
      
 

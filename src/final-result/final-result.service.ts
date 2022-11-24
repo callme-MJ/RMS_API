@@ -214,7 +214,7 @@ export class FinalResultService {
       .where('program.categoryID = :id', { id })
       .andWhere('program.finalResultPublished :finalResultEntered', {
         finalResultEntered: PublishingStatus.TRUE,
-        })
+      })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
@@ -235,7 +235,7 @@ export class FinalResultService {
       .where('program.categoryID = :id', { id })
       .andWhere('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
-        })
+      })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
@@ -346,6 +346,8 @@ export class FinalResultService {
             return 3;
           case 'Third':
             return 1;
+          case 'None':
+            return 0;
         }
       case 'group':
         switch (programData.category_id) {
@@ -357,6 +359,8 @@ export class FinalResultService {
                 return 7;
               case 'Third':
                 return 5;
+              case 'None':
+                return 0;
             }
           default:
             switch (position) {
@@ -366,6 +370,8 @@ export class FinalResultService {
                 return 5;
               case 'Third':
                 return 3;
+              case 'None':
+                return 0;
             }
         }
     }
@@ -387,6 +393,8 @@ export class FinalResultService {
             return 7;
           case 'B':
             return 5;
+          default:
+            return 0;
         }
       default:
         switch (grade) {
@@ -394,6 +402,8 @@ export class FinalResultService {
             return 5;
           case 'B':
             return 3;
+          default:
+            return 0;
         }
     }
   }

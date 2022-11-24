@@ -97,7 +97,11 @@ export class FinalResultService {
   }
 
   findAllMarks() {
-    return this.FinalMarkRepo.find();
+    return this.FinalMarkRepo.find({
+      order: {
+        totalPoint: 'DESC',
+      },
+    });
   }
 
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
@@ -124,17 +128,17 @@ export class FinalResultService {
   }
 
   async getResultOfProgram(code: string) {
-    const result =await  this.CandidateProgramRepo.findOne({
+    const result = await this.CandidateProgramRepo.findOne({
       where: {
         programCode: code,
         program: {
           finalResultPublished: PublishingStatus.TRUE,
         },
         isSelected: SelectionStatus.TRUE,
-        point: Between(1,100)
+        point: Between(1, 100),
       },
     });
-    console.log(result)
+    console.log(result);
     return result;
   }
 

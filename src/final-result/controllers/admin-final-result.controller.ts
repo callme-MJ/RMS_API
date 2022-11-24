@@ -49,7 +49,7 @@ export class AdminFinalResultController {
     return this.finalResultService.entryMarks(createEliminationMarkDto);
   }
 
-  @Get("/marks")
+  @Get("/marks/all")
   Get() {
     return this.finalResultService.findAllMarks();
   }

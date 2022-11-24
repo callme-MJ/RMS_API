@@ -25,12 +25,13 @@ import {
       private readonly finalResultService: FinalResultService,
       private readonly programService: ProgramsService,
     ) {}
+    
   
     @Get("/programs")
     async findAll(@Query() queryParams: IProgramFilter) {
       try {
         const programs =  this.programService.findAll(queryParams);
-        console.log((await programs).length)
+        // console.log((await programs).length)
         return programs;
       } catch (error) {
         throw error;
@@ -49,7 +50,7 @@ import {
       return this.finalResultService.entryMarks(createEliminationMarkDto);
     }
   
-    @Get("/marks")
+    @Get("/marks/all")
     Get() {
       return this.finalResultService.findAllMarks();
     }

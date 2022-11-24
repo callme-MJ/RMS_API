@@ -74,12 +74,12 @@ export class AdminFinalResultController {
 
   @Get("/institutions/all")
   getTotalOfInstitutions(@Query() queryParams: IProgramFilter) {
-    return this.finalResultService.getTotalOfInstitutions(queryParams);
+    return this.finalResultService.getTotalOfInstitutionsEntered(queryParams);
   }
 
   @Get("/institutions/category/:id")
   getTotalOfInstitutionsByCategory(@Param('id') id: number) {
-    return this.finalResultService.getTotalOfInstitutionsByCategory(id);
+    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(id);
   }
 
   @Get("/programs/status")

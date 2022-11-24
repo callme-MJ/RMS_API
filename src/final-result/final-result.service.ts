@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import {
   CandidateProgram,
-  SelectionStatus
+  SelectionStatus,
 } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import {
   EnteringStatus,
   Program,
-  PublishingStatus
+  PublishingStatus,
 } from 'src/program/entities/program.entity';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
 import { Between, Repository } from 'typeorm';
@@ -101,7 +101,7 @@ export class FinalResultService {
       },
     });
   }
-  findAllMarksOfProgram(code:string) {
+  findAllMarksOfProgram(code: string) {
     return this.FinalMarkRepo.find({
       where: {
         programCode: code,
@@ -160,7 +160,7 @@ export class FinalResultService {
     return result;
   }
 
-  async getTotalOfInstitutions(queryParams: IProgramFilter) {
+  async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -168,6 +168,31 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .where('candidateProgram.sessionID = :sessionID', {
         sessionID: queryParams.sessionID,
+      })
+      .andWhere('program.finalResultPublished :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('total', 'DESC')
+      .getRawMany();
+    console.log(total);
+    return total;
+  }
+  async getTotalOfInstitutionsEntered(queryParams: IProgramFilter) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .where('candidateProgram.sessionID = :sessionID', {
+        sessionID: queryParams.sessionID,
+      })
+      .andWhere('program.finalResultPublished :finalResultEntered', {
+        finalResultEntered: PublishingStatus.TRUE,
       })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
@@ -180,19 +205,43 @@ export class FinalResultService {
     return total;
   }
 
-  async getTotalOfInstitutionsByCategory(id: number) {
+  async getTotalOfInstitutionsByCategoryEntered(id: number) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .where('program.categoryID = :id', { id })
+      .andWhere('program.finalResultPublished :finalResultEntered', {
+        finalResultEntered: PublishingStatus.TRUE,
+        })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
-      .addGroupBy("program.categoryID")
+      .addGroupBy('program.categoryID')
+      .orderBy('total', 'DESC')
+      .getRawMany();
+    console.log(total);
+    return total;
+  }
+  async getTotalOfInstitutionsByCategoryPublished(id: number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .where('program.categoryID = :id', { id })
+      .andWhere('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+        })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .addGroupBy('program.categoryID')
       .orderBy('total', 'DESC')
       .getRawMany();
     console.log(total);
@@ -203,9 +252,9 @@ export class FinalResultService {
       .leftJoinAndSelect('program.session', 'session')
       .select('session.name', 'sessionName')
       .addSelect('Count(program.id)', 'totalPublished')
-      // .where('program.finalResultPublished = :finalResultPublished', {
-      //   finalResultPublished: PublishingStatus.TRUE,
-      // })
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
       // .addSelect('Count(program.id)', 'totalEntered')
       // .where('program.finalResultEntered = :finalResultEntered', {
       //   finalResultEntered: EnteringStatus.TRUE,
@@ -238,9 +287,12 @@ export class FinalResultService {
   }
   async publishResultOfFinal(programCode: string) {
     try {
-      const program = await this.programService.findOneByProgramCode(programCode);
+      const program = await this.programService.findOneByProgramCode(
+        programCode,
+      );
       if (!program) throw new NotFoundException('Program not found');
-      if(program.finalResultEntered != EnteringStatus.TRUE) throw new NotFoundException('Result not entered completely');
+      if (program.finalResultEntered != EnteringStatus.TRUE)
+        throw new NotFoundException('Result not entered completely');
       program.finalResultPublished = PublishingStatus.TRUE;
       await this.programService.update(program.id, program);
       return program;
@@ -251,7 +303,9 @@ export class FinalResultService {
 
   async unPublishResultOfFinal(programCode: string) {
     try {
-      const program = await this.programService.findOneByProgramCode(programCode);
+      const program = await this.programService.findOneByProgramCode(
+        programCode,
+      );
       if (!program) throw new NotFoundException('Program not found');
       program.finalResultPublished = PublishingStatus.FALSE;
       await this.programService.update(program.id, program);
@@ -261,15 +315,15 @@ export class FinalResultService {
     }
   }
 
-  async getPublishedPrograms(){
+  async getPublishedPrograms() {
     return await this.ProgramRepo.find({
-      where:{
-        finalResultPublished:PublishingStatus.TRUE
+      where: {
+        finalResultPublished: PublishingStatus.TRUE,
       },
-      order:{
-        updatedAt:"DESC"
-      }
-    })
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
   }
 
   async getPositionPoint(position: string, programCode: string) {

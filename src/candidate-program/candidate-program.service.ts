@@ -90,7 +90,7 @@ export class CandidateProgramService {
   }
 
   async findCandidatesOfProgramOfFinal(code: string) {
-    const program = await this.programsService.findOneByProgramCode(code);
+    // const program = await this.programsService.findOneByProgramCode(code);
     const data = await this.candidateProgramRepository.find({
       where: { programCode: code, isSelected: SelectionStatus.TRUE },
     });

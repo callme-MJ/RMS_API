@@ -66,7 +66,7 @@ export class ControllerFinalResultController {
     return candidate;
   }
 
-  @Post('/marks')
+  @Post('/marks/one')
   @UsePipes(ValidationPipe)
   create(@Body() createEliminationMarkDto: CreateFinalMarkDto) {
     return this.finalResultService.entryMarks(createEliminationMarkDto);
@@ -101,14 +101,24 @@ export class ControllerFinalResultController {
     return this.finalResultService.getResultOfProgram(code);
   }
 
-  @Get('/institutions/all')
-  getTotalOfInstitutions(@Query() queryParams: IProgramFilter) {
-    return this.finalResultService.getTotalOfInstitutions(queryParams);
+  @Get('/institutions/published/all')
+  getTotalOfInstitutionsPublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsPublished(queryParams);
   }
 
-  @Get('/institutions/category/:id')
-  getTotalOfInstitutionsByCategory(@Param('id') id: number) {
-    return this.finalResultService.getTotalOfInstitutionsByCategory(id);
+  @Get('/institutions/entered/all')
+  getTotalOfInstitutionsEntered(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsEntered(queryParams);
+  }
+
+  @Get('/institutions/category/published/:id')
+  getTotalOfInstitutionsByCategoryPublished(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(id);
+  }
+
+  @Get('/institutions/category/entered/:id')
+  getTotalOfInstitutionsByCategoryEntered(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryEntered(id);
   }
 
   @Get('/programs/status')

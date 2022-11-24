@@ -3,20 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import {
   CandidateProgram,
-  Grade,
-  SelectionStatus,
+  SelectionStatus
 } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import {
   EnteringStatus,
   Program,
-  PublishingStatus,
+  PublishingStatus
 } from 'src/program/entities/program.entity';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
-import { Between, Not, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { CreateFinalMarkDto } from './dto/create-final-mark.dto';
 import { CreateFinalResultDTO } from './dto/create-final-result.dto';
-import { UpdateFinalMarkDto } from './dto/update-final-mark.dto';
 import { FinalMark } from './entities/final-mark.entity';
 
 @Injectable()
@@ -30,7 +28,7 @@ export class FinalResultService {
     private readonly ProgramRepo: Repository<Program>,
     private readonly candidateProgramService: CandidateProgramService,
     private readonly candidateService: CandidateService,
-    private readonly ProgramsService: ProgramsService,
+    private readonly programService: ProgramsService,
   ) {}
   async findCandidatesOfProgram(code: string) {
     try {
@@ -65,7 +63,7 @@ export class FinalResultService {
       const candidate = await this.candidateService.findCandidateBychestNO(
         CreateFinalMarkDto.chestNO,
       );
-      const program = await this.ProgramsService.findOneByProgramCode(
+      const program = await this.programService.findOneByProgramCode(
         CreateFinalMarkDto.programCode,
       );
       if (!candidate) throw new NotFoundException('Candidate not found');
@@ -88,7 +86,7 @@ export class FinalResultService {
         CreateFinalMarkDto.pointThree,
       ];
       const countJudges = arr.filter((item) => item > 0).length;
-      newResult.percetage = (newResult.totalPoint / (countJudges * 100)) * 100;
+      newResult.percentage = (newResult.totalPoint / (countJudges * 100)) * 100;
       await this.FinalMarkRepo.save(newResult);
       return newResult;
     } catch (error) {
@@ -103,18 +101,35 @@ export class FinalResultService {
       },
     });
   }
+  findAllMarksOfProgram(code:string) {
+    return this.FinalMarkRepo.find({
+      where: {
+        programCode: code,
+      },
+      order: {
+        totalPoint: 'DESC',
+      },
+    });
+  }
 
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
+    const finalResult = await this.FinalMarkRepo.findOne({
+      where: {
+        candidateProgram: {
+          id: id,
+        },
+      },
+    });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = createFinalResultDTO.position;
-    candidateProgram.grade = createFinalResultDTO.grade;
+    candidateProgram.grade = await this.getGrade(finalResult.percentage);
     const postionPoint = await this.getPositionPoint(
       createFinalResultDTO.position,
       candidateProgram.programCode,
     );
     const gradePoint = await this.getGradePoint(
-      createFinalResultDTO.grade,
+      candidateProgram.grade,
       candidateProgram.programCode,
     );
     console.log(postionPoint, gradePoint);
@@ -136,6 +151,9 @@ export class FinalResultService {
         },
         isSelected: SelectionStatus.TRUE,
         point: Between(1, 100),
+      },
+      order: {
+        point: 'DESC',
       },
     });
     console.log(result);
@@ -174,29 +192,84 @@ export class FinalResultService {
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
+      .addGroupBy("program.categoryID")
       .orderBy('total', 'DESC')
       .getRawMany();
     console.log(total);
     return total;
   }
-  async getProgramsStutus(queryParams: IProgramFilter) {
+  async getProgramsStutus() {
     const status = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.session', 'session')
-      .select('Count(program.id)', 'totalPublished')
-      .where('session.id = :sessionID', { sessionID: queryParams.sessionID })
-      .andWhere('program.finalResultPublished = :finalResultPublished', {
-        finalResultPublished: PublishingStatus.TRUE,
-      })
-      .addSelect('Count(program.id)', 'totalEntered')
-      .where('program.sessionID = :sessionID', {
-        sessionID: queryParams.sessionID,
-      })
-      .andWhere('program.finalResultEntered = :finalResultEntered', {
-        finalResultEntered: EnteringStatus.TRUE,
-      })
+      .select('session.name', 'sessionName')
+      .addSelect('Count(program.id)', 'totalPublished')
+      // .where('program.finalResultPublished = :finalResultPublished', {
+      //   finalResultPublished: PublishingStatus.TRUE,
+      // })
+      // .addSelect('Count(program.id)', 'totalEntered')
+      // .where('program.finalResultEntered = :finalResultEntered', {
+      //   finalResultEntered: EnteringStatus.TRUE,
+      // })
+      .groupBy('session.id')
       .getRawMany();
     console.log(status);
     return status;
+  }
+
+  async getToppers() {
+    const toppers = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('program.session', 'session')
+      .select('candidate.name', 'candidateName')
+      .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect('MAX(candidateProgram.point)', 'score')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('session.name', 'sessionName')
+      .where('program.type = :type', { type: 'single' })
+      .groupBy('category.id')
+      .getRawMany();
+    return toppers;
+  }
+  async publishResultOfFinal(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(programCode);
+      if (!program) throw new NotFoundException('Program not found');
+      if(program.finalResultEntered != EnteringStatus.TRUE) throw new NotFoundException('Result not entered completely');
+      program.finalResultPublished = PublishingStatus.TRUE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async unPublishResultOfFinal(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(programCode);
+      if (!program) throw new NotFoundException('Program not found');
+      program.finalResultPublished = PublishingStatus.FALSE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getPublishedPrograms(){
+    return await this.ProgramRepo.find({
+      where:{
+        finalResultPublished:PublishingStatus.TRUE
+      },
+      order:{
+        updatedAt:"DESC"
+      }
+    })
   }
 
   async getPositionPoint(position: string, programCode: string) {
@@ -268,6 +341,14 @@ export class FinalResultService {
           case 'B':
             return 3;
         }
+    }
+  }
+  async getGrade(percetage: number) {
+    switch (true) {
+      case percetage >= 80 && percetage <= 100:
+        return 'A';
+      case percetage >= 65 && percetage <= 79:
+        return 'B';
     }
   }
 }

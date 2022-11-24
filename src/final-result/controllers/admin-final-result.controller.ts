@@ -85,7 +85,7 @@ export class AdminFinalResultController {
   @Get("/programs/status")
   getProgramsStutus(@Query() queryParams: IProgramFilter) {
     console.log(queryParams)
-    return this.finalResultService.getProgramsStutus(queryParams);
+    return this.finalResultService.getProgramsStutus();
   }
 
   

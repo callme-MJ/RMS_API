@@ -40,7 +40,7 @@ export class FinalMark {
   totalPoint: number;
 
   @Column("decimal", { precision: 5, scale: 2 })
-  percetage: number;
+  percentage: number;
 
   @Column({ nullable: true })
   remarks: string;

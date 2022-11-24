@@ -34,7 +34,7 @@ export class PublicFinalResultController {
   @Get('/programs')
   async findAll(@Query() queryParams: IProgramFilter) {
     try {
-      const programs = this.programService.findAll(queryParams);
+      const programs = this.finalResultService.getPublishedPrograms();
       console.log((await programs).length);
       return programs;
     } catch (error) {
@@ -78,6 +78,6 @@ export class PublicFinalResultController {
   @Get('/programs/status')
   getProgramsStutus(@Query() queryParams: IProgramFilter) {
     console.log(queryParams);
-    return this.finalResultService.getProgramsStutus(queryParams);
+    return this.finalResultService.getProgramsStutus();
   }
 }

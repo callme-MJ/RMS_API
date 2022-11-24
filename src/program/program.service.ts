@@ -55,9 +55,9 @@ export class ProgramsService {
       });
       if (!program) throw new NotFoundException('Program not found');
       program.date = schedule.date;
-      program.time = schedule.time;
+      program.s_time = schedule.s_time;
       program.venue = schedule.venue;
-      program.duration = schedule.duration;
+      program.e_time = schedule.e_time;
       await this.programRepository.save(program);
       return program;
     } catch (error) {
@@ -74,9 +74,9 @@ export class ProgramsService {
       })
       const schedule = {
         date: program.date,
-        time: program.time,
+        s_time: program.s_time,
         venue: program.venue,
-        duration: program.duration,
+        e_time: program.e_time,
         id: program.id,
         name: program.name,
         code: program.programCode
@@ -91,13 +91,15 @@ export class ProgramsService {
   public async findAllSchedule(queryParams:IProgramFilter){
     try {
       const program = await this.programRepository.createQueryBuilder("program")
+      .leftJoinAndSelect("program.category", "category")
       .select("program.id","id")
       .addSelect("program.name","name")
       .addSelect("program.programCode","code")
       .addSelect("program.venue","venue")
-      .addSelect("program.duration","duration")
+      .addSelect("program.e_time","e_time")
       .addSelect("program.date","date")
-      .addSelect("program.time","time")
+      .addSelect("program.s_time","s_time")
+      .addSelect("category.name","category")
       .getRawMany()
 
       console.log(program);

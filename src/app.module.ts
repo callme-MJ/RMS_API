@@ -20,6 +20,7 @@ import { UserModule } from './user/user.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { EliminationResultModule } from './elimination-result/elimination-result.module';
 import { MediaModule } from './media/media.module';
+import { FinalResultModule } from './final-result/final-result.module';
 
 
 @Module({
@@ -101,6 +102,7 @@ import { MediaModule } from './media/media.module';
     SessionModule,
     EliminationResultModule,
     MediaModule,
+    FinalResultModule,
 
   ],
   controllers: [AppController],

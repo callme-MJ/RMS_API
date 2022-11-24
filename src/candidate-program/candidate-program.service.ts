@@ -1,15 +1,13 @@
-import { Body, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { clearConfigCache } from 'prettier';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
-import { Institute } from 'src/institute/entities/institute.entity';
 import {
   EnteringStatus,
   Program,
-  PublishingStatus,
+  PublishingStatus
 } from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
 import { Session, SessionStatus } from 'src/session/entities/session.entity';
@@ -21,7 +19,7 @@ import {
   CandidateProgram,
   RoundStatus,
   SelectionStatus,
-  Status,
+  Status
 } from './entities/candidate-program.entity';
 export interface ICandidateProgramFIilter extends IFilter {
   candidateID: number;
@@ -89,21 +87,18 @@ export class CandidateProgramService {
     const candidate = data.map((candidate) => candidate.candidate);
     console.log(candidate.length);
     return candidate;
-    // }
-    // if (program.type == 'group') {
-
-    //   const group = await this.candidateProgramRepository.createQueryBuilder('candidatePrograms')
-    //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
-    //   .where('candidatePrograms.programCode = :programCode', { programCode: code })
-    //   .select('candidatePrograms.chestNO',"candidatePrograms.")
-    //   .groupBy('candidatePrograms.institute.id')
-    //   .getMany();
-    //   const candidate = group.map((candidate) => candidate.candidate);
-    //   console.log(candidate);
-    //   console.log(candidate.length);
-    //   return candidate;
-    // }
   }
+
+  async findCandidatesOfProgramOfFinal(code: string) {
+    // const program = await this.programsService.findOneByProgramCode(code);
+    const data = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE },
+    });
+    const candidate = data.map((candidate) => candidate.candidate);
+    console.log(candidate.length);
+    return candidate;
+  }
+  
   async findCandidatesOfPublishedProgram(code: string) {
     let candidatePrograms = await this.candidateProgramRepository.find({
       where: {
@@ -171,9 +166,9 @@ export class CandidateProgramService {
             status: SessionStatus.ACTIVE,
           },
         },
-        order:{
-          chestNO: 'ASC'
-        }
+        order: {
+          chestNO: 'ASC',
+        },
       });
 
       return candidatePrograms;
@@ -582,7 +577,8 @@ export class CandidateProgramService {
         instituteId: loggedInCoordinator.institute.id,
       })
       .andWhere('candidatePrograms.isSelected = :status', {
-        status: 'true',})
+        status: 'true',
+      })
       .getMany();
     return registerablePrograms;
   }
@@ -651,6 +647,7 @@ export class CandidateProgramService {
     await this.candidateProgramRepository.save(candidateProgram);
     return candidateProgram;
   }
+  
 
   public async deleteSelection(id: number): Promise<CandidateProgram> {
     const candidateProgram = await this.candidateProgramRepository.findOneBy({

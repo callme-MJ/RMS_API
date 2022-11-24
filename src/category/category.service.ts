@@ -35,8 +35,9 @@ export class CategoryService {
       return this.categoryRepository.find({
         where: {
           session: {
-            id: 1,
-          },
+            id: sessionID,
+            status: SessionStatus.ACTIVE,
+          }
         },
       });
     } catch (error) {

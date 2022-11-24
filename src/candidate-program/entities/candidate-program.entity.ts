@@ -23,6 +23,19 @@ export enum SelectionStatus {
   FALSE = 'False',
 }
 
+export enum Position {
+  First = 'First',
+  Second = 'Second',
+  Third = 'Third',
+  None = 'None',
+}
+
+export enum Grade {
+  A = 'A',
+  B = 'B',
+  None = 'None',
+}
+
 export enum RoundStatus {
   Elimination = 'Elimination',
   Final = 'Final',
@@ -56,10 +69,10 @@ export class CandidateProgram {
   @Column({ type: 'varchar', default: Status.NotSubmitted })
   status: Status;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: Position.None })
   position: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: Grade.None })
   grade: string;
 
   @Column({ nullable: true })

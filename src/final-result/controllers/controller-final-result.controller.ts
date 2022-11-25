@@ -96,6 +96,19 @@ export class ControllerFinalResultController {
     return this.finalResultService.createResult(CreateFinalResultDTO, id);
   }
 
+  @Post('/submit/:id')
+  submitResult(
+    @Param('id') id: number,
+  ) {
+    return this.finalResultService.submitResult( id);
+  }
+  @Delete('/submit/:id')
+  unsubmitResult(
+    @Param('id') id: number,
+  ) {
+    return this.finalResultService.unsubmitResult( id);
+  }
+
   @Delete('/:id')
   deleteResult(
     @Param('id') id: number,
@@ -154,8 +167,8 @@ export class ControllerFinalResultController {
   }
 
   @Get("programs/published")
-  getPublishedPrograms(){
-    return this.finalResultService.getPublishedPrograms()
+  getPublishedPrograms(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.getPublishedPrograms(queryParams)
   }
 
 }

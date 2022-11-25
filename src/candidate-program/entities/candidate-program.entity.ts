@@ -76,6 +76,12 @@ export class CandidateProgram {
   grade: string;
 
   @Column({ nullable: true })
+  postionPoint: number;
+
+  @Column({ nullable: true })
+  gradePoint: number;
+
+  @Column({ nullable: true })
   point: number;
 
   @Column({ nullable: true })

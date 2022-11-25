@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.entity';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
@@ -27,8 +28,8 @@ export class CandidateService {
   constructor(
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
-    @InjectRepository(Session)
-    private readonly SessionRepository: Repository<Session>,
+    @InjectRepository(CandidateProgram)
+    private readonly candidateProgramRepo:Repository<CandidateProgram>,
     private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
     private readonly sessionService: SessionService,
@@ -133,13 +134,15 @@ export class CandidateService {
   }
 
   findCandidateBychestNO(
-    chestNO: number,
+    chestNo: number,
     sessionID?: number,
   ): Promise<Candidate> {
     try {
-      return this.candidateRepository.findOneBy({
-        chestNO: chestNO,
-        session: { id: sessionID },
+      return this.candidateRepository.findOne({
+        where:{
+          chestNO: chestNo,
+          session: { id: sessionID },
+        }
       });
     } catch (error) {
       throw error;
@@ -303,5 +306,59 @@ export class CandidateService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async findCandidateDetails(chestNo:number){
+   const candidate = await this.findCandidateBychestNO(chestNo)
+   const candidateDetails = await this.candidateProgramRepo
+   .createQueryBuilder('candidateProgram')
+   .leftJoinAndSelect('candidateProgram.program','program')
+   .leftJoinAndSelect("candidateProgram.candidate","candidate")
+   .leftJoinAndSelect('candidate.institute','institute')
+   .leftJoinAndSelect('candidate.category','category')
+   .where('candidate.chest_no=:chestNo',{chestNo:chestNo})
+   .select("candidate.name",'name')
+   .addSelect("candidate.chestNO","chestNO")
+   .addSelect("candidate.photo","photo")
+   .addSelect("category.name","category")
+   .addSelect("institute.shortName","institute")
+   .addSelect('candidateProgram.program_name','program')
+   .addSelect('candidateProgram.point',"mark")
+   .addSelect('candidateProgram.position','position')
+   .addSelect('candidateProgram.grade','grade')
+   .addSelect('program.date','date')
+   .addSelect('program.s_time','time')
+   .addSelect('program.venue','venue')
+   .getRawMany()
+
+  //  const programDetails = [];
+  //   candidateDetails.map((program) => {
+  //     programDetails.push(program.program);
+  //     programDetails.push(program.venue)
+  //     programDetails.push(program.date)
+  //     programDetails.push(program.mark)
+  //     programDetails.push(program.position)
+  //     programDetails.push(program.grade)
+  //   });
+   const programDetails = {
+    venue:candidateDetails.forEach((item)=>item.venue),
+    date:candidateDetails.forEach((item)=>item.date),
+    s_time:candidateDetails.forEach((item)=>item.s_time),
+    program:candidateDetails.forEach((item)=>item.program),
+    mark:candidateDetails.forEach((item)=>item.mark),
+    position:candidateDetails.forEach((item)=>item.position),
+    grade:candidateDetails.forEach((item)=>item.grade)
+   };
+   const details = {
+    chestNO: candidateDetails[0].chestNO,
+    name: candidateDetails[0].name,
+    institute: candidateDetails[0].institute,
+    photo: candidateDetails[0].photo,
+    category: candidateDetails[0].category,
+    programs: programDetails,
+  };
+    console.log(details);
+    return candidateDetails;
+    
   }
 }

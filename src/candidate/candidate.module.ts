@@ -13,14 +13,16 @@ import { AdminService } from 'src/admin/admin.service';
 import { Admin } from 'src/admin/entities/admin.entity';
 import { ControllerCandidatesController } from './controllers/controller-candidate.controller';
 import { Session } from 'src/session/entities/session.entity';
+import { publicCandidatesController } from './controllers/public-candidate.controller';
+import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Candidate,Coordinator,Admin,Session]),
+    TypeOrmModule.forFeature([Candidate,Coordinator,Admin,Session,CandidateProgram]),
     CategoryModule,
     InstituteModule,
   ],
-  controllers: [AdminCandidatesController,CoordinatorCandidatesController,ControllerCandidatesController],
+  controllers: [AdminCandidatesController,CoordinatorCandidatesController,ControllerCandidatesController,publicCandidatesController],
   providers: [CandidateService, S3Service,CoordinatorService,AdminService],
   exports: [CandidateService]
 })

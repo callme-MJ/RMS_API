@@ -5,12 +5,12 @@ export class CreateScheduleDto {
     date: string;
 
     @IsNotEmpty()
-    time: string;
+    s_time: string;
 
     @IsNotEmpty()
     venue: number;
     
     @IsNotEmpty()
-    duration: number;
+    e_time: string;
   
 }

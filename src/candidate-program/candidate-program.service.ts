@@ -260,7 +260,7 @@ export class CandidateProgramService {
     try {
       const { chestNO, programCode } = newCandidateProgram;
 
-      const candidateProgram = await this.candidateProgramRepository
+      const candidateProgram =  this.candidateProgramRepository
         .createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
         .leftJoinAndSelect('candidateProgram.program', 'program')

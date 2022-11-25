@@ -54,7 +54,7 @@ export class Program {
   date: string;
 
   @Column({ nullable: true })
-  time: string;
+  s_time: string;
 
   @Column({ nullable: true })
   venue: number;
@@ -75,7 +75,7 @@ export class Program {
   isStarred: string;
 
   @Column({ nullable: true })
-  duration: number;
+  e_time: string;
 
   @Column({ nullable: true })
   conceptNote: string;

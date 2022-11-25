@@ -102,9 +102,22 @@ export class ControllerFinalResultController {
   @Delete('/:id')
   deleteResult(
     @Param('id') id: number,
+    ) {
+      return this.finalResultService.deleteResult(id);
+    }
+  @Post('/submit/:id')
+  submitResult(
+    @Param('id') id: number,
   ) {
-    return this.finalResultService.deleteResult(id);
+    return this.finalResultService.submitResult( id);
   }
+  @Delete('/submit/:id')
+  unsubmitResult(
+    @Param('id') id: number,
+  ) {
+    return this.finalResultService.unsubmitResult( id);
+  }
+
 
   @Get('/:id')
   getResult(@Param('id') id: number) {
@@ -157,13 +170,13 @@ export class ControllerFinalResultController {
   }
 
   @Get("programs/published")
-  getPublishedPrograms(){
-    return this.finalResultService.getPublishedPrograms()
+  getPublishedPrograms(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.getPublishedPrograms(queryParams)
   }
 
   @Get("programs/entered")
-  getEnteredPrograms(){
-    return this.finalResultService.getEnteredPrograms()
+  getEnteredPrograms(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.getEnteredPrograms(queryParams)
   }
 
 }

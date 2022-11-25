@@ -34,7 +34,7 @@ export class PublicFinalResultController {
   @Get('/programs/published')
   async findAll(@Query() queryParams: IProgramFilter) {
     try {
-      const programs = this.finalResultService.getPublishedPrograms();
+      const programs = this.finalResultService.getPublishedPrograms(queryParams);
       console.log((await programs).length);
       return programs;
     } catch (error) {

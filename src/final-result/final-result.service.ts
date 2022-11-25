@@ -71,7 +71,7 @@ export class FinalResultService {
       const newResult: FinalMark =
         this.FinalMarkRepo.create(CreateFinalMarkDto);
       // program.resultEntered = EnteringStatus.TRUE;
-      
+
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.instituteID = candidate.institute.id;
@@ -95,6 +95,7 @@ export class FinalResultService {
         candidateProgram.grade,
         candidateProgram.programCode,
       );
+      candidateProgram.gradePoint = gradePoint;
       candidateProgram.point = gradePoint;
       await this.CandidateProgramRepo.save(candidateProgram);
       return newResult;
@@ -110,8 +111,10 @@ export class FinalResultService {
       id: FinalMark.candidateProgram.id,
     });
     candidateProgram.position = null;
-    candidateProgram.point = null;
     candidateProgram.grade = null;
+    candidateProgram.gradePoint = null;
+    candidateProgram.postionPoint = null;
+    candidateProgram.point = null;
     await this.CandidateProgramRepo.save(candidateProgram);
     if (!FinalMark) throw new NotFoundException('Mark not found');
     await this.FinalMarkRepo.delete({ id });
@@ -137,28 +140,33 @@ export class FinalResultService {
 
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
-    // const finalResult = await this.FinalMarkRepo.findOne({
-    //   where: {
-    //     candidateProgram: {
-    //       id: id,
-    //     },
-    //   },
-    // });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = createFinalResultDTO.position;
-    
+
     const postionPoint = await this.getPositionPoint(
       createFinalResultDTO.position,
       candidateProgram.programCode,
     );
-    // const gradePoint = await this.getGradePoint(
-    //   candidateProgram.grade,
-    //   candidateProgram.programCode,
-    // );
-    // console.log(postionPoint, gradePoint);
+    candidateProgram.postionPoint = postionPoint;
+
     candidateProgram.point = postionPoint + candidateProgram.point;
     await this.CandidateProgramRepo.save(candidateProgram);
     return candidateProgram;
+  }
+  async submitResult(id: number) {
+    const program = await this.ProgramRepo.findOneBy({ id });
+    if (!program) throw new NotFoundException('Program not found');
+    program.finalResultEntered = EnteringStatus.TRUE;
+    await this.ProgramRepo.save(program);
+    return program;
+  }
+
+  async unsubmitResult(id: number) {
+    const program = await this.ProgramRepo.findOneBy({ id });
+    if (!program) throw new NotFoundException('Program not found');
+    program.finalResultEntered = EnteringStatus.FALSE;
+    await this.ProgramRepo.save(program);
+    return program;
   }
 
   getResult(id: number) {
@@ -187,6 +195,8 @@ export class FinalResultService {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = null;
+    candidateProgram.point = candidateProgram.gradePoint;
+    candidateProgram.postionPoint= null;
     await this.CandidateProgramRepo.save(candidateProgram);
   }
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
@@ -344,20 +354,24 @@ export class FinalResultService {
     }
   }
 
-  async getPublishedPrograms() {
+  async getPublishedPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {
         finalResultPublished: PublishingStatus.TRUE,
+        sessionID: queryParams.sessionID,
       },
       order: {
         updatedAt: 'DESC',
       },
     });
   }
-  async getEnteredPrograms() {
+  async getEnteredPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {
         finalResultEntered: EnteringStatus.TRUE,
+        session:{
+          id:queryParams.sessionID
+        }
       },
       order: {
         updatedAt: 'DESC',
@@ -366,10 +380,9 @@ export class FinalResultService {
   }
   async getAllPrograms(queryParams:IProgramFilter) {
     return await this.ProgramRepo.find({
-      where :{
+      where: {
         sessionID: queryParams.sessionID,
-      }
-      
+      },
     });
   }
 

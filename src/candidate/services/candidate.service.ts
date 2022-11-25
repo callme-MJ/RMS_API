@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { name } from 'aws-sdk/clients/importexport';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { CategoryService } from 'src/category/category.service';
@@ -15,6 +16,7 @@ import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
 import { Candidate, Gender } from '../entities/candidate.entity';
+import { Details } from '../entities/export.class';
 import { IFilter } from '../interfaces/filter.interface';
 import { S3Service } from './s3.service';
 
@@ -32,7 +34,6 @@ export class CandidateService {
     private readonly candidateProgramRepo:Repository<CandidateProgram>,
     private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
-    private readonly sessionService: SessionService,
     private readonly instituteService: InstituteService,
     private readonly categoryService: CategoryService,
   ) {}
@@ -255,7 +256,6 @@ export class CandidateService {
   async checkEligibility(candidateDTO: CandidateDTO) {
     try {
       let { adno, instituteID } = candidateDTO;
-      const candidate = await this.candidateRepository.findOneBy({ adno });
       let duplicate = await this.candidateRepository.find({
         relations: {
           institute: true,
@@ -314,53 +314,43 @@ export class CandidateService {
    .leftJoinAndSelect('candidate.category', 'category')
    .leftJoinAndSelect('candidate.institute', 'institute')
    .where('candidate.chestNO = :chestNo', {chestNo})
-   .select(['candidate.id', 'candidate.name','candidate.chestNO', 'candidate.photo', 'category.name', 'institute.name'])
+   .select(['candidate.id', 'candidate.name','candidate.chestNO', 'candidate.photo', 'category.name', 'institute.shortName','candidate.gender'])
    .getRawMany();
        
-   const programDetails = await this.candidateProgramRepo
+   const program = await this.candidateProgramRepo
    .createQueryBuilder('candidateProgram')
-   .leftJoinAndSelect('candidateProgram.program','program')
    .where('candidateProgram.chest_no=:chestNo',{chestNo:chestNo})
-   .select('candidateProgram.program_name','program')
-   .addSelect('candidateProgram.point',"mark")
-   .addSelect('candidateProgram.position','position')
-   .addSelect('candidateProgram.grade','grade')
+   .leftJoinAndSelect('candidateProgram.program','program')
+   .select('program.name','name')
+   .addSelect('program.program_code','code')
    .addSelect('program.date','date')
+   .addSelect('program.final_result_entered','entered')
    .addSelect('program.s_time','time')
    .addSelect('program.venue','venue')
    .getRawMany()
 
-   
-   const details = [...candidate,programDetails]
-   console.log(details);
-   
-  //  const programDetails = [];
-  //   candidateDetails.map((program) => {
-  //     programDetails.push(program.program);
-  //     programDetails.push(program.venue)
-  //     programDetails.push(program.date)
-  //     programDetails.push(program.mark)
-  //     programDetails.push(program.position)
-  //     programDetails.push(program.grade)
-  //   });
-  //  const programDetails = {
-  //   venue:candidateDetails.forEach((item)=>item.venue),
-  //   date:candidateDetails.forEach((item)=>item.date),
-  //   s_time:candidateDetails.forEach((item)=>item.s_time),
-  //   program:candidateDetails.forEach((item)=>item.program),
-  //   mark:candidateDetails.forEach((item)=>item.mark),
-  //   position:candidateDetails.forEach((item)=>item.position),
-  //   grade:candidateDetails.forEach((item)=>item.grade)
-  //  };
-  //  const details = {
-  //   chestNO: candidateDetails[0].chestNO,
-  //   name: candidateDetails[0].name,
-  //   institute: candidateDetails[0].institute,
-  //   photo: candidateDetails[0].photo,
-  //   category: candidateDetails[0].category,
-  //   programs: programDetails,
-  // };
-    // console.log(details);
+   const result = await this.candidateProgramRepo
+   .createQueryBuilder('candidateProgram')
+   .leftJoinAndSelect('candidateProgram.program','program')
+   .where('candidateProgram.chest_no=:chestNo',{chestNo:chestNo})
+   .andWhere('program.final_result_entered = :entered',{entered:"true"})
+   .select('candidateProgram.point',"mark")
+   .addSelect('program.name','name')
+   .addSelect('candidateProgram.position','position')
+   .addSelect('candidateProgram.grade','grade')
+   .getRawMany()
+
+   const programDetails = program.map((item)=>{item.result = result.find((res)=>res.name == item.name); return item})    
+
+   const details: Details = {
+     name: candidate[0].candidate_name,
+     chestNO: candidate[0].candidate_chestNO,
+     photo: candidate[0].candidate_photo,
+     gender: candidate[0].candidate_gender,
+     institute: candidate[0].institute_short_name,
+     category: candidate[0].category_name,
+    program:[...programDetails]
+   }
     return details;
     
   }

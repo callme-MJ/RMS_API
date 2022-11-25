@@ -13,6 +13,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { CategoryService } from 'src/category/category.service';
 import { InstituteService } from 'src/institute/institute.service';
+import { Role } from 'src/login/interfaces/user-roles.enum';
+import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
 import { SessionService } from 'src/session/session.service';
 import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
@@ -21,6 +23,7 @@ import { FinalResultService } from '../final-result.service';
 
 @Controller('user/final-result')
 @UseGuards(AuthGuard('jwt-user'))
+@Roles(Role.CONTROLLER)
 export class ControllerFinalResultController {
   constructor(
     private readonly finalResultService: FinalResultService,

@@ -158,4 +158,9 @@ export class ControllerFinalResultController {
     return this.finalResultService.getPublishedPrograms()
   }
 
+  @Get("programs/entered")
+  getEnteredPrograms(){
+    return this.finalResultService.getEnteredPrograms()
+  }
+
 }

@@ -354,6 +354,16 @@ export class FinalResultService {
       },
     });
   }
+  async getEnteredPrograms() {
+    return await this.ProgramRepo.find({
+      where: {
+        finalResultEntered: EnteringStatus.TRUE,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+  }
   async getAllPrograms(queryParams:IProgramFilter) {
     return await this.ProgramRepo.find({
       where :{

@@ -15,8 +15,4 @@ export class Judge {
 
     @Column()
     phoneNo: string;
-
-    @Column({nullable: true,default: null})
-    programs?: string;
-
 }

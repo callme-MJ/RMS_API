@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
 import { JudgesService } from '../judges.service';
 import { CreateJudgeDto } from '../dto/create-judge.dto';
 import { UpdateJudgeDto } from '../dto/update-judge.dto';
@@ -18,10 +18,10 @@ export class JudgesController {
     return this.judgesService.create(createJudgeDto);
   }
 
-  @Post('program/:code')
-  addProgram(@Param('id')id:number,@Query('code')code:string) {
-    return this.judgesService.addProgram(code,id);
-  }
+  // @Post('program')
+  // addProgram(@Body()body: any) {
+  //   return this.judgesService.addProgram(body);
+  // }
 
 
   @Get()

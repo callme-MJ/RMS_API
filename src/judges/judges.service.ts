@@ -19,12 +19,15 @@ constructor(
     return await this.judgesRepo.save(judge);
   }
 
-  async addProgram(code: string,id: number) {
-    const program = await this.programService.findOneByProgramCode(code);
-    const judge:Judge = await this.judgesRepo.findOneBy({id});
-    judge.programs=program.programCode;
-    return await this.judgesRepo.save(judge);
-  }
+  // async addProgram(body: any) {
+  //   const program = await this.programService.findOneByProgramCode(body.code,);
+  //   const judge:Judge = await this.judgesRepo.findOneBy({id:body.id});
+  //   console.log(body.id, body.code);
+  //   console.log(program,judge);
+    
+  //   judge.programs=program.programCode;
+  //   return await this.judgesRepo.save(judge);
+  // }
 
   findAll() {
     return this.judgesRepo.find();

@@ -1,3 +1,4 @@
+import { Program } from "src/program/entities/program.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -15,7 +16,7 @@ export class Judge {
     @Column()
     phoneNo: string;
 
-    @Column()
-    programs: string;
+    @Column({nullable: true,default: null})
+    programs?: string;
 
 }

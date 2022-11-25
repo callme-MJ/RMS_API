@@ -22,7 +22,8 @@ constructor(
   async addProgram(code: string,id: number) {
     const program = await this.programService.findOneByProgramCode(code);
     const judge:Judge = await this.judgesRepo.findOneBy({id});
-    return await this.judgesRepo.save(program);
+    judge.programs=program.programCode;
+    return await this.judgesRepo.save(judge);
   }
 
   findAll() {

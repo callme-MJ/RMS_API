@@ -53,7 +53,7 @@ export class FinalResultService {
           programCode: CreateFinalMarkDto.programCode,
         },
       });
-      
+
       if (FinalMark.length > 0)
         throw new NotFoundException('Mark already exists');
       if (!candidateProgram)
@@ -71,12 +71,7 @@ export class FinalResultService {
       const newResult: FinalMark =
         this.FinalMarkRepo.create(CreateFinalMarkDto);
       // program.resultEntered = EnteringStatus.TRUE;
-      const gradePoint = await this.getGradePoint(
-        candidateProgram.grade,
-        candidateProgram.programCode,
-      );
-      candidateProgram.point = gradePoint;
-      await this.CandidateProgramRepo.save(candidateProgram);
+      
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.instituteID = candidate.institute.id;
@@ -95,6 +90,13 @@ export class FinalResultService {
       const countJudges = arr.filter((item) => item > 0).length;
       newResult.percentage = (newResult.totalPoint / (countJudges * 100)) * 100;
       await this.FinalMarkRepo.save(newResult);
+      candidateProgram.grade = await this.getGrade(newResult.percentage);
+      const gradePoint = await this.getGradePoint(
+        candidateProgram.grade,
+        candidateProgram.programCode,
+      );
+      candidateProgram.point = gradePoint;
+      await this.CandidateProgramRepo.save(candidateProgram);
       return newResult;
     } catch (error) {
       throw error;
@@ -104,7 +106,9 @@ export class FinalResultService {
     const FinalMark = await this.FinalMarkRepo.findOneBy({
       id,
     });
-    const candidateProgram = await this.CandidateProgramRepo.findOneBy({id: FinalMark.candidateProgram.id});
+    const candidateProgram = await this.CandidateProgramRepo.findOneBy({
+      id: FinalMark.candidateProgram.id,
+    });
     candidateProgram.position = null;
     candidateProgram.point = null;
     candidateProgram.grade = null;
@@ -133,16 +137,16 @@ export class FinalResultService {
 
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
-    const finalResult = await this.FinalMarkRepo.findOne({
-      where: {
-        candidateProgram: {
-          id: id,
-        },
-      },
-    });
+    // const finalResult = await this.FinalMarkRepo.findOne({
+    //   where: {
+    //     candidateProgram: {
+    //       id: id,
+    //     },
+    //   },
+    // });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = createFinalResultDTO.position;
-    candidateProgram.grade = await this.getGrade(finalResult.percentage);
+    
     const postionPoint = await this.getPositionPoint(
       createFinalResultDTO.position,
       candidateProgram.programCode,
@@ -348,6 +352,14 @@ export class FinalResultService {
       order: {
         updatedAt: 'DESC',
       },
+    });
+  }
+  async getAllPrograms(queryParams:IProgramFilter) {
+    return await this.ProgramRepo.find({
+      where :{
+        sessionID: queryParams.sessionID,
+      }
+      
     });
   }
 

@@ -13,6 +13,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { CategoryService } from 'src/category/category.service';
 import { InstituteService } from 'src/institute/institute.service';
+import { Role } from 'src/login/interfaces/user-roles.enum';
+import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
 import { SessionService } from 'src/session/session.service';
 import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
@@ -21,6 +23,7 @@ import { FinalResultService } from '../final-result.service';
 
 @Controller('user/final-result')
 @UseGuards(AuthGuard('jwt-user'))
+@Roles(Role.CONTROLLER)
 export class ControllerFinalResultController {
   constructor(
     private readonly finalResultService: FinalResultService,
@@ -97,6 +100,12 @@ export class ControllerFinalResultController {
   }
 
   @Post('/submit/:id')
+  @Delete('/:id')
+  deleteResult(
+    @Param('id') id: number,
+  ) {
+    return this.finalResultService.deleteResult(id);
+  }
   submitResult(
     @Param('id') id: number,
   ) {
@@ -109,12 +118,6 @@ export class ControllerFinalResultController {
     return this.finalResultService.unsubmitResult( id);
   }
 
-  @Delete('/:id')
-  deleteResult(
-    @Param('id') id: number,
-  ) {
-    return this.finalResultService.deleteResult(id);
-  }
 
   @Get('/:id')
   getResult(@Param('id') id: number) {
@@ -169,6 +172,11 @@ export class ControllerFinalResultController {
   @Get("programs/published")
   getPublishedPrograms(@Query() queryParams: IProgramFilter){
     return this.finalResultService.getPublishedPrograms(queryParams)
+  }
+
+  @Get("programs/entered")
+  getEnteredPrograms(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.getEnteredPrograms(queryParams)
   }
 
 }

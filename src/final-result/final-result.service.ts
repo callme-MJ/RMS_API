@@ -195,7 +195,8 @@ export class FinalResultService {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = null;
-
+    candidateProgram.point = candidateProgram.gradePoint;
+    candidateProgram.postionPoint= null;
     await this.CandidateProgramRepo.save(candidateProgram);
   }
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
@@ -364,8 +365,20 @@ export class FinalResultService {
       },
     });
   }
-
-  async getAllPrograms(queryParams: IProgramFilter) {
+  async getEnteredPrograms(queryParams: IProgramFilter) {
+    return await this.ProgramRepo.find({
+      where: {
+        finalResultEntered: EnteringStatus.TRUE,
+        session:{
+          id:queryParams.sessionID
+        }
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+  }
+  async getAllPrograms(queryParams:IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {
         sessionID: queryParams.sessionID,

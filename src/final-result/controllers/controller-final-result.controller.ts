@@ -72,6 +72,11 @@ export class ControllerFinalResultController {
     return this.finalResultService.entryMarks(createEliminationMarkDto);
   }
 
+  @Delete('/marks/one/:id')
+  DeleteMarks(@Param('id') id: number) {
+    return this.finalResultService.DeleteMarks(id);
+  }
+
   @Get('/marks/all')
   findAllMarks() {
     return this.finalResultService.findAllMarks();
@@ -89,6 +94,13 @@ export class ControllerFinalResultController {
     @Param('id') id: number,
   ) {
     return this.finalResultService.createResult(CreateFinalResultDTO, id);
+  }
+
+  @Delete('/:id')
+  deleteResult(
+    @Param('id') id: number,
+  ) {
+    return this.finalResultService.deleteResult(id);
   }
 
   @Get('/:id')

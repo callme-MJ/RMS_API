@@ -53,6 +53,7 @@ export class FinalResultService {
           programCode: CreateFinalMarkDto.programCode,
         },
       });
+
       if (FinalMark.length > 0)
         throw new NotFoundException('Mark already exists');
       if (!candidateProgram)
@@ -70,6 +71,7 @@ export class FinalResultService {
       const newResult: FinalMark =
         this.FinalMarkRepo.create(CreateFinalMarkDto);
       // program.resultEntered = EnteringStatus.TRUE;
+      
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.instituteID = candidate.institute.id;
@@ -88,10 +90,31 @@ export class FinalResultService {
       const countJudges = arr.filter((item) => item > 0).length;
       newResult.percentage = (newResult.totalPoint / (countJudges * 100)) * 100;
       await this.FinalMarkRepo.save(newResult);
+      candidateProgram.grade = await this.getGrade(newResult.percentage);
+      const gradePoint = await this.getGradePoint(
+        candidateProgram.grade,
+        candidateProgram.programCode,
+      );
+      candidateProgram.point = gradePoint;
+      await this.CandidateProgramRepo.save(candidateProgram);
       return newResult;
     } catch (error) {
       throw error;
     }
+  }
+  async DeleteMarks(id: number) {
+    const FinalMark = await this.FinalMarkRepo.findOneBy({
+      id,
+    });
+    const candidateProgram = await this.CandidateProgramRepo.findOneBy({
+      id: FinalMark.candidateProgram.id,
+    });
+    candidateProgram.position = null;
+    candidateProgram.point = null;
+    candidateProgram.grade = null;
+    await this.CandidateProgramRepo.save(candidateProgram);
+    if (!FinalMark) throw new NotFoundException('Mark not found');
+    await this.FinalMarkRepo.delete({ id });
   }
 
   findAllMarks() {
@@ -114,26 +137,26 @@ export class FinalResultService {
 
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
-    const finalResult = await this.FinalMarkRepo.findOne({
-      where: {
-        candidateProgram: {
-          id: id,
-        },
-      },
-    });
+    // const finalResult = await this.FinalMarkRepo.findOne({
+    //   where: {
+    //     candidateProgram: {
+    //       id: id,
+    //     },
+    //   },
+    // });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
     candidateProgram.position = createFinalResultDTO.position;
-    candidateProgram.grade = await this.getGrade(finalResult.percentage);
+    
     const postionPoint = await this.getPositionPoint(
       createFinalResultDTO.position,
       candidateProgram.programCode,
     );
-    const gradePoint = await this.getGradePoint(
-      candidateProgram.grade,
-      candidateProgram.programCode,
-    );
-    console.log(postionPoint, gradePoint);
-    candidateProgram.point = postionPoint + gradePoint;
+    // const gradePoint = await this.getGradePoint(
+    //   candidateProgram.grade,
+    //   candidateProgram.programCode,
+    // );
+    // console.log(postionPoint, gradePoint);
+    candidateProgram.point = postionPoint + candidateProgram.point;
     await this.CandidateProgramRepo.save(candidateProgram);
     return candidateProgram;
   }
@@ -160,6 +183,12 @@ export class FinalResultService {
     return result;
   }
 
+  async deleteResult(id: number) {
+    const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
+    if (!candidateProgram) throw new NotFoundException('Candidate not found');
+    candidateProgram.position = null;
+    await this.CandidateProgramRepo.save(candidateProgram);
+  }
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -323,6 +352,14 @@ export class FinalResultService {
       order: {
         updatedAt: 'DESC',
       },
+    });
+  }
+  async getAllPrograms(queryParams:IProgramFilter) {
+    return await this.ProgramRepo.find({
+      where :{
+        sessionID: queryParams.sessionID,
+      }
+      
     });
   }
 

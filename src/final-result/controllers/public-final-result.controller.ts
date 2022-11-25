@@ -31,10 +31,21 @@ export class PublicFinalResultController {
     private readonly sessionService: SessionService,
   ) {}
 
-  @Get('/programs')
+  @Get('/programs/published')
   async findAll(@Query() queryParams: IProgramFilter) {
     try {
       const programs = this.finalResultService.getPublishedPrograms();
+      console.log((await programs).length);
+      return programs;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/programs')
+  async findAllPrograms(@Query() queryParams: IProgramFilter) {
+    try {
+      const programs = this.finalResultService.getAllPrograms(queryParams);
       console.log((await programs).length);
       return programs;
     } catch (error) {

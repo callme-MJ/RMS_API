@@ -309,20 +309,19 @@ export class CandidateService {
   }
 
   async findCandidateDetails(chestNo:number){
-   const candidate = await this.findCandidateBychestNO(chestNo)
-   const candidateDetails = await this.candidateProgramRepo
+   const candidate = await this.candidateRepository.
+   createQueryBuilder('candidate')
+   .leftJoinAndSelect('candidate.category', 'category')
+   .leftJoinAndSelect('candidate.institute', 'institute')
+   .where('candidate.chestNO = :chestNo', {chestNo})
+   .select(['candidate.id', 'candidate.name','candidate.chestNO', 'candidate.photo', 'category.name', 'institute.name'])
+   .getRawMany();
+       
+   const programDetails = await this.candidateProgramRepo
    .createQueryBuilder('candidateProgram')
    .leftJoinAndSelect('candidateProgram.program','program')
-   .leftJoinAndSelect("candidateProgram.candidate","candidate")
-   .leftJoinAndSelect('candidate.institute','institute')
-   .leftJoinAndSelect('candidate.category','category')
-   .where('candidate.chest_no=:chestNo',{chestNo:chestNo})
-   .select("candidate.name",'name')
-   .addSelect("candidate.chestNO","chestNO")
-   .addSelect("candidate.photo","photo")
-   .addSelect("category.name","category")
-   .addSelect("institute.shortName","institute")
-   .addSelect('candidateProgram.program_name','program')
+   .where('candidateProgram.chest_no=:chestNo',{chestNo:chestNo})
+   .select('candidateProgram.program_name','program')
    .addSelect('candidateProgram.point',"mark")
    .addSelect('candidateProgram.position','position')
    .addSelect('candidateProgram.grade','grade')
@@ -331,6 +330,10 @@ export class CandidateService {
    .addSelect('program.venue','venue')
    .getRawMany()
 
+   
+   const details = [...candidate,programDetails]
+   console.log(details);
+   
   //  const programDetails = [];
   //   candidateDetails.map((program) => {
   //     programDetails.push(program.program);
@@ -340,25 +343,25 @@ export class CandidateService {
   //     programDetails.push(program.position)
   //     programDetails.push(program.grade)
   //   });
-   const programDetails = {
-    venue:candidateDetails.forEach((item)=>item.venue),
-    date:candidateDetails.forEach((item)=>item.date),
-    s_time:candidateDetails.forEach((item)=>item.s_time),
-    program:candidateDetails.forEach((item)=>item.program),
-    mark:candidateDetails.forEach((item)=>item.mark),
-    position:candidateDetails.forEach((item)=>item.position),
-    grade:candidateDetails.forEach((item)=>item.grade)
-   };
-   const details = {
-    chestNO: candidateDetails[0].chestNO,
-    name: candidateDetails[0].name,
-    institute: candidateDetails[0].institute,
-    photo: candidateDetails[0].photo,
-    category: candidateDetails[0].category,
-    programs: programDetails,
-  };
-    console.log(details);
-    return candidateDetails;
+  //  const programDetails = {
+  //   venue:candidateDetails.forEach((item)=>item.venue),
+  //   date:candidateDetails.forEach((item)=>item.date),
+  //   s_time:candidateDetails.forEach((item)=>item.s_time),
+  //   program:candidateDetails.forEach((item)=>item.program),
+  //   mark:candidateDetails.forEach((item)=>item.mark),
+  //   position:candidateDetails.forEach((item)=>item.position),
+  //   grade:candidateDetails.forEach((item)=>item.grade)
+  //  };
+  //  const details = {
+  //   chestNO: candidateDetails[0].chestNO,
+  //   name: candidateDetails[0].name,
+  //   institute: candidateDetails[0].institute,
+  //   photo: candidateDetails[0].photo,
+  //   category: candidateDetails[0].category,
+  //   programs: programDetails,
+  // };
+    // console.log(details);
+    return details;
     
   }
 }

@@ -99,13 +99,13 @@ export class ControllerFinalResultController {
     return this.finalResultService.createResult(CreateFinalResultDTO, id);
   }
 
-  @Post('/submit/:id')
   @Delete('/:id')
   deleteResult(
     @Param('id') id: number,
-  ) {
-    return this.finalResultService.deleteResult(id);
-  }
+    ) {
+      return this.finalResultService.deleteResult(id);
+    }
+  @Post('/submit/:id')
   submitResult(
     @Param('id') id: number,
   ) {

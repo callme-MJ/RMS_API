@@ -53,6 +53,7 @@ export class FinalResultService {
           programCode: CreateFinalMarkDto.programCode,
         },
       });
+      
       if (FinalMark.length > 0)
         throw new NotFoundException('Mark already exists');
       if (!candidateProgram)
@@ -70,6 +71,12 @@ export class FinalResultService {
       const newResult: FinalMark =
         this.FinalMarkRepo.create(CreateFinalMarkDto);
       // program.resultEntered = EnteringStatus.TRUE;
+      const gradePoint = await this.getGradePoint(
+        candidateProgram.grade,
+        candidateProgram.programCode,
+      );
+      candidateProgram.point = gradePoint;
+      await this.CandidateProgramRepo.save(candidateProgram);
       newResult.candidateName = candidate.name;
       newResult.categoryID = candidate.categoryID;
       newResult.instituteID = candidate.institute.id;
@@ -92,6 +99,18 @@ export class FinalResultService {
     } catch (error) {
       throw error;
     }
+  }
+  async DeleteMarks(id: number) {
+    const FinalMark = await this.FinalMarkRepo.findOneBy({
+      id,
+    });
+    const candidateProgram = await this.CandidateProgramRepo.findOneBy({id: FinalMark.candidateProgram.id});
+    candidateProgram.position = null;
+    candidateProgram.point = null;
+    candidateProgram.grade = null;
+    await this.CandidateProgramRepo.save(candidateProgram);
+    if (!FinalMark) throw new NotFoundException('Mark not found');
+    await this.FinalMarkRepo.delete({ id });
   }
 
   findAllMarks() {
@@ -128,12 +147,12 @@ export class FinalResultService {
       createFinalResultDTO.position,
       candidateProgram.programCode,
     );
-    const gradePoint = await this.getGradePoint(
-      candidateProgram.grade,
-      candidateProgram.programCode,
-    );
-    console.log(postionPoint, gradePoint);
-    candidateProgram.point = postionPoint + gradePoint;
+    // const gradePoint = await this.getGradePoint(
+    //   candidateProgram.grade,
+    //   candidateProgram.programCode,
+    // );
+    // console.log(postionPoint, gradePoint);
+    candidateProgram.point = postionPoint + candidateProgram.point;
     await this.CandidateProgramRepo.save(candidateProgram);
     return candidateProgram;
   }
@@ -160,6 +179,12 @@ export class FinalResultService {
     return result;
   }
 
+  async deleteResult(id: number) {
+    const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
+    if (!candidateProgram) throw new NotFoundException('Candidate not found');
+    candidateProgram.position = null;
+    await this.CandidateProgramRepo.save(candidateProgram);
+  }
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',

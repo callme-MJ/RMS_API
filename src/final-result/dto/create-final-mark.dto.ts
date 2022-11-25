@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Max, Min } from 'class-validator';
 
 export class CreateFinalMarkDto {
   @IsNotEmpty()
@@ -8,9 +8,13 @@ export class CreateFinalMarkDto {
   programCode: string;
 
   @IsNotEmpty()
+  @Min(1)
+  @Max(100)
   pointOne: number;
 
+  @Max(100)
   pointTwo: number;
 
+  @Max(100)
   pointThree: number;
 }

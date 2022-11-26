@@ -17,8 +17,8 @@ export enum PublishingStatus {
   TRUE = 'True',
   FALSE = 'False',
 }
-@Entity({ name: 'program' })
-export class Program {
+@Entity({ name: 'program2' })
+export class Program2 {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -110,11 +110,11 @@ export class Program {
   @ManyToOne(() => Session, (session) => session.programs)
   session: Session;
 
-  @Expose({  name: 'created_at' })
+  @Expose({ groups: ['single'], name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
 
-  @Expose({  name: 'updated_at' })
+  @Expose({ groups: ['single'], name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
 

@@ -109,6 +109,13 @@ export class ProgramsService {
     }
   }
 
+   findAllforJudges(): Promise<Program[]> {
+    try {
+      return this.programRepository.find();
+    } catch (error) {
+      throw error;
+    }
+  }
   public async findAll(queryParams: IProgramFilter): Promise<Program[]> {
     try {
       const programQuery =

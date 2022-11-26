@@ -21,6 +21,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { EliminationResultModule } from './elimination-result/elimination-result.module';
 import { MediaModule } from './media/media.module';
 import { FinalResultModule } from './final-result/final-result.module';
+import { JudgesModule } from './judges/judges.module';
 
 
 @Module({
@@ -103,6 +104,7 @@ import { FinalResultModule } from './final-result/final-result.module';
     EliminationResultModule,
     MediaModule,
     FinalResultModule,
+    JudgesModule,
 
   ],
   controllers: [AppController],

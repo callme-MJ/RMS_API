@@ -430,7 +430,7 @@ export class FinalResultService {
         sessionID: queryParams.sessionID,
       })
       .andWhere("candidateProgram.round = :round", {
-        round: "final",
+        round: "Final",
       })
       .getRawMany();
     return overview;

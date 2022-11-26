@@ -91,12 +91,16 @@ export class CandidateProgramService {
 
   async findCandidatesOfProgramOfFinal(code: string) {
     // const program = await this.programsService.findOneByProgramCode(code);
-    const data = await this.candidateProgramRepository.find({
-      where: { programCode: code, isSelected: SelectionStatus.TRUE },
+    const candidatePrograms = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE  },
+      order:{
+        codeLetter:"asc",
+      }
     });
-    const candidate = data.map((candidate) => candidate.candidate);
-    console.log(candidate.length);
-    return candidate;
+    // const candidate = data.map((candidate) => candidate.candidate);
+
+    console.log(candidatePrograms.length);
+    return candidatePrograms;
   }
   
   async findCandidatesOfPublishedProgram(code: string) {

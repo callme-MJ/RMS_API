@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import {
   CandidateProgram,
+  RoundStatus,
   SelectionStatus,
 } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
@@ -13,6 +14,7 @@ import {
 } from 'src/program/entities/program.entity';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
 import { Between, Repository } from 'typeorm';
+import { CreateCodeLetterDto } from './dto/create-codeLetter.dto';
 import { CreateFinalMarkDto } from './dto/create-final-mark.dto';
 import { CreateFinalResultDTO } from './dto/create-final-result.dto';
 import { FinalMark } from './entities/final-mark.entity';
@@ -180,7 +182,7 @@ export class FinalResultService {
         program: {
           finalResultPublished: PublishingStatus.TRUE,
         },
-        isSelected: SelectionStatus.TRUE,
+        round: RoundStatus.Final,
         point: Between(1, 100),
       },
       order: {
@@ -220,7 +222,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total);
+    console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsEntered(queryParams: IProgramFilter) {
@@ -244,7 +246,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total);
+      console.log(total.length);
     return total;
   }
 
@@ -271,7 +273,7 @@ export class FinalResultService {
       .orderBy("institute.id", "ASC")
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total);
+      console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsByCategoryPublished(queryParams: IProgramFilter) {
@@ -297,7 +299,7 @@ export class FinalResultService {
       // .orderBy("institute.id", "ASC")
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total);
+      console.log(total.length);
     return total;
   }
   async getProgramStutusPublished(queryParams: IProgramFilter) {
@@ -316,7 +318,7 @@ export class FinalResultService {
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
-    console.log(status);
+    console.log(status.length);
     return status;
   }
   async getProgramStatusEntered(queryParams: IProgramFilter) {
@@ -335,7 +337,7 @@ export class FinalResultService {
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
-    console.log(status);
+    console.log(status.length);
     return status;
   }
 
@@ -434,6 +436,21 @@ export class FinalResultService {
       })
       .getRawMany();
     return overview;
+  }
+  async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
+    try {
+      const candidate_program = await this.CandidateProgramRepo.findOne({
+        where:{
+          programCode: createCodeLetterDto.programCode,
+          chestNO:createCodeLetterDto.chestNO
+        }
+      });
+      candidate_program.codeLetter = createCodeLetterDto.codeLetter;
+      await this.candidateProgramService.update(candidate_program.id, candidate_program);
+      return candidate_program;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getPositionPoint(position: string, programCode: string) {

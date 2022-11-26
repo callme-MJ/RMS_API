@@ -17,6 +17,7 @@ import { Role } from 'src/login/interfaces/user-roles.enum';
 import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { IProgramFilter, ProgramsService } from 'src/program/program.service';
 import { SessionService } from 'src/session/session.service';
+import { CreateCodeLetterDto } from '../dto/create-codeLetter.dto';
 import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
 import { CreateFinalResultDTO } from '../dto/create-final-result.dto';
 import { FinalResultService } from '../final-result.service';
@@ -190,5 +191,8 @@ export class ControllerFinalResultController {
     return this.finalResultService.getOverview(queryParams)
   }
 
-
+  @Post("/candidate/codeLetter")
+  addcodeLetter(@Body() createCodeLetterDto: CreateCodeLetterDto){
+    return this.finalResultService.addCodeLetter(createCodeLetterDto)
+  }
 }

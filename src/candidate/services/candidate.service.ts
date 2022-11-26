@@ -326,6 +326,8 @@ export class CandidateService {
    .addSelect('program.date','date')
    .addSelect('program.final_result_entered','entered')
    .addSelect('program.final_result_published','published')
+   .addSelect('program.type','type')
+   .addSelect('program.skill','skill')
    .addSelect('program.s_time','time')
    .addSelect('program.venue','venue')
    .getRawMany()

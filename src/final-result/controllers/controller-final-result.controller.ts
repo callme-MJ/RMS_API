@@ -139,19 +139,25 @@ export class ControllerFinalResultController {
     return this.finalResultService.getTotalOfInstitutionsEntered(queryParams);
   }
 
-  @Get('/institutions/category/published/:id')
-  getTotalOfInstitutionsByCategoryPublished(@Param('id') id: number) {
-    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(id);
+  @Get('/institutions/published/category')
+  getTotalOfInstitutionsByCategoryPublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(queryParams);
   }
 
-  @Get('/institutions/category/entered/:id')
-  getTotalOfInstitutionsByCategoryEntered(@Param('id') id: number) {
-    return this.finalResultService.getTotalOfInstitutionsByCategoryEntered(id);
+  @Get('/institutions/entered/category')
+  getTotalOfInstitutionsByCategoryEntered(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryEntered(queryParams);
   }
 
-  @Get('/programs/status')
-  getProgramsStutus(@Query() queryParams: IProgramFilter) {
-    return this.finalResultService.getProgramsStutus();
+  
+  @Get('/programs/status/published')
+  getProgramStutusPublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getProgramStutusPublished(queryParams);
+  }
+
+  @Get('/programs/status/entered')
+  getProgramStatusEntered(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getProgramStatusEntered(queryParams);
   }
 
   @Get('/toppers/all')
@@ -183,6 +189,6 @@ export class ControllerFinalResultController {
   getOverview(@Query() queryParams: IProgramFilter){
     return this.finalResultService.getOverview(queryParams)
   }
-  
+
 
 }

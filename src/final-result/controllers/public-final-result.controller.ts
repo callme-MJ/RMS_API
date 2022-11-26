@@ -76,19 +76,18 @@ export class PublicFinalResultController {
     return this.finalResultService.getResultOfProgram(code);
   }
 
-  @Get('/institutions/all')
-  getTotalOfInstitutions(@Query() queryParams: IProgramFilter) {
+  @Get('/institutions/published/all')
+  getTotalOfInstitutionsPublished(@Query() queryParams: IProgramFilter) {
     return this.finalResultService.getTotalOfInstitutionsPublished(queryParams);
   }
 
-  @Get('/institutions/category/:id')
-  getTotalOfInstitutionsByCategory(@Param('id') id: number) {
-    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(id);
+  @Get('/institutions/published/category')
+  getTotalOfInstitutionsByCategoryPublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(queryParams);
   }
 
-  @Get('/programs/status')
-  getProgramsStutus(@Query() queryParams: IProgramFilter) {
-    console.log(queryParams);
-    return this.finalResultService.getProgramsStutus();
+  @Get('/programs/status/published')
+  getProgramStutusPublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getProgramStutusPublished(queryParams);
   }
 }

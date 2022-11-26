@@ -179,4 +179,10 @@ export class ControllerFinalResultController {
     return this.finalResultService.getEnteredPrograms(queryParams)
   }
 
+  @Get("overview")
+  getOverview(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.getOverview(queryParams)
+  }
+  
+
 }

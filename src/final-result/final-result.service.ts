@@ -174,7 +174,7 @@ export class FinalResultService {
   }
 
   async getResultOfProgram(code: string) {
-    const result = await this.CandidateProgramRepo.findOne({
+    const result = await this.CandidateProgramRepo.find({
       where: {
         programCode: code,
         program: {
@@ -384,6 +384,16 @@ export class FinalResultService {
         sessionID: queryParams.sessionID,
       },
     });
+  }
+  async getOverview(queryParams: IProgramFilter) {
+    const overview = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.session', 'session')
+      .select('session.name', 'sessionName')
+      .addSelect("candidateProgram.programCode", "programCode")
+      .addSelect("program.name", "programName")
+      .getRawMany();
+    return overview;
   }
 
   async getPositionPoint(position: string, programCode: string) {

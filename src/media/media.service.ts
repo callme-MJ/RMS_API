@@ -67,6 +67,14 @@ export class MediaService {
     return this.galleryRepo.delete(id);
   }
 
+  async likeImage(id: number) {
+    return await this.galleryRepo.increment({ id }, 'likes', 1);
+  }
+
+  async unLikeImage(id: number) {
+    return await this.galleryRepo.decrement({ id }, 'likes',1);
+  }
+
   private async uploadMedia(
     media: Media,
     photo: Express.Multer.File,

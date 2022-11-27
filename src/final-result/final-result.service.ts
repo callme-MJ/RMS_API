@@ -309,15 +309,15 @@ export class FinalResultService {
     const status = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.category', 'category')
       .leftJoinAndSelect('program.session', 'session')
-      .select('session.name', 'sessionName')
-      .addSelect('Count(program.id)', 'totalProgramPublished')
+      .select('Count(program.id)', 'totalProgramPublished')
+      .addSelect("session.id","sessionID")
+      .addSelect("session.name","sessionName")
       .where('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
       })
-      .andWhere('session.id = :sessionID', {
-        sessionID: queryParams.sessionID,
-      })
-      .addSelect('category.name', 'categoryName')
+      // .andWhere('session.id = :sessionID', {
+      //   sessionID: queryParams.sessionID,
+      // })
       .groupBy('session.id')
       // .addGroupBy('category.id')
       .getRawMany();

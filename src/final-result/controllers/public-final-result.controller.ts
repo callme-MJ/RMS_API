@@ -96,4 +96,9 @@ export class PublicFinalResultController {
     return this.finalResultService.getResultsOfInstitute(id);
   }
 
+  @Get('/toppers/all')
+  getToppers() {
+    return this.finalResultService.getToppers();
+  }
+  
 }

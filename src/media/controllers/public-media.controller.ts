@@ -26,9 +26,9 @@ export class PublicMediaController {
     return this.mediaService.findAllGallery();
   }
 
-  @Get('/:id')
-  findOne(@Param('id') id: string) {
-    return this.mediaService.findOne(+id);
+  @Get('/:slug')
+  findOne(@Param('slug') slug: string) {
+    return this.mediaService.findOne(slug);
   }
 
   @Get('gallery/:id')

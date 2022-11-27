@@ -56,7 +56,7 @@ export class UserMediaController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.mediaService.findOne(+id);
+    return this.mediaService.findOne(id);
   }
   
   @Get('gallery/:id')

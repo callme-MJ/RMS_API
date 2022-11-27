@@ -47,8 +47,12 @@ export class MediaService {
     return this.galleryRepo.find();
   }
 
-  findOne(id: number) {
-    return this.mediaRepo.findOneBy({ id });
+  findOne(slug: string) {
+    return this.mediaRepo.findOne({ 
+      where:{
+        slug:slug
+      }
+     });
   }
 
   findOneImage(id: number) {
@@ -59,11 +63,19 @@ export class MediaService {
     return this.mediaRepo.update(id, updateNewsDTO);
   }
 
-  remove(id: number) {
-    return this.mediaRepo.delete(id);
+  async remove(id: number) {
+    try {
+      let media = await this.mediaRepo.findOneBy({id});
+      await this.s3Service.deleteFile(media.file);
+      return  this.mediaRepo.delete(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
-  removeGallery(id: number) {
+ async removeGallery(id: number) {
+    let gallery = await this.galleryRepo.findOneBy({id});
+    await this.s3Service.deleteFile(gallery.file);
     return this.galleryRepo.delete(id);
   }
 

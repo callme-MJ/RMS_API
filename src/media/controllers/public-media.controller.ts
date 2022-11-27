@@ -35,4 +35,14 @@ export class PublicMediaController {
   findOneImage(@Param('id') id: string) {
     return this.mediaService.findOneImage(+id);
   }
+
+  @Post('gallery/like/:id')
+  likeImage(@Param('id') id: string) {
+    return this.mediaService.likeImage(+id);
+  }
+
+  @Post('gallery/unlike/:id')
+  unLikeImage(@Param('id') id: string) {
+    return this.mediaService.unLikeImage(+id);
+  }
 }

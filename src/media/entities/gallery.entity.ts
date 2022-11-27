@@ -17,6 +17,9 @@ import { Files } from "./file.interface";
     @Column()
     tag: string;
 
+    @Column({nullable: true,default:0})
+    likes: number;
+
     @Column({type:'json',nullable:true})
     file: Files
      

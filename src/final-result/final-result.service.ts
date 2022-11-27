@@ -201,7 +201,7 @@ export class FinalResultService {
     candidateProgram.postionPoint = null;
     await this.CandidateProgramRepo.save(candidateProgram);
   }
-  
+
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -319,7 +319,7 @@ export class FinalResultService {
       })
       .addSelect('category.name', 'categoryName')
       .groupBy('session.id')
-      .addGroupBy('category.id')
+      // .addGroupBy('category.id')
       .getRawMany();
     // console.log(status.length);
     return status;

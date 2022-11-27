@@ -186,8 +186,9 @@ export class ControllerFinalResultController {
     return this.finalResultService.getEnteredPrograms(queryParams)
   }
 
-  @Get("overview")
+  @Get("/overview/all")
   getOverview(@Query() queryParams: IProgramFilter){
+    console.log(queryParams)
     return this.finalResultService.getOverview(queryParams)
   }
 

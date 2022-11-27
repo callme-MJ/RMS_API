@@ -14,7 +14,8 @@ import { UpdateSchedule } from './dto/update-schedule';
 import { Program, PublishingStatus } from './entities/program.entity';
 
 export interface IProgramFilter extends IFilter {
-  sessionID: number;
+  sessionID: number,
+  CategoryID: number,
 }
 @Injectable()
 export class ProgramsService {

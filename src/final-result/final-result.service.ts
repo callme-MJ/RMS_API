@@ -189,7 +189,7 @@ export class FinalResultService {
         point: 'DESC',
       },
     });
-    console.log(result);
+    // console.log(result);
     return result;
   }
 
@@ -201,6 +201,7 @@ export class FinalResultService {
     candidateProgram.postionPoint = null;
     await this.CandidateProgramRepo.save(candidateProgram);
   }
+  
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -222,7 +223,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsEntered(queryParams: IProgramFilter) {
@@ -246,7 +247,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
 
@@ -274,7 +275,7 @@ export class FinalResultService {
       .orderBy('institute.id', 'ASC')
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsByCategoryPublished(queryParams: IProgramFilter) {
@@ -301,7 +302,7 @@ export class FinalResultService {
       // .orderBy("institute.id", "ASC")
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
   async getProgramStutusPublished(queryParams: IProgramFilter) {
@@ -320,7 +321,7 @@ export class FinalResultService {
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
-    console.log(status.length);
+    // console.log(status.length);
     return status;
   }
   async getProgramStatusEntered(queryParams: IProgramFilter) {
@@ -339,7 +340,7 @@ export class FinalResultService {
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
-    console.log(status.length);
+    // console.log(status.length);
     return status;
   }
   async getResultsOfInstitute(id: number) {
@@ -359,7 +360,7 @@ export class FinalResultService {
         }
       }
     })
-    console.log(results.length);
+    // console.log(results.length);
     return results;
   }
 
@@ -385,6 +386,24 @@ export class FinalResultService {
       .addGroupBy("category.id")
       .getRawMany();
     return toppers;
+  }
+
+  async getResultOfAllPrograms(){
+    const results = await this.CandidateProgramRepo.find({
+      where:{
+        point:Between(1,100),
+        program:{
+          finalResultPublished:PublishingStatus.TRUE
+        }
+      },
+      order:{
+        program:{
+          updatedAt:"DESC"
+        }
+      },
+    })
+    // console.log(results.length);
+    return results;
   }
   async publishResultOfFinal(programCode: string) {
     try {
@@ -448,18 +467,19 @@ export class FinalResultService {
     });
   }
   async getOverview(queryParams: IProgramFilter) {
-    const overview = await this.CandidateProgramRepo.createQueryBuilder(
-      'candidateProgram',
-    )
-      .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect('program.session', 'session')
-      .where('program.sessionID = :sessionID', {
-        sessionID: queryParams.sessionID,
-      })
-      .andWhere('candidateProgram.round = :round', {
-        round: 'Final',
-      })
-      .getRawMany();
+    const overview = await this.CandidateProgramRepo.find({
+      where:{
+        session:{
+          id:queryParams.sessionID
+        },
+        round:RoundStatus.Final,
+        program:{
+          category:{
+            id:queryParams.CategoryID
+          }
+        }
+      }
+    })
     return overview;
   }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
@@ -491,7 +511,7 @@ export class FinalResultService {
       .select('category.id')
       .addSelect('program.type')
       .getRawOne();
-    console.log(programData);
+    // console.log(programData);
     switch (programData.program_type) {
       case 'single':
         switch (position) {
@@ -540,7 +560,7 @@ export class FinalResultService {
       .where('candidateProgram.programCode = :programCode', { programCode })
       .select('program.isStarred')
       .getRawOne();
-    console.log(programData);
+    // console.log(programData);
     switch (programData.program_is_starred) {
       case 'True':
         switch (grade) {

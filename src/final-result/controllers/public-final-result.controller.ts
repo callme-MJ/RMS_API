@@ -100,5 +100,12 @@ export class PublicFinalResultController {
   getToppers() {
     return this.finalResultService.getToppers();
   }
+
+  @Get('/programs/all')
+  getResultOfAllPrograms() {
+    return this.finalResultService.getResultOfAllPrograms();
+  }
+
   
+
 }

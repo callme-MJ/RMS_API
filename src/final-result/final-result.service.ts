@@ -341,18 +341,22 @@ export class FinalResultService {
     return status;
   }
   async getResultsOfInstitute(id: number) {
-    const results = await this.CandidateProgramRepo.createQueryBuilder(
-      'candidateProgram',
-    )
-      .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect('candidateProgram.institute', 'institute')
-      .where('institute.id = :instituteID', { instituteID: id })
-      .andWhere('program.finalResultPublished = :finalResultPublished', {
-        finalResultPublished: PublishingStatus.TRUE,
-      })
-      .andWhere("candidateProgram.point != '0'")
-      .orderBy("program.updatedAt", "DESC")
-      .getMany()
+    const results = await this.CandidateProgramRepo.find({
+      where:{
+        institute:{
+          id:id
+        },
+        point:Between(1,100),
+        program:{
+          finalResultPublished:PublishingStatus.TRUE
+        }
+      },
+      order:{
+        program:{
+          updatedAt:"DESC"
+        }
+      }
+    })
     console.log(results.length);
     return results;
   }

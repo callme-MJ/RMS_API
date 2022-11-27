@@ -212,13 +212,13 @@ export class FinalResultService {
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
-      .addSelect("institute.coverPhoto", "institutePhoto")
+      .addSelect('institute.coverPhoto', 'institutePhoto')
       .where('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
       })
       .andWhere('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
-        })
+      })
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
@@ -236,17 +236,17 @@ export class FinalResultService {
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
-      .addSelect("institute.coverPhoto", "institutePhoto")
+      .addSelect('institute.coverPhoto', 'institutePhoto')
       .where('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
       })
-      .andWhere("program.finalResultEntered = :finalResultEntered", {
+      .andWhere('program.finalResultEntered = :finalResultEntered', {
         finalResultEntered: EnteringStatus.TRUE,
-        })
+      })
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-      console.log(total.length);
+    console.log(total.length);
     return total;
   }
 
@@ -256,24 +256,25 @@ export class FinalResultService {
     )
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect("program.category", "category")
+      .leftJoinAndSelect('program.category', 'category')
       .andWhere('program.finalResultEntered = :finalResultEntered', {
         finalResultEntered: PublishingStatus.TRUE,
       })
-      .andWhere("candidateProgram.session.id = :sessionID", {
+      .andWhere('candidateProgram.session.id = :sessionID', {
         sessionID: queryParams.sessionID,
-        })
+      })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.name", "categoryName")
+      .addSelect("category.id","categoryID")
+      .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
       .addGroupBy('program.categoryID')
-      .orderBy("institute.id", "ASC")
+      .orderBy('institute.id', 'ASC')
       .addOrderBy('total', 'DESC')
       .getRawMany();
-      console.log(total.length);
+    console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsByCategoryPublished(queryParams: IProgramFilter) {
@@ -282,24 +283,25 @@ export class FinalResultService {
     )
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect("program.category", "category")
+      .leftJoinAndSelect('program.category', 'category')
       .andWhere('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
       })
-      .andWhere("candidateProgram.session.id = :sessionID", {
+      .andWhere('candidateProgram.session.id = :sessionID', {
         sessionID: queryParams.sessionID,
-        })
+      })
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.name", "categoryName")
+      .addSelect("category.id","categoryID")
+      .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
       .addGroupBy('program.categoryID')
       // .orderBy("institute.id", "ASC")
       .addOrderBy('total', 'DESC')
       .getRawMany();
-      console.log(total.length);
+    console.log(total.length);
     return total;
   }
   async getProgramStutusPublished(queryParams: IProgramFilter) {
@@ -313,7 +315,7 @@ export class FinalResultService {
       })
       .andWhere('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
-        })
+      })
       .addSelect('category.name', 'categoryName')
       .groupBy('session.id')
       .addGroupBy('category.id')
@@ -332,13 +334,33 @@ export class FinalResultService {
       })
       .andWhere('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
-        })
+      })
       .addSelect('category.name', 'categoryName')
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
     console.log(status.length);
     return status;
+  }
+  async getResultsOfInstitute(id: number) {
+    const results = await this.CandidateProgramRepo.find({
+      where:{
+        institute:{
+          id:id
+        },
+        point:Between(1,100),
+        program:{
+          finalResultPublished:PublishingStatus.TRUE
+        }
+      },
+      order:{
+        program:{
+          updatedAt:"DESC"
+        }
+      }
+    })
+    console.log(results.length);
+    return results;
   }
 
   async getToppers() {
@@ -348,16 +370,19 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
-      .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('candidate.category', 'category')
       .leftJoinAndSelect('program.session', 'session')
       .select('candidate.name', 'candidateName')
       .addSelect('candidate.chestNO', 'chestNO')
       .addSelect('MAX(candidateProgram.point)', 'score')
       .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect("category.id","categoryID")
+      .addSelect("session.id","sessionID")
       .addSelect('category.name', 'categoryName')
       .addSelect('session.name', 'sessionName')
       .where('program.type = :type', { type: 'single' })
-      .groupBy('category.id')
+      .groupBy('session.id')
+      .addGroupBy("category.id")
       .getRawMany();
     return toppers;
   }
@@ -431,8 +456,8 @@ export class FinalResultService {
       .where('program.sessionID = :sessionID', {
         sessionID: queryParams.sessionID,
       })
-      .andWhere("candidateProgram.round = :round", {
-        round: "Final",
+      .andWhere('candidateProgram.round = :round', {
+        round: 'Final',
       })
       .getRawMany();
     return overview;
@@ -440,13 +465,16 @@ export class FinalResultService {
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
     try {
       const candidate_program = await this.CandidateProgramRepo.findOne({
-        where:{
+        where: {
           programCode: createCodeLetterDto.programCode,
-          chestNO:createCodeLetterDto.chestNO
-        }
+          chestNO: createCodeLetterDto.chestNO,
+        },
       });
       candidate_program.codeLetter = createCodeLetterDto.codeLetter;
-      await this.candidateProgramService.update(candidate_program.id, candidate_program);
+      await this.candidateProgramService.update(
+        candidate_program.id,
+        candidate_program,
+      );
       return candidate_program;
     } catch (error) {
       throw error;

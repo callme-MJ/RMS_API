@@ -90,4 +90,15 @@ export class PublicFinalResultController {
   getProgramStutusPublished(@Query() queryParams: IProgramFilter) {
     return this.finalResultService.getProgramStutusPublished(queryParams);
   }
+
+  @Get("/institutes/:id")
+  getResultsOfInstitute(@Param('id') id: number) {
+    return this.finalResultService.getResultsOfInstitute(id);
+  }
+
+  @Get('/toppers/all')
+  getToppers() {
+    return this.finalResultService.getToppers();
+  }
+  
 }

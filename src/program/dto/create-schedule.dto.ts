@@ -8,7 +8,7 @@ export class CreateScheduleDto {
     s_time: string;
 
     @IsNotEmpty()
-    venue: number;
+    venue: string;
     
     @IsNotEmpty()
     e_time: string;

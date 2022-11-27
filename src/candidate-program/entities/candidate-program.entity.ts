@@ -81,7 +81,7 @@ export class CandidateProgram {
   @Column({ nullable: true })
   gradePoint: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true ,default:0})
   point: number;
 
   @Column({ nullable: true })

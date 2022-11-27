@@ -35,7 +35,7 @@ export class CreateProgramDto {
   time: string;
 
   @IsNotEmpty()
-  venue: number;
+  venue: string;
 
   @IsNotEmpty()
   curbGroup: string;

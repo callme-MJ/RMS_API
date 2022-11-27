@@ -26,7 +26,6 @@ export class S3Service {
 
   public async deleteFile(file: Photo): Promise<boolean> {
     if (!file || !file.key) return false;
-
     return await this.s3Delete(file.key);
   }
 

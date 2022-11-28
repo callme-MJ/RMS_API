@@ -379,10 +379,12 @@ export class FinalResultService {
       .leftJoinAndSelect('program.session', 'session')
       .select('candidate.name', 'candidateName')
       .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect("candidate.photo","candidatePhoto")
       .addSelect('MAX(candidateProgram.point)', 'score')
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect("category.id","categoryID")
       .addSelect("session.id","sessionID")
+
       .addSelect('category.name', 'categoryName')
       .addSelect('session.name', 'sessionName')
       .where('program.type = :type', { type: 'single' })
@@ -481,19 +483,24 @@ export class FinalResultService {
     });
   }
   async getOverview(queryParams: IProgramFilter) {
-    const overview = await this.CandidateProgramRepo.find({
-      where:{
-        session:{
-          id:queryParams.sessionID
-        },
-        round:RoundStatus.Final,
-        program:{
-          category:{
-            id:queryParams.CategoryID
-          }
-        }
-      }
-    })
+    const overview = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.institute","institute")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.category","category")
+    .where("candidateprogram.round=  :round",{round:RoundStatus.Final})
+    .andWhere("program.sessionID = :sessionID",{sessionID:queryParams.sessionID})
+    .select("candidate.name","candidateName")
+    .addSelect("candidate.chestNO","chestNO")
+    .addSelect("program.name","programName")
+    .addSelect("program.programCode","programCode")
+    .addSelect("institute.shortName","instituteShortName")
+    .addSelect("category.name","categoryName")
+    .addSelect("candidateProgram.position","postion")
+    .addSelect("candidateProgram.grade","grade")
+    .addSelect("candidateProgram.point","point")
+    .getRawMany()
+    console.log(overview.length)
     return overview;
   }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {

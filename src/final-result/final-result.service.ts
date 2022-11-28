@@ -143,6 +143,10 @@ export class FinalResultService {
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
+
+    candidateProgram.position = null;
+    candidateProgram.grade = null;
+    candidateProgram.point = candidateProgram.gradePoint;
     candidateProgram.position = createFinalResultDTO.position;
 
     const postionPoint = await this.getPositionPoint(
@@ -389,20 +393,30 @@ export class FinalResultService {
   }
 
   async getResultOfAllPrograms(){
-    const results = await this.CandidateProgramRepo.find({
-      where:{
-        point:Between(1,100),
-        program:{
-          finalResultPublished:PublishingStatus.TRUE
-        }
-      },
-      order:{
-        program:{
-          updatedAt:"DESC"
-        }
-      },
-    })
-    // console.log(results.length);
+    const results = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.institute","institute")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.category","category")
+    .select("program.id","id")
+    .addSelect("candidate.name","candidateName")
+    .addSelect("candidate.chestNO","chestNO")
+    .addSelect("program.name","programName")
+    .addSelect("program.programCode","programCode")
+    .addSelect("candidateProgram.point","point")
+    .addSelect("candidateProgram.position","position")
+    .addSelect("candidateProgram.grade","grade")
+    .addSelect("candidate.photo","photo")
+    .addSelect("institute.shortName","instituteShortName")
+    .addSelect("category.name","categoryName")
+    .where("program.finalResultPublished = :finalResultPublished",{finalResultPublished:PublishingStatus.TRUE})
+    .andWhere("candidateProgram.point > :point",{point:0})
+    .orderBy("program.updatedAt","DESC")
+    .addOrderBy("program.id","ASC")
+    .addOrderBy("candidateProgram.point","DESC")
+    // .groupBy("program.id")
+    .getRawMany()
+    console.log(results.length);
     return results;
   }
   async publishResultOfFinal(programCode: string) {

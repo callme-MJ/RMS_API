@@ -206,7 +206,7 @@ export class FinalResultService {
     await this.CandidateProgramRepo.save(candidateProgram);
   }
 
-  async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
+  async   getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -488,7 +488,7 @@ export class FinalResultService {
     .leftJoinAndSelect("candidateProgram.institute","institute")
     .leftJoinAndSelect("candidateProgram.candidate","candidate")
     .leftJoinAndSelect("candidate.category","category")
-    .where("candidateprogram.round=  :round",{round:RoundStatus.Final})
+    .where("candidateProgram.round =  :round",{round:RoundStatus.Final})
     .andWhere("program.sessionID = :sessionID",{sessionID:queryParams.sessionID})
     .select("candidate.name","candidateName")
     .addSelect("candidate.chestNO","chestNO")

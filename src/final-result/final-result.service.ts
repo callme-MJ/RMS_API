@@ -388,9 +388,13 @@ export class FinalResultService {
       .addSelect('category.name', 'categoryName')
       .addSelect('session.name', 'sessionName')
       .where('program.type = :type', { type: 'single' })
+      .from('candidate_program', 'candidateProgram')
       .groupBy('session.id')
       .addGroupBy("category.id")
+      .addGroupBy('candidate.id')
+      .orderBy('score', 'DESC')
       .getRawMany();
+      console.log(toppers.length);
     return toppers;
   }
 

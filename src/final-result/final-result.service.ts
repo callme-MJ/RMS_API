@@ -206,7 +206,7 @@ export class FinalResultService {
     await this.CandidateProgramRepo.save(candidateProgram);
   }
 
-  async   getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
+  async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -271,7 +271,7 @@ export class FinalResultService {
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
+      .addSelect('category.id', 'categoryID')
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
@@ -282,6 +282,60 @@ export class FinalResultService {
     // console.log(total.length);
     return total;
   }
+  async getTotalOfInstitutionsCategoryPublished(id:number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('program.category.id = :categoryID', {
+        categoryID: id,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('institute.id', 'ASC')
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
+  async getTotalOfInstitutionsCategoryEntered(id:number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.finalResultPublished = :finalResultEntered', {
+        finalResultEntered: EnteringStatus.TRUE,
+      })
+      .andWhere('program.category.id = :categoryID', {
+        categoryID: id,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('institute.id', 'ASC')
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
+
+
   async getTotalOfInstitutionsByCategoryPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -298,7 +352,7 @@ export class FinalResultService {
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
+      .addSelect('category.id', 'categoryID')
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
@@ -314,8 +368,8 @@ export class FinalResultService {
       .leftJoinAndSelect('program.category', 'category')
       .leftJoinAndSelect('program.session', 'session')
       .select('Count(program.id)', 'totalProgramPublished')
-      .addSelect("session.id","sessionID")
-      .addSelect("session.name","sessionName")
+      .addSelect('session.id', 'sessionID')
+      .addSelect('session.name', 'sessionName')
       .where('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
       })
@@ -349,26 +403,28 @@ export class FinalResultService {
   }
   async getResultsOfInstitute(id: number) {
     const results = await this.CandidateProgramRepo.find({
-      where:{
-        institute:{
-          id:id
+      where: {
+        institute: {
+          id: id,
         },
-        point:Between(1,100),
-        program:{
-          finalResultPublished:PublishingStatus.TRUE
-        }
+        point: Between(1, 100),
+        program: {
+          finalResultPublished: PublishingStatus.TRUE,
+        },
       },
-      order:{
-        program:{
-          updatedAt:"DESC"
-        }
-      }
-    })
+      order: {
+        program: {
+          updatedAt: 'DESC',
+        },
+      },
+    });
     // console.log(results.length);
     return results;
   }
 
   async getToppers() {
+    const candidate_programs =
+      this.CandidateProgramRepo.createQueryBuilder('candidateProgram');
     const toppers = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -379,49 +435,71 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.session', 'session')
       .select('candidate.name', 'candidateName')
       .addSelect('candidate.chestNO', 'chestNO')
-      .addSelect("candidate.photo","candidatePhoto")
-      .addSelect('MAX(candidateProgram.point)', 'score')
+      .addSelect('candidate.photo', 'candidatePhoto')
+      .addSelect('MAX(candidateSum.sum)', 'score')
       .addSelect('institute.id', 'instituteID')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
-      .addSelect("session.id","sessionID")
+      .addSelect('category.id', 'categoryID')
+      .addSelect('session.id', 'sessionID')
       .addSelect('category.name', 'categoryName')
       .addSelect('session.name', 'sessionName')
       .where('program.type = :type', { type: 'single' })
-      .from('candidate_program', 'candidateProgram')
-      .groupBy('session.id')
-      .addGroupBy("category.id")
-      .addGroupBy('candidate.id')
+      // .from(
+      //   `${
+      //     candidate_programs
+      //       .subQuery()
+      //       // .leftJoinAndSelect('cp.candidate', 'candidate')
+      //       .select('SUM(point)', 'sum')
+      //       .from('candidate_program', 'cp')
+      //     //     .groupBy('candidate.id');
+      //     //   // .orderBy('user_record.date', 'DESC');
+      //   }`,
+      //   'candidateSum',
+      // )
+      // .from((subQuery) => {
+      //   return subQuery
+
+      //   .leftJoinAndSelect('cp.candidate', 'candidate')
+      //   .select('SUM(point)', 'sum')
+      //   .from("candidate_program", 'cp')
+      //     .groupBy('candidate.id');
+      //   // .orderBy('user_record.date', 'DESC');
+      // }, 'candidateSum')
+      .addGroupBy('category.id')
       .orderBy('score', 'DESC')
       .getRawMany();
-      console.log(toppers.length);
+    console.log(toppers.length);
     return toppers;
   }
 
-  async getResultOfAllPrograms(){
-    const results = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
-    .leftJoinAndSelect("candidateProgram.program","program")
-    .leftJoinAndSelect("candidateProgram.institute","institute")
-    .leftJoinAndSelect("candidateProgram.candidate","candidate")
-    .leftJoinAndSelect("candidate.category","category")
-    .select("program.id","id")
-    .addSelect("candidate.name","candidateName")
-    .addSelect("candidate.chestNO","chestNO")
-    .addSelect("program.name","programName")
-    .addSelect("program.programCode","programCode")
-    .addSelect("candidateProgram.point","point")
-    .addSelect("candidateProgram.position","position")
-    .addSelect("candidateProgram.grade","grade")
-    .addSelect("candidate.photo","photo")
-    .addSelect("institute.shortName","instituteShortName")
-    .addSelect("category.name","categoryName")
-    .where("program.finalResultPublished = :finalResultPublished",{finalResultPublished:PublishingStatus.TRUE})
-    .andWhere("candidateProgram.point > :point",{point:0})
-    .orderBy("program.updatedAt","DESC")
-    .addOrderBy("program.id","ASC")
-    .addOrderBy("candidateProgram.point","DESC")
-    // .groupBy("program.id")
-    .getRawMany()
+  async getResultOfAllPrograms() {
+    const results = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .select('program.id', 'id')
+      .addSelect('candidate.name', 'candidateName')
+      .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect('program.name', 'programName')
+      .addSelect('program.programCode', 'programCode')
+      .addSelect('candidateProgram.point', 'point')
+      .addSelect('candidateProgram.position', 'position')
+      .addSelect('candidateProgram.grade', 'grade')
+      .addSelect('candidate.photo', 'photo')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.name', 'categoryName')
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('candidateProgram.point > :point', { point: 0 })
+      .orderBy('program.updatedAt', 'DESC')
+      .addOrderBy('program.id', 'ASC')
+      .addOrderBy('candidateProgram.point', 'DESC')
+      // .groupBy("program.id")
+      .getRawMany();
     console.log(results.length);
     return results;
   }
@@ -487,26 +565,30 @@ export class FinalResultService {
     });
   }
   async getOverview(queryParams: IProgramFilter) {
-    const overview = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
-    .leftJoinAndSelect("candidateProgram.program","program")
-    .leftJoinAndSelect("candidateProgram.institute","institute")
-    .leftJoinAndSelect("candidateProgram.candidate","candidate")
-    .leftJoinAndSelect("candidate.category","category")
-    .where("candidateProgram.round =  :round",{round:RoundStatus.Final})
-    .andWhere("program.sessionID = :sessionID",{sessionID:queryParams.sessionID})
-    .select("candidate.name","candidateName")
-    .addSelect("candidate.chestNO","chestNO")
-    .addSelect("program.name","programName")
-    .addSelect("program.programCode","programCode")
-    .addSelect("institute.shortName","instituteShortName")
-    .addSelect("category.name","categoryName")
-    .addSelect("candidateProgram.position","postion")
-    .addSelect("candidateProgram.grade","grade")
-    .addSelect("candidateProgram.point","point")
-    .addSelect("program.finalResultEntered","finalResultEntered")
-    .addSelect("program.finalResultPublished","finalResultPublished")
-    .getRawMany()
-    console.log(overview.length)
+    const overview = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .where('candidateProgram.round =  :round', { round: RoundStatus.Final })
+      .andWhere('program.sessionID = :sessionID', {
+        sessionID: queryParams.sessionID,
+      })
+      .select('candidate.name', 'candidateName')
+      .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect('program.name', 'programName')
+      .addSelect('program.programCode', 'programCode')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('candidateProgram.position', 'postion')
+      .addSelect('candidateProgram.grade', 'grade')
+      .addSelect('candidateProgram.point', 'point')
+      .addSelect('program.finalResultEntered', 'finalResultEntered')
+      .addSelect('program.finalResultPublished', 'finalResultPublished')
+      .getRawMany();
+    console.log(overview.length);
     return overview;
   }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {

@@ -706,7 +706,7 @@ export class FinalResultService {
       .addSelect('candidateProgram.point', 'point')
       .addSelect('program.finalResultEntered', 'finalResultEntered')
       .addSelect('program.finalResultPublished', 'finalResultPublished')
-      .addSelect("program.private-published","private-published")
+      .addSelect("program.private_published","private-published")
       .getRawMany();
     console.log(overview.length);
     return overview;

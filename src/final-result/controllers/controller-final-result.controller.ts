@@ -189,7 +189,7 @@ export class ControllerFinalResultController {
 
   @Get('/toppers/all')
   getToppers() {
-    return this.finalResultService.getToppers();
+    return this.finalResultService.gettoppers1();
   }
 
   @Post('/publish/:code')

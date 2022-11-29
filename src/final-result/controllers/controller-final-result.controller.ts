@@ -134,6 +134,10 @@ export class ControllerFinalResultController {
   getTotalOfInstitutionsPublished(@Query() queryParams: IProgramFilter) {
     return this.finalResultService.getTotalOfInstitutionsPublished(queryParams);
   }
+  @Get('/institutions/private-published/all')
+  getTotalOfInstitutionsPrivatePublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsPrivatePublished(queryParams);
+  }
 
   @Get('/institutions/entered/all')
   getTotalOfInstitutionsEntered(@Query() queryParams: IProgramFilter) {
@@ -143,6 +147,10 @@ export class ControllerFinalResultController {
   @Get('/institutions/published/category')
   getTotalOfInstitutionsByCategoryPublished(@Query() queryParams: IProgramFilter) {
     return this.finalResultService.getTotalOfInstitutionsByCategoryPublished(queryParams);
+  }
+  @Get('/institutions/private-published/category')
+  getTotalOfInstitutionsByCategoryPrivatePublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getTotalOfInstitutionsByCategoryPrivatePublished(queryParams);
   }
 
   @Get('/institutions/entered/category')
@@ -154,6 +162,10 @@ export class ControllerFinalResultController {
   getTotalOfInstitutionsCategoryPublished(@Param('id') id: number) {
     return this.finalResultService.getTotalOfInstitutionsCategoryPublished(id);
   }
+  @Get('/institutions/private-published/category/:id')
+  getTotalOfInstitutionsCategoryPrivatePublished(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsCategoryPrivatePublished(id);
+  }
 
   @Get('/institutions/entered/category/:id')
   getTotalOfInstitutionsCategoryEntered(@Param('id') id: number) {
@@ -164,6 +176,10 @@ export class ControllerFinalResultController {
   @Get('/programs/status/published')
   getProgramStutusPublished(@Query() queryParams: IProgramFilter) {
     return this.finalResultService.getProgramStutusPublished(queryParams);
+  }
+  @Get('/programs/status/private-published')
+  getProgramStutusprivatePublished(@Query() queryParams: IProgramFilter) {
+    return this.finalResultService.getProgramStatusprivatePublished(queryParams);
   }
 
   @Get('/programs/status/entered')
@@ -201,7 +217,7 @@ export class ControllerFinalResultController {
     return this.finalResultService.privateUnPublishResultOfFinal(code);
   }
 
-  @Get("private-programs/published")
+  @Get("programs/private-published")
   getPrivagePublishedPrograms(@Query() queryParams: IProgramFilter){
     return this.finalResultService.getPrivatePublishedPrograms(queryParams)
   }

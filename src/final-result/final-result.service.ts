@@ -298,8 +298,8 @@ export class FinalResultService {
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
       .addGroupBy('program.categoryID')
-      .orderBy('institute.id', 'ASC')
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
+      // .orderBy('institute.id', 'ASC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -324,8 +324,8 @@ export class FinalResultService {
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
-      .orderBy('institute.id', 'ASC')
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
+      // .addOrderBy('institute.id', 'ASC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -376,8 +376,8 @@ export class FinalResultService {
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
-      .orderBy('institute.id', 'ASC')
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
+      // .orderBy('institute.id', 'ASC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -543,34 +543,7 @@ export class FinalResultService {
     }, {});
     return Object.values(toppers);
   }
-  // async getToppers() {
-  //   const query = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
-  //   .leftJoinAndSelect("candidateProgram.candidate", "candidate")
-  //   .leftJoinAndSelect("candidateProgram.session", "session")
-  //   .leftJoinAndSelect("candidate.category", "category")
-  //   .leftJoinAndSelect("candidate.instiute", "institute")
-    // .select("institute.shortName", "instituteShortName")
-    // .addSelect("candidate.name", "candidateName")
-    // .addSelect("candidate.chestNO", "chestNo")
-    // .addSelect("candidate.photo", "photo")
-    // .addSelect("candidate.category_id", "categoryID")
-    // .addSelect("category.name", "categoryName")
-    // .addSelect("session.name", "sessionName")
-    // .addSelect("SUM(candidateProgram.point)", "score")
-
-  //   .groupBy("candidateProgram.category_id, candidateProgram.chestNO")
-  //   .orderBy("score", "DESC")
-  //   .getRawMany()
-
-  //   const toppers = query.reduce((acc, item) => {
-  //     if (!acc[item.category_id]) {
-  //       acc[item.category_id] = item;
-  //     }
-  //     return acc;
-  //   }, {});
-  //   return Object.values(toppers);
-  // }
-
+  
   async getResultOfAllPrograms() {
     const results = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -705,6 +678,9 @@ export class FinalResultService {
       },
     });
   }
+
+  
+
   async getOverview(queryParams: IProgramFilter) {
     const overview = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',

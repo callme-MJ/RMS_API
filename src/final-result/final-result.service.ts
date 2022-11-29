@@ -522,10 +522,10 @@ export class FinalResultService {
     .leftJoinAndSelect("candidateProgram.session", "session")
     .leftJoinAndSelect("candidate.category", "category")
     .leftJoinAndSelect("candidate.institute", "institute")
-    .select("candidateProgram.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name ,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id as sessionID" )
+    .select("candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name ,candidate.photo ,category.name as categoryName,session.name  , session.id " )
     .addSelect("SUM(candidateProgram.point)", "score")
     
-    .groupBy("candidateProgram.category_id, candidateProgram.chestNO")
+    .groupBy("candidate.category_id, candidateProgram.chestNO")
     .orderBy("score", "DESC")
     .getRawMany()
 

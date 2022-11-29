@@ -86,8 +86,8 @@ export class Program {
   @Column({nullable: true})
   resultPublished: string;
 
-  @Column({nullable: true, default:false})
-  privatetPublished: string;
+  @Column({nullable: true, default:"false"})
+  privatePublished: string;
 
   @Column({ nullable: true })
   finalResultEntered: string;

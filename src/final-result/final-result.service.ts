@@ -230,6 +230,30 @@ export class FinalResultService {
     // console.log(total.length);
     return total;
   }
+  async getTotalOfInstitutionsPrivatePublished(queryParams: IProgramFilter) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.session', 'session')
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .addSelect('institute.coverPhoto', 'institutePhoto')
+      .where('session.id = :sessionID', {
+        sessionID: queryParams.sessionID,
+      })
+      .andWhere('program.privatePublished = :privatePublished', {
+        privatePublished: PublishingStatus.TRUE,
+      })
+      .groupBy('institute.id')
+      .orderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
   async getTotalOfInstitutionsEntered(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -308,6 +332,32 @@ export class FinalResultService {
     // console.log(total.length);
     return total;
   }
+  async getTotalOfInstitutionsCategoryPrivatePublished(id:number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.privatePublished = :privatePublished', {
+        privatePublished: PublishingStatus.TRUE,
+      })
+      .andWhere('program.category.id = :categoryID', {
+        categoryID: id,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('institute.id', 'ASC')
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
   async getTotalOfInstitutionsCategoryEntered(id:number) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -363,6 +413,33 @@ export class FinalResultService {
     // console.log(total.length);
     return total;
   }
+  async getTotalOfInstitutionsByCategoryPrivatePublished(queryParams: IProgramFilter) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.privatePublished = :privatePublished', {
+        privatePublished: PublishingStatus.TRUE,
+      })
+      .andWhere('candidateProgram.session.id = :sessionID', {
+        sessionID: queryParams.sessionID,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .addGroupBy('program.categoryID')
+      // .orderBy("institute.id", "ASC")
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
   async getProgramStutusPublished(queryParams: IProgramFilter) {
     const status = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.category', 'category')
@@ -372,6 +449,25 @@ export class FinalResultService {
       .addSelect('session.name', 'sessionName')
       .where('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
+      })
+      // .andWhere('session.id = :sessionID', {
+      //   sessionID: queryParams.sessionID,
+      // })
+      .groupBy('session.id')
+      // .addGroupBy('category.id')
+      .getRawMany();
+    // console.log(status.length);
+    return status;
+  }
+  async getProgramStatusprivatePublished(queryParams: IProgramFilter) {
+    const status = await this.ProgramRepo.createQueryBuilder('program')
+      .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('program.session', 'session')
+      .select('Count(program.id)', 'totalProgramPublished')
+      .addSelect('session.id', 'sessionID')
+      .addSelect('session.name', 'sessionName')
+      .where('program.privatePublished = :privatePublished', {
+        privatePublished: PublishingStatus.TRUE,
       })
       // .andWhere('session.id = :sessionID', {
       //   sessionID: queryParams.sessionID,
@@ -552,7 +648,7 @@ export class FinalResultService {
       if (!program) throw new NotFoundException('Program not found');
       if (program.finalResultEntered != EnteringStatus.TRUE)
         throw new NotFoundException('Result not entered completely');
-      program.privatetPublished = PublishingStatus.TRUE;
+      program.privatePublished = PublishingStatus.TRUE;
       await this.programService.update(program.id, program);
       return program;
     } catch (error) {
@@ -566,7 +662,7 @@ export class FinalResultService {
         programCode,
       );
       if (!program) throw new NotFoundException('Program not found');
-      program.privatetPublished = PublishingStatus.FALSE;
+      program.privatePublished = PublishingStatus.FALSE;
       await this.programService.update(program.id, program);
       return program;
     } catch (error) {
@@ -577,7 +673,7 @@ export class FinalResultService {
   async getPrivatePublishedPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {
-        privatetPublished: PublishingStatus.TRUE,
+        privatePublished: PublishingStatus.TRUE,
         sessionID: queryParams.sessionID,
       },
       order: {

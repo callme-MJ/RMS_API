@@ -98,7 +98,7 @@ export class PublicFinalResultController {
 
   @Get('/toppers/all')
   getToppers() {
-    return this.finalResultService.getToppers();
+    return this.finalResultService.gettoppers1();
   }
 
   @Get('/programs/all')

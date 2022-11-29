@@ -574,7 +574,7 @@ export class FinalResultService {
     }
   }
 
-  async privateGetPublishedPrograms(queryParams: IProgramFilter) {
+  async getPrivatePublishedPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {
         privatetPublished: PublishingStatus.TRUE,

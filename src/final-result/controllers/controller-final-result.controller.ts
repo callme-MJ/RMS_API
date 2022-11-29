@@ -181,6 +181,21 @@ export class ControllerFinalResultController {
     return this.finalResultService.getPublishedPrograms(queryParams)
   }
 
+  @Post('/publish/:code')
+  privatePublishResult(@Param('code') code: string) {
+    return this.finalResultService.privatePublishResultOfFinal(code);
+  }
+
+  @Delete('/publish/:code')
+  privateUnPublishResult(@Param('code') code: string) {
+    return this.finalResultService.privateUnPublishResultOfFinal(code);
+  }
+
+  @Get("programs/published")
+  getPrivagePublishedPrograms(@Query() queryParams: IProgramFilter){
+    return this.finalResultService.privateGetPublishedPrograms(queryParams)
+  }
+
   @Get("programs/entered")
   getEnteredPrograms(@Query() queryParams: IProgramFilter){
     return this.finalResultService.getEnteredPrograms(queryParams)

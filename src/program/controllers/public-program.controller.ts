@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param, Query
@@ -21,6 +22,11 @@ import { IProgramFilter, ProgramsService } from '../program.service';
     @Get('schedule/:id')
     findOne(@Param('id') id: number) {
       return this.programsService.findOneSchedule(+id);
+    }
+
+    @Get('live')
+    findLivePg(@Body()time: string){
+      return this.programsService.findLivePg(time);
     }
   }
   

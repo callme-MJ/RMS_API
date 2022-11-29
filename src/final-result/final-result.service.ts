@@ -583,6 +583,49 @@ export class FinalResultService {
       },
     });
   }
+  async privatePublishResultOfFinal(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(
+        programCode,
+      );
+      if (!program) throw new NotFoundException('Program not found');
+      if (program.finalResultEntered != EnteringStatus.TRUE)
+        throw new NotFoundException('Result not entered completely');
+      program.privatetPublished = PublishingStatus.TRUE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async privateUnPublishResultOfFinal(programCode: string) {
+    try {
+      const program = await this.programService.findOneByProgramCode(
+        programCode,
+      );
+      if (!program) throw new NotFoundException('Program not found');
+      program.privatetPublished = PublishingStatus.FALSE;
+      await this.programService.update(program.id, program);
+      return program;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getPrivatePublishedPrograms(queryParams: IProgramFilter) {
+    return await this.ProgramRepo.find({
+      where: {
+        privatetPublished: PublishingStatus.TRUE,
+        sessionID: queryParams.sessionID,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+  }
+
+
   async getEnteredPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
       where: {

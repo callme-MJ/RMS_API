@@ -40,7 +40,9 @@ export class MediaService {
   }
 
   findAll() {
-    return this.mediaRepo.find();
+    return this.mediaRepo.find({
+      order: {"createdAt": "DESC"}
+    });
   }
 
   findAllGallery() {

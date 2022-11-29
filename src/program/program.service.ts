@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as moment from "moment";
 import { throwError } from 'rxjs';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CategoryService } from 'src/category/category.service';
@@ -88,6 +89,24 @@ export class ProgramsService {
     } catch (error) {
       throw error
     }
+  }
+
+  async findLivePg(time:string){
+    try {
+      let liveTime = moment().format("HH:mm:");
+      const livePg = await this.programRepository.find({
+        where:{
+          s_time:liveTime
+        }
+      })
+      console.log(liveTime);
+      
+    } catch (error) {
+      throw error
+    }
+//     select * from hockey_stats 
+// where game_date between '2012-03-11 00:00:00' and '2012-05-11 23:59:00' 
+// order by game_date desc;
   }
 
   public async findAllSchedule(queryParams:IProgramFilter){

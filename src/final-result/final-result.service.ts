@@ -582,7 +582,9 @@ export class FinalResultService {
       );
       if (!program) throw new NotFoundException('Program not found');
       if (program.finalResultEntered != EnteringStatus.TRUE)
-        throw new NotFoundException('Result not entered completely');
+      throw new NotFoundException('Result not entered completely');
+      if (program.privatePublished != EnteringStatus.TRUE)
+      throw new NotFoundException('Result not published');
       program.finalResultPublished = PublishingStatus.TRUE;
       await this.programService.update(program.id, program);
       return program;

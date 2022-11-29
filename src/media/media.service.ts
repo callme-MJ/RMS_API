@@ -77,7 +77,7 @@ export class MediaService {
 
  async removeGallery(id: number) {
     let gallery = await this.galleryRepo.findOneBy({id});
-    await this.s3Service.deleteFile(gallery.file);
+    // await this.s3Service.deleteFile(gallery.file);
     return this.galleryRepo.delete(id);
   }
 

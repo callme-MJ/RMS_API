@@ -150,6 +150,16 @@ export class ControllerFinalResultController {
     return this.finalResultService.getTotalOfInstitutionsByCategoryEntered(queryParams);
   }
 
+  @Get('/institutions/published/category/:id')
+  getTotalOfInstitutionsCategoryPublished(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsCategoryPublished(id);
+  }
+
+  @Get('/institutions/entered/category/:id')
+  getTotalOfInstitutionsCategoryEntered(@Param('id') id: number) {
+    return this.finalResultService.getTotalOfInstitutionsCategoryEntered(id);
+  }
+
   
   @Get('/programs/status/published')
   getProgramStutusPublished(@Query() queryParams: IProgramFilter) {
@@ -201,8 +211,9 @@ export class ControllerFinalResultController {
     return this.finalResultService.getEnteredPrograms(queryParams)
   }
 
-  @Get("overview")
+  @Get("/overview/all")
   getOverview(@Query() queryParams: IProgramFilter){
+    console.log(queryParams)
     return this.finalResultService.getOverview(queryParams)
   }
 

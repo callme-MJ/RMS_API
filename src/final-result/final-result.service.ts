@@ -143,6 +143,10 @@ export class FinalResultService {
   async createResult(createFinalResultDTO: CreateFinalResultDTO, id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');
+
+    candidateProgram.position = null;
+    candidateProgram.grade = null;
+    candidateProgram.point = candidateProgram.gradePoint;
     candidateProgram.position = createFinalResultDTO.position;
 
     const postionPoint = await this.getPositionPoint(
@@ -189,7 +193,7 @@ export class FinalResultService {
         point: 'DESC',
       },
     });
-    console.log(result);
+    // console.log(result);
     return result;
   }
 
@@ -201,6 +205,7 @@ export class FinalResultService {
     candidateProgram.postionPoint = null;
     await this.CandidateProgramRepo.save(candidateProgram);
   }
+
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -222,7 +227,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
   async getTotalOfInstitutionsEntered(queryParams: IProgramFilter) {
@@ -246,7 +251,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
 
@@ -266,7 +271,7 @@ export class FinalResultService {
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
+      .addSelect('category.id', 'categoryID')
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
@@ -274,9 +279,63 @@ export class FinalResultService {
       .orderBy('institute.id', 'ASC')
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
+  async getTotalOfInstitutionsCategoryPublished(id:number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('program.category.id = :categoryID', {
+        categoryID: id,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('institute.id', 'ASC')
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
+  async getTotalOfInstitutionsCategoryEntered(id:number) {
+    const total = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .andWhere('program.finalResultPublished = :finalResultEntered', {
+        finalResultEntered: EnteringStatus.TRUE,
+      })
+      .andWhere('program.category.id = :categoryID', {
+        categoryID: id,
+      })
+      .select('institute.id', 'instituteID')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('Sum(candidateProgram.point)', 'total')
+      .groupBy('institute.id')
+      .orderBy('institute.id', 'ASC')
+      .addOrderBy('total', 'DESC')
+      .getRawMany();
+    // console.log(total.length);
+    return total;
+  }
+
+
   async getTotalOfInstitutionsByCategoryPublished(queryParams: IProgramFilter) {
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
@@ -293,7 +352,7 @@ export class FinalResultService {
       .select('institute.id', 'instituteID')
       .addSelect('institute.name', 'instituteName')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
+      .addSelect('category.id', 'categoryID')
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
@@ -301,26 +360,26 @@ export class FinalResultService {
       // .orderBy("institute.id", "ASC")
       .addOrderBy('total', 'DESC')
       .getRawMany();
-    console.log(total.length);
+    // console.log(total.length);
     return total;
   }
   async getProgramStutusPublished(queryParams: IProgramFilter) {
     const status = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.category', 'category')
       .leftJoinAndSelect('program.session', 'session')
-      .select('session.name', 'sessionName')
-      .addSelect('Count(program.id)', 'totalProgramPublished')
+      .select('Count(program.id)', 'totalProgramPublished')
+      .addSelect('session.id', 'sessionID')
+      .addSelect('session.name', 'sessionName')
       .where('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
       })
-      .andWhere('session.id = :sessionID', {
-        sessionID: queryParams.sessionID,
-      })
-      .addSelect('category.name', 'categoryName')
+      // .andWhere('session.id = :sessionID', {
+      //   sessionID: queryParams.sessionID,
+      // })
       .groupBy('session.id')
-      .addGroupBy('category.id')
+      // .addGroupBy('category.id')
       .getRawMany();
-    console.log(status.length);
+    // console.log(status.length);
     return status;
   }
   async getProgramStatusEntered(queryParams: IProgramFilter) {
@@ -339,31 +398,33 @@ export class FinalResultService {
       .groupBy('session.id')
       .addGroupBy('category.id')
       .getRawMany();
-    console.log(status.length);
+    // console.log(status.length);
     return status;
   }
   async getResultsOfInstitute(id: number) {
     const results = await this.CandidateProgramRepo.find({
-      where:{
-        institute:{
-          id:id
+      where: {
+        institute: {
+          id: id,
         },
-        point:Between(1,100),
-        program:{
-          finalResultPublished:PublishingStatus.TRUE
-        }
+        point: Between(1, 100),
+        program: {
+          finalResultPublished: PublishingStatus.TRUE,
+        },
       },
-      order:{
-        program:{
-          updatedAt:"DESC"
-        }
-      }
-    })
-    console.log(results.length);
+      order: {
+        program: {
+          updatedAt: 'DESC',
+        },
+      },
+    });
+    // console.log(results.length);
     return results;
   }
 
   async getToppers() {
+    const candidate_programs =
+      this.CandidateProgramRepo.createQueryBuilder('candidateProgram');
     const toppers = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -371,20 +432,76 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
       .leftJoinAndSelect('candidate.category', 'category')
-      .leftJoinAndSelect('program.session', 'session')
+      .leftJoinAndSelect('candidateProgram.session', 'session')
       .select('candidate.name', 'candidateName')
       .addSelect('candidate.chestNO', 'chestNO')
-      .addSelect('MAX(candidateProgram.point)', 'score')
+      .addSelect('candidate.photo', 'candidatePhoto')
+      .addSelect('MAX(candidateSum.sum)', 'score')
+      .addSelect('institute.id', 'instituteID')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect("category.id","categoryID")
-      .addSelect("session.id","sessionID")
+      .addSelect('category.id', 'categoryID')
+      .addSelect('session.id', 'sessionID')
       .addSelect('category.name', 'categoryName')
       .addSelect('session.name', 'sessionName')
       .where('program.type = :type', { type: 'single' })
-      .groupBy('session.id')
-      .addGroupBy("category.id")
+      // .from(
+      //   `${
+      //     candidate_programs
+      //       .subQuery()
+      //       // .leftJoinAndSelect('cp.candidate', 'candidate')
+      //       .select('SUM(point)', 'sum')
+      //       .from('candidate_program', 'cp')
+      //     //     .groupBy('candidate.id');
+      //     //   // .orderBy('user_record.date', 'DESC');
+      //   }`,
+      //   'candidateSum',
+      // )
+      // .from((subQuery) => {
+      //   return subQuery
+
+      //   .leftJoinAndSelect('cp.candidate', 'candidate')
+      //   .select('SUM(point)', 'sum')
+      //   .from("candidate_program", 'cp')
+      //     .groupBy('candidate.id');
+      //   // .orderBy('user_record.date', 'DESC');
+      // }, 'candidateSum')
+      .addGroupBy('category.id')
+      .orderBy('score', 'DESC')
       .getRawMany();
+    console.log(toppers.length);
     return toppers;
+  }
+
+  async getResultOfAllPrograms() {
+    const results = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .select('program.id', 'id')
+      .addSelect('candidate.name', 'candidateName')
+      .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect('program.name', 'programName')
+      .addSelect('program.programCode', 'programCode')
+      .addSelect('candidateProgram.point', 'point')
+      .addSelect('candidateProgram.position', 'position')
+      .addSelect('candidateProgram.grade', 'grade')
+      .addSelect('candidate.photo', 'photo')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.name', 'categoryName')
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('candidateProgram.point > :point', { point: 0 })
+      .orderBy('program.updatedAt', 'DESC')
+      .addOrderBy('program.id', 'ASC')
+      .addOrderBy('candidateProgram.point', 'DESC')
+      // .groupBy("program.id")
+      .getRawMany();
+    console.log(results.length);
+    return results;
   }
   async publishResultOfFinal(programCode: string) {
     try {
@@ -495,14 +612,26 @@ export class FinalResultService {
       'candidateProgram',
     )
       .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect('program.session', 'session')
-      .where('program.sessionID = :sessionID', {
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .where('candidateProgram.round =  :round', { round: RoundStatus.Final })
+      .andWhere('program.sessionID = :sessionID', {
         sessionID: queryParams.sessionID,
       })
-      .andWhere('candidateProgram.round = :round', {
-        round: 'Final',
-      })
+      .select('candidate.name', 'candidateName')
+      .addSelect('candidate.chestNO', 'chestNO')
+      .addSelect('program.name', 'programName')
+      .addSelect('program.programCode', 'programCode')
+      .addSelect('institute.shortName', 'instituteShortName')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('candidateProgram.position', 'postion')
+      .addSelect('candidateProgram.grade', 'grade')
+      .addSelect('candidateProgram.point', 'point')
+      .addSelect('program.finalResultEntered', 'finalResultEntered')
+      .addSelect('program.finalResultPublished', 'finalResultPublished')
       .getRawMany();
+    console.log(overview.length);
     return overview;
   }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
@@ -534,7 +663,7 @@ export class FinalResultService {
       .select('category.id')
       .addSelect('program.type')
       .getRawOne();
-    console.log(programData);
+    // console.log(programData);
     switch (programData.program_type) {
       case 'single':
         switch (position) {
@@ -583,7 +712,7 @@ export class FinalResultService {
       .where('candidateProgram.programCode = :programCode', { programCode })
       .select('program.isStarred')
       .getRawOne();
-    console.log(programData);
+    // console.log(programData);
     switch (programData.program_is_starred) {
       case 'True':
         switch (grade) {

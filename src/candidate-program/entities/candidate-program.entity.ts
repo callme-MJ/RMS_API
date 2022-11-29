@@ -100,6 +100,7 @@ export class CandidateProgram {
   @ManyToOne(() => Candidate, (candidate) => candidate.candidatePrograms, {
     eager: true,
   })
+  @JoinTable()
   candidate: Candidate;
 
   @ManyToOne(() => Institute, (institute) => institute.candidatePrograms, {

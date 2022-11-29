@@ -15,7 +15,9 @@ import { UpdateSchedule } from './dto/update-schedule';
 import { Program, PublishingStatus } from './entities/program.entity';
 
 export interface IProgramFilter extends IFilter {
-  sessionID: number;
+  sessionID: number,
+  CategoryID: number,
+  programCode:string,
 }
 @Injectable()
 export class ProgramsService {
@@ -166,6 +168,7 @@ export class ProgramsService {
             id: queryParams.sessionID,
             status: SessionStatus.ACTIVE,
           },
+          programCode:queryParams.programCode
         },
       });
     } catch (error) {

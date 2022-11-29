@@ -529,9 +529,8 @@ export class FinalResultService {
     .andWhere("program.type = :type", {
       type: "single",
       })
-    .select("candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name ,candidate.photo ,category.name as categoryName,session.name  , session.id " )
+    .select("candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id " )
     .addSelect("SUM(candidateProgram.point)", "score")
-    
     .groupBy("candidate.category_id, candidateProgram.chestNO")
     .orderBy("score", "DESC")
     .getRawMany()

@@ -519,9 +519,16 @@ export class FinalResultService {
   async getToppers() {
     const query = await this.CandidateProgramRepo.createQueryBuilder("candidateProgram")
     .leftJoinAndSelect("candidateProgram.candidate", "candidate")
+    .leftJoinAndSelect("candidateProgram.program", "program")
     .leftJoinAndSelect("candidateProgram.session", "session")
     .leftJoinAndSelect("candidate.category", "category")
     .leftJoinAndSelect("candidate.institute", "institute")
+    .where("program.finalResultPublished = :finalResultPublished", {
+      finalResultPublished: PublishingStatus.TRUE,
+      })
+    .andWhere("program.type = :type", {
+      type: "single",
+      })
     .select("candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name ,candidate.photo ,category.name as categoryName,session.name  , session.id " )
     .addSelect("SUM(candidateProgram.point)", "score")
     

@@ -41,12 +41,14 @@ export class MediaService {
 
   findAll() {
     return this.mediaRepo.find({
-      order: {"createdAt": "DESC"}
+      order: {createdAt: "DESC"}
     });
   }
 
   findAllGallery() {
-    return this.galleryRepo.find();
+    return this.galleryRepo.find({
+      order: {createdAt: "DESC"}
+    });
   }
 
   findOne(slug: string) {

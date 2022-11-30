@@ -9,6 +9,7 @@ import { CoordinatorCandidateProgramController } from './controllers/coordinator
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { ControllerCandidateProgramController } from './controllers/controller-candidate-program.controller';
+import { PublicCandidateProgramController } from './controllers/public-candidate-proram.controller';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ControllerCandidateProgramController } from './controllers/controller-c
     AdminCandidateProgramController,
     CoordinatorCandidateProgramController,
     ControllerCandidateProgramController,
+    PublicCandidateProgramController
   ],
   providers: [CandidateProgramService],
   exports: [CandidateProgramService],

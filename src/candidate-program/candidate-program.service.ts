@@ -665,7 +665,29 @@ export class CandidateProgramService {
     return candidateProgram;
   }
 
-  public async selectCandidate() {}
+  public async getoverview() {
+    const overview = await this.candidateProgramRepository.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.institute","institute")
+    .leftJoinAndSelect("candidate.category","category")
+    .where("candidateProgram.round = :round",{round:RoundStatus.Final})
+    .select("candidateProgram.chestNO","chestNO")
+    .addSelect("candidate.name","candidateName")
+    .addSelect("institute.name","instituteName")
+    .addSelect("candidateProgram.program_name","programName")
+    .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("candidateProgram.postion_point","positionPoint")
+    .addSelect("candidateProgram.grade_point","gradePoint")
+    .addSelect("candidateProgram.point","point")
+    .addSelect("category.name","categoryName")
+    .addSelect("program.final_result_entered","result_entered")
+    .addSelect("program.final_result_published","result_published")
+    .addSelect("program.private_published","result_accounced")
+    .getRawMany()
+    console.log(overview.length)
+    return overview;
+  }
 
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);

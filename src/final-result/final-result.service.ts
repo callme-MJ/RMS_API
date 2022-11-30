@@ -552,6 +552,7 @@ export class FinalResultService {
     .select('program.id', 'programID')
     .addSelect('program.name', 'programName')
     .addSelect('program.programCode', 'programCode')
+    .addSelect('category.name', 'categoryName')
     .getRawMany()
     console.log(programs);
     
@@ -571,8 +572,8 @@ export class FinalResultService {
       .addSelect('candidateProgram.position', 'position')
       .addSelect('candidateProgram.grade', 'grade')
       .addSelect('candidate.photo', 'photo')
+      .addSelect('candidateProgram.updatedAt', 'updatedAt')
       .addSelect('institute.shortName', 'instituteShortName')
-      .addSelect('category.name', 'categoryName')
       .where('program.finalResultPublished = :finalResultPublished', {finalResultPublished: PublishingStatus.TRUE})
       .andWhere('candidateProgram.point > :point', { point: 0 })
       .orderBy('program.updatedAt', 'DESC')
@@ -707,7 +708,7 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
-      .leftJoinAndSelect('candidate.category', 'category')
+      .leftJoinAndSelect('program.category', 'category')
       .where('candidateProgram.round =  :round', { round: RoundStatus.Final })
       .andWhere('program.sessionID = :sessionID', {
         sessionID: queryParams.sessionID,

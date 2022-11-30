@@ -668,6 +668,7 @@ export class CandidateProgramService {
   public async getoverview() {
     const overview = await this.candidateProgramRepository.createQueryBuilder("candidateProgram")
     .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.session","session")
     .leftJoinAndSelect("candidateProgram.candidate","candidate")
     .leftJoinAndSelect("candidate.institute","institute")
     .leftJoinAndSelect("program.category","category")
@@ -678,11 +679,13 @@ export class CandidateProgramService {
     .addSelect("institute.name","instituteName")
     .addSelect("candidateProgram.program_name","programName")
     .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("program.type","programType")
     .addSelect("category.name","categoryName")
     .addSelect("candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point","totalPoint")
     .addSelect("program.final_result_entered","result_entered")
     .addSelect("program.final_result_published","result_published")
     .addSelect("program.private_published","result_accounced")
+    .addSelect("session.name","sessionName")
     .getRawMany()
     console.log(overview.length)
     return overview;

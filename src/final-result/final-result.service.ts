@@ -545,6 +545,16 @@ export class FinalResultService {
   }
   
   async getResultOfAllPrograms() {
+
+    const programs = await this.ProgramRepo.createQueryBuilder("program")
+    .leftJoinAndSelect("program.category", "category")
+    .leftJoinAndSelect("program.session", "session")
+    .select('program.id', 'programID')
+    .addSelect('program.name', 'programName')
+    .addSelect('program.programCode', 'programCode')
+    .getRawMany()
+    console.log(programs);
+    
     const results = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -563,17 +573,24 @@ export class FinalResultService {
       .addSelect('candidate.photo', 'photo')
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('category.name', 'categoryName')
-      .where('program.finalResultPublished = :finalResultPublished', {
-        finalResultPublished: PublishingStatus.TRUE,
-      })
+      .where('program.finalResultPublished = :finalResultPublished', {finalResultPublished: PublishingStatus.TRUE})
       .andWhere('candidateProgram.point > :point', { point: 0 })
       .orderBy('program.updatedAt', 'DESC')
       .addOrderBy('program.id', 'ASC')
       .addOrderBy('candidateProgram.point', 'DESC')
       // .groupBy("program.id")
       .getRawMany();
-    console.log(results.length);
-    return results;
+    const programResults = programs.map((program) => {
+      const programResult = results.filter(
+        (result) => result.programCode === program.programCode,
+      );
+      return {
+        ...program,
+        programResult,
+      };
+    });
+    
+    return programResults;
   }
   async publishResultOfFinal(programCode: string) {
     try {

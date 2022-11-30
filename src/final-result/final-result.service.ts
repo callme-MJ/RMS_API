@@ -707,7 +707,7 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
-      .leftJoinAndSelect('candidate.category', 'category')
+      .leftJoinAndSelect('program.category', 'category')
       .where('candidateProgram.round =  :round', { round: RoundStatus.Final })
       .andWhere('program.sessionID = :sessionID', {
         sessionID: queryParams.sessionID,

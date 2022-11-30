@@ -683,6 +683,7 @@ export class CandidateProgramService {
     .addSelect("program.final_result_entered","result_entered")
     .addSelect("program.final_result_published","result_published")
     .addSelect("program.private_published","result_accounced")
+    .addSelect("program.skill","skill")
     .getRawMany()
     console.log(overview.length)
     return overview;

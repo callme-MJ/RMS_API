@@ -350,8 +350,7 @@ export class FinalResultService {
       .addSelect('category.name', 'categoryName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .groupBy('institute.id')
-      .orderBy('institute.id', 'ASC')
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -405,7 +404,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .addGroupBy('program.categoryID')
       // .orderBy("institute.id", "ASC")
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -432,7 +431,7 @@ export class FinalResultService {
       .groupBy('institute.id')
       .addGroupBy('program.categoryID')
       // .orderBy("institute.id", "ASC")
-      .addOrderBy('total', 'DESC')
+      .orderBy('total', 'DESC')
       .getRawMany();
     // console.log(total.length);
     return total;
@@ -753,10 +752,10 @@ export class FinalResultService {
     const instituteWiseTotal = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
     .leftJoinAndSelect('candidateProgram.session', 'session')
     .leftJoinAndSelect('candidateProgram.institute', 'institute') 
-    .select("session.id", "sessionID")
+    .select("institute.id", "instituteID")
     .addSelect("session.name", "sessionName")
     .addSelect("institute.shortName", "insituteShortName")
-    .addSelect("institute.id", "insituteID")
+    .addSelect("session.id", "sessionID")
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
     .groupBy("institute.id")
     .orderBy("totalPoint","DESC")

@@ -242,8 +242,5 @@ export class ControllerFinalResultController {
   submitCodeLetter(@Param('code') code: string){
     return this.finalResultService.submitCodeLetter(code)
   }
-  @Get("scorecard/all")
-  getScoreCard(){
-    return this.finalResultService.getScoreCard()
-  }
+ 
 }

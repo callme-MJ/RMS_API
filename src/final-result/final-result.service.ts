@@ -552,7 +552,9 @@ export class FinalResultService {
     .select('program.id', 'programID')
     .addSelect('program.name', 'programName')
     .addSelect('program.programCode', 'programCode')
+    .addSelect("program.updatedAt", "updatedAt")
     .addSelect('category.name', 'categoryName')
+    .orderBy("program.updatedAt", "DESC")
     .getRawMany()
     console.log(programs);
     
@@ -572,7 +574,7 @@ export class FinalResultService {
       .addSelect('candidateProgram.position', 'position')
       .addSelect('candidateProgram.grade', 'grade')
       .addSelect('candidate.photo', 'photo')
-      .addSelect('candidateProgram.updatedAt', 'updatedAt')
+      // .addSelect('candidateProgram.updatedAt', 'updatedAt')
       .addSelect('institute.shortName', 'instituteShortName')
       .where('program.finalResultPublished = :finalResultPublished', {finalResultPublished: PublishingStatus.TRUE})
       .andWhere('candidateProgram.point > :point', { point: 0 })
@@ -706,22 +708,12 @@ export class FinalResultService {
       },
     });
   }
-  async getScoreCard(){
-    const total = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
-    .leftJoinAndSelect('candidateProgram.session', 'session')
-    .leftJoinAndSelect('candidateProgram.institute', 'institute') 
-    .select("session.id", "sessionID")
-    .addSelect("session.name", "sessionName")
-    .addSelect("institute.shortName", "insituteShortName")
-
-
-  }
   
-
+  
   async getOverview(queryParams: IProgramFilter) {
     const overview = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
-    )
+      )
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
@@ -743,11 +735,63 @@ export class FinalResultService {
       .addSelect('program.finalResultPublished', 'finalResultPublished')
       .addSelect("program.private_published","private-published")
       .getRawMany();
-    console.log(overview.length);
-    return overview;
-  }
-
+      console.log(overview.length);
+      return overview;
+    }
+    // async getScoreCard(){
+    //   const total = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    //   .leftJoinAndSelect('candidateProgram.session', 'session')
+    //   .leftJoinAndSelect('candidateProgram.institute', 'institute') 
+    //   .select("session.id", "sessionID")
+    //   .addSelect("session.name", "sessionName")
+    //   .addSelect("institute.shortName", "insituteShortName")
   
+  
+    // }
+    
+  async getScoreCard(){
+    const instituteWiseTotal = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.session', 'session')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute') 
+    .select("session.id", "sessionID")
+    .addSelect("session.name", "sessionName")
+    .addSelect("institute.shortName", "insituteShortName")
+    .addSelect("institute.id", "insituteID")
+    .addSelect("SUM(candidateProgram.point)", "totalPoint")
+    .groupBy("institute.id")
+    .orderBy("totalPoint","DESC")
+    .getRawMany()
+    console.log(instituteWiseTotal);
+    
+
+
+    const categoryWiseTotal = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.program', 'program')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute')
+    .leftJoinAndSelect('program.category', 'category')
+    .select("category.id", "categoryID")
+    .addSelect("category.name", "categoryName")
+    .addSelect('institute.id', 'instituteID')
+    .addSelect("SUM(candidateProgram.point)", "totalPoint")
+    .groupBy("category.id")
+    .getRawMany()
+    console.log(categoryWiseTotal);
+
+    const scoreCard= instituteWiseTotal.map((institute)=>{
+      const categoryTotal = categoryWiseTotal.filter((category)=>category.instituteID == institute.insituteID)
+      return {
+        sessionID: institute.sessionID,
+        sessionName: institute.sessionName,
+        instituteShortName: institute.insituteShortName,
+        totalPoint: institute.totalPoint,
+        categoryTotal
+      }
+    })
+
+
+    return {scoreCard}
+    
+  }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
     try {
       const candidate_program = await this.CandidateProgramRepo.findOne({

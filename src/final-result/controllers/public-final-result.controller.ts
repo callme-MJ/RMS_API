@@ -111,4 +111,9 @@ export class PublicFinalResultController {
     return this.finalResultService.getScoreCard()
   }
 
+  @Get("updated-at-time")
+  getUpdatedAtTIme(){
+    return this.finalResultService.getUpdatedAtTime()
+  }
+
 }

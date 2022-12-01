@@ -904,4 +904,12 @@ export class FinalResultService {
         return 'B';
     }
   }
+
+  async getUpdatedAtTime() {
+    const time = await this.ProgramRepo.find({
+      select: ['updatedAt'],
+      order: { updatedAt: 'DESC' }
+    });
+    return time[0].updatedAt;
+  }
 }

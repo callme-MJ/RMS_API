@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandidateProgramService } from 'src/candidate-program/candidate-program.service';
 import {
   CandidateProgram,
-  RoundStatus
+  RoundStatus,
+  SelectionStatus
 } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import {
@@ -128,7 +129,8 @@ export class FinalResultService {
       },
     });
   }
-  findAllMarksOfProgram(code: string) {
+  async findAllMarksOfProgram(code: string) {
+    
     return this.FinalMarkRepo.find({
       where: {
         programCode: code,
@@ -754,13 +756,13 @@ export class FinalResultService {
     .leftJoinAndSelect('candidateProgram.institute', 'institute') 
     .select("institute.id", "instituteID")
     .addSelect("session.name", "sessionName")
-    .addSelect("institute.shortName", "insituteShortName")
+    .addSelect("institute.short_name", "insituteShortName")
     .addSelect("session.id", "sessionID")
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
-    .groupBy("institute.id")
+    .groupBy("institute.id,session.name,institute.short_name,session.id")
     .orderBy("totalPoint","DESC")
     .getRawMany()
-    console.log(instituteWiseTotal);
+    console.log(instituteWiseTotal.length);
     
 
 
@@ -772,12 +774,13 @@ export class FinalResultService {
     .addSelect("category.name", "categoryName")
     .addSelect('institute.id', 'instituteID')
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
-    .groupBy("category.id")
+    .groupBy("category.id,category.name,institute.id")
+    .addGroupBy("institute.id")
     .getRawMany()
     console.log(categoryWiseTotal);
 
     const scoreCard= instituteWiseTotal.map((institute)=>{
-      const categoryTotal = categoryWiseTotal.filter((category)=>category.instituteID == institute.insituteID)
+      const categoryTotal = categoryWiseTotal.filter((category)=>category.instituteID == institute.instituteID)
       return {
         sessionID: institute.sessionID,
         sessionName: institute.sessionName,
@@ -787,8 +790,7 @@ export class FinalResultService {
       }
     })
 
-
-    return {scoreCard}
+    return scoreCard;
     
   }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {

@@ -739,6 +739,29 @@ export class FinalResultService {
     console.log(overview.length);
     return overview;
   }
+
+  async getScoreCard(){
+    const total = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.session', 'session')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute') 
+    .select("session.id", "sessionID")
+    .addSelect("session.name", "sessionName")
+    .addSelect("institute.shortName", "insituteShortName")
+    .addSelect("institute.id", "insituteID")
+    .addSelect("SUM(candidateProgram.point)", "totalPoint")
+    .groupBy("institute.id")
+    .getRawMany()
+
+
+    const categoryWiseTotal = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.progam', 'program')
+    .leftJoinAndSelect('program.category', 'category')
+    .select("category.id", "categoryID")
+    .addSelect("category.name", "categoryName")
+    .addSelect("SUM(candidateProgram.point)", "totalPoint")
+    .groupBy("category.id")
+    .getRawMany()
+  }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
     try {
       const candidate_program = await this.CandidateProgramRepo.findOne({
@@ -843,7 +866,7 @@ export class FinalResultService {
     switch (true) {
       case percetage >= 80 && percetage <= 100:
         return 'A';
-      case percetage >= 65 && percetage <= 79:
+      case percetage >= 65 && percetage <= 79.9:
         return 'B';
     }
   }

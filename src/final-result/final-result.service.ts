@@ -706,7 +706,16 @@ export class FinalResultService {
       },
     });
   }
+  async getScoreCard(){
+    const total = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+    .leftJoinAndSelect('candidateProgram.session', 'session')
+    .leftJoinAndSelect('candidateProgram.institute', 'institute') 
+    .select("session.id", "sessionID")
+    .addSelect("session.name", "sessionName")
+    .addSelect("institute.shortName", "insituteShortName")
 
+
+  }
   
 
   async getOverview(queryParams: IProgramFilter) {
@@ -841,7 +850,7 @@ export class FinalResultService {
     switch (true) {
       case percetage >= 80 && percetage <= 100:
         return 'A';
-      case percetage >= 65 && percetage <= 79:
+      case percetage >= 65 && percetage <= 79.9:
         return 'B';
     }
   }

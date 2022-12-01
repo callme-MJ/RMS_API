@@ -761,7 +761,7 @@ export class FinalResultService {
     .groupBy("institute.id")
     .orderBy("totalPoint","DESC")
     .getRawMany()
-    console.log(instituteWiseTotal);
+    // console.log(instituteWiseTotal);
     
 
 
@@ -774,8 +774,9 @@ export class FinalResultService {
     .addSelect('institute.id', 'instituteID')
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
     .groupBy("category.id")
+    .addGroupBy("institute.id")
     .getRawMany()
-    console.log(categoryWiseTotal);
+    // console.log(categoryWiseTotal);
 
     const scoreCard= instituteWiseTotal.map((institute)=>{
       const categoryTotal = categoryWiseTotal.filter((category)=>category.instituteID == institute.insituteID)
@@ -788,7 +789,8 @@ export class FinalResultService {
       }
     })
 
-
+    console.log(categoryWiseTotal);
+    
     return {scoreCard}
     
   }

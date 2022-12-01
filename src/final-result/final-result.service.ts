@@ -737,6 +737,10 @@ export class FinalResultService {
     console.log(overview.length);
     return overview;
   }
+
+  async getScoreCard(){
+
+  }
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
     try {
       const candidate_program = await this.CandidateProgramRepo.findOne({
@@ -841,7 +845,7 @@ export class FinalResultService {
     switch (true) {
       case percetage >= 80 && percetage <= 100:
         return 'A';
-      case percetage >= 65 && percetage <= 79:
+      case percetage >= 65 && percetage <= 79.9:
         return 'B';
     }
   }

@@ -609,8 +609,8 @@ export class FinalResultService {
       if (program.privatePublished != EnteringStatus.TRUE)
       throw new NotFoundException('Result not published');
       program.finalResultPublished = PublishingStatus.TRUE;
+      await this.ProgramRepo.save(program);
       await this.programService.update(program.id, program);
-      // await this.programService.update(program.id, program);
       return program;
     } catch (error) {
       throw error;

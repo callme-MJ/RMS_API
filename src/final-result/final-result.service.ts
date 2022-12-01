@@ -552,7 +552,9 @@ export class FinalResultService {
     .select('program.id', 'programID')
     .addSelect('program.name', 'programName')
     .addSelect('program.programCode', 'programCode')
+    .addSelect("program.updatedAt", "updatedAt")
     .addSelect('category.name', 'categoryName')
+    .orderBy("program.updatedAt", "DESC")
     .getRawMany()
     console.log(programs);
     
@@ -572,7 +574,7 @@ export class FinalResultService {
       .addSelect('candidateProgram.position', 'position')
       .addSelect('candidateProgram.grade', 'grade')
       .addSelect('candidate.photo', 'photo')
-      .addSelect('candidateProgram.updatedAt', 'updatedAt')
+      // .addSelect('candidateProgram.updatedAt', 'updatedAt')
       .addSelect('institute.shortName', 'instituteShortName')
       .where('program.finalResultPublished = :finalResultPublished', {finalResultPublished: PublishingStatus.TRUE})
       .andWhere('candidateProgram.point > :point', { point: 0 })

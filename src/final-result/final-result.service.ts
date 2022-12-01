@@ -207,6 +207,8 @@ export class FinalResultService {
   }
 
   async getTotalOfInstitutionsPublished(queryParams: IProgramFilter) {
+
+
     const total = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -608,6 +610,7 @@ export class FinalResultService {
       throw new NotFoundException('Result not published');
       program.finalResultPublished = PublishingStatus.TRUE;
       await this.programService.update(program.id, program);
+      // await this.programService.update(program.id, program);
       return program;
     } catch (error) {
       throw error;

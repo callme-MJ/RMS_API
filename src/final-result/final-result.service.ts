@@ -761,7 +761,7 @@ export class FinalResultService {
     .groupBy("institute.id")
     .orderBy("totalPoint","DESC")
     .getRawMany()
-    console.log(instituteWiseTotal);
+    // console.log();
     
 
 
@@ -774,6 +774,7 @@ export class FinalResultService {
     .addSelect('institute.id', 'instituteID')
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
     .groupBy("category.id")
+    .addGroupBy("institute.id")
     .getRawMany()
     console.log(categoryWiseTotal);
 

@@ -86,6 +86,11 @@ export class Program {
   @Column({nullable: true})
   resultPublished: string;
 
+
+
+  @Column({nullable: true, default:"false"})
+  codeLetterSubmitted: string;
+  
   @Column({nullable: true, default:"false"})
   privatePublished: string;
 

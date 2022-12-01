@@ -624,6 +624,13 @@ export class FinalResultService {
       throw error;
     }
   }
+  async submitCodeLetter(code:string){
+    const program = await this.programService.findOneByProgramCode(code);
+    if(!program) throw new NotFoundException('Program not found');
+    program.codeLetterSubmitted = EnteringStatus.TRUE;
+    await this.programService.update(program.id,program);
+    return program;
+  }
 
   async getPublishedPrograms(queryParams: IProgramFilter) {
     return await this.ProgramRepo.find({
@@ -658,6 +665,7 @@ export class FinalResultService {
         programCode,
       );
       if (!program) throw new NotFoundException('Program not found');
+      if(program.finalResultPublished == PublishingStatus.TRUE) throw new NotFoundException('Result has been announced');
       program.privatePublished = PublishingStatus.FALSE;
       await this.programService.update(program.id, program);
       return program;

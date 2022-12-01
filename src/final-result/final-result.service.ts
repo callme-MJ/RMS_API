@@ -907,6 +907,6 @@ export class FinalResultService {
       select: ['updatedAt'],
       order: { updatedAt: 'DESC' }
     });
-    return time;
+    return time[0].updatedAt;
   }
 }

@@ -238,5 +238,8 @@ export class ControllerFinalResultController {
     return this.finalResultService.addCodeLetter(createCodeLetterDto)
   }
 
-  
+  @Post("/submitCodeLetter/:code")
+  submitCodeLetter(@Param('code') code: string){
+    return this.finalResultService.submitCodeLetter(code)
+  }
 }

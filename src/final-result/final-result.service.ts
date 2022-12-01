@@ -762,7 +762,11 @@ export class FinalResultService {
     .groupBy("institute.id,session.name,institute.short_name,session.id")
     .orderBy("totalPoint","DESC")
     .getRawMany()
+<<<<<<< HEAD
     console.log(instituteWiseTotal.length);
+=======
+    // console.log();
+>>>>>>> ba0229b95cc18edeec36235431620c444bd0d947
     
 
 
@@ -774,7 +778,11 @@ export class FinalResultService {
     .addSelect("category.name", "categoryName")
     .addSelect('institute.id', 'instituteID')
     .addSelect("SUM(candidateProgram.point)", "totalPoint")
+<<<<<<< HEAD
     .groupBy("category.id,category.name,institute.id")
+=======
+    .groupBy("category.id")
+>>>>>>> ba0229b95cc18edeec36235431620c444bd0d947
     .addGroupBy("institute.id")
     .getRawMany()
     console.log(categoryWiseTotal);

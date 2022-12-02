@@ -33,6 +33,15 @@ export class AdminCandidatesController {
       throw error;
     }
   }
+  
+  @Get(":id")
+  async getCandidatesByInstitute(@Query() queryParams: ICandidateFilter,@Param()id:number) {
+    try {
+      return await this.candidateService.findAllCandidatesOfInstitute(id,queryParams)
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('photo'))

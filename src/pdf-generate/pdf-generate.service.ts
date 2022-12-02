@@ -14,17 +14,24 @@ export class PdfGenerateService {
 //start
 async getpdf(){
   const puppeteer = require('puppeteer')
+  try {
     
-  // async function printPDF() {
-const browser = await puppeteer.launch({ headless: true });
-const page = await browser.newPage();
-await page.goto('https://sibaq.dhiu.in/explore', {waitUntil: 'networkidle0'});
-const pdf = await page.pdf({ format: 'A4' });
+    
+    // async function printPDF() {
+      const browser = await puppeteer.launch({ headless: true });
+      const page = await browser.newPage();
+      await page.goto('https://sibaq.in/explore', {
+        // waitUntil: 'networkidle0'
+    });
+      const pdf = await page.pdf({ format: 'A4',printBackground:true });
+      
+      await browser.close();
+      return pdf;
+      
+    } catch (error) {
+      throw error
+    }
 
-await browser.close();
-
-
-return pdf;
 }
 
 async generatePDF(): Promise<Buffer> {

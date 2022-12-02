@@ -945,7 +945,7 @@ export class FinalResultService {
   }
 
   async getUpdatedAtTime() {
-    const time = await this.ProgramRepo.findOne({
+    const time = await this.ProgramRepo.find({
       where:{resultPublished:PublishingStatus.TRUE},
       select:['updatedAt'],
       order:{updatedAt:'DESC'}

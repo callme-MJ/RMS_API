@@ -22,6 +22,8 @@ import { EliminationResultModule } from './elimination-result/elimination-result
 import { MediaModule } from './media/media.module';
 import { FinalResultModule } from './final-result/final-result.module';
 import { JudgesModule } from './judges/judges.module';
+import { PdfGenerate } from './pdf-generate/entities/pdf-generate.entity';
+import { PdfGenerateModule } from './pdf-generate/pdf-generate.module';
 
 
 @Module({
@@ -105,6 +107,7 @@ import { JudgesModule } from './judges/judges.module';
     MediaModule,
     FinalResultModule,
     JudgesModule,
+    PdfGenerateModule
 
   ],
   controllers: [AppController],

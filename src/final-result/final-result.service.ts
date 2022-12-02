@@ -776,6 +776,7 @@ export class FinalResultService {
   // }
 
   async getScoreCard() {
+
     const instituteWiseTotal =
       await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.session', 'session')
@@ -799,6 +800,8 @@ export class FinalResultService {
     });
     console.log(instituteWiseTotal[0]);
     instituteWiseTotal.sort((a, b) => b.percentage - a.percentage);
+
+
     const categoryWiseTotal =
       await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.program', 'program')
@@ -940,10 +943,10 @@ export class FinalResultService {
   }
 
   async getUpdatedAtTime() {
-    const time = await this.ProgramRepo.find({
-      select: ['updatedAt'],
-      order: { updatedAt: 'DESC' },
-    });
+    const time = await this.ProgramRepo.findOne({
+      where:{resultPublished:PublishingStatus.TRUE},
+      select:['updatedAt']
+    })
     return time[0].updatedAt;
   }
 }

@@ -18,10 +18,13 @@ async getpdf(){
     
     
     // async function printPDF() {
-      const browser = await puppeteer.launch({ headless: true });
+      const browser = await puppeteer.launch({ 
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
       const page = await browser.newPage();
-      await page.goto('https://sibaq.in/explore', {
-        // waitUntil: 'networkidle0'
+      await page.goto('https://sibaq.in/pdf-gen', {
+        waitUntil: 'networkidle0'
     });
       const pdf = await page.pdf({ format: 'A4',printBackground:true });
       

@@ -34,10 +34,10 @@ export class AdminCandidatesController {
     }
   }
   
-  @Get(":id")
-  async getCandidatesByInstitute(@Query() queryParams: ICandidateFilter,@Param()id:number) {
+  @Get("/:id")
+  async getCandidatesByInstitute(@Query() queryParams: ICandidateFilter,@Param("id")id:number) {
     try {
-      return await this.candidateService.findAllCandidatesOfInstitute(id,queryParams)
+      return await this.candidateService.findAllCandidatesOfInstitute(+id,queryParams)
     } catch (error) {
       throw error;
     }

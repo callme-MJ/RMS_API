@@ -18,7 +18,7 @@ export class AdminInstitutesController {
   ) {
     return this.instituteService.create(body, coverPhoto);
   }
-
+  
   @SerializeOptions({ groups: ['collection'] })
   @Get()
   findAll(@Query('session_id') sessionID: number = 0) {

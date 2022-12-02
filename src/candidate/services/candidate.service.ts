@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { name } from 'aws-sdk/clients/importexport';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { CategoryService } from 'src/category/category.service';
@@ -10,8 +9,6 @@ import { NotFoundException } from 'src/exceptions/not-found-exception';
 import { ValidationException } from 'src/exceptions/validation-exception';
 import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteService } from 'src/institute/institute.service';
-import { Session } from 'src/session/entities/session.entity';
-import { SessionService } from 'src/session/session.service';
 import { Repository } from 'typeorm';
 import { CandidateDTO } from '../dtos/candidate.dto';
 import { UpdateCandidateDTO } from '../dtos/update-candidate.dto';
@@ -31,7 +28,7 @@ export class CandidateService {
     @InjectRepository(Candidate)
     private readonly candidateRepository: Repository<Candidate>,
     @InjectRepository(CandidateProgram)
-    private readonly candidateProgramRepo:Repository<CandidateProgram>,
+    private readonly candidateProgramRepo: Repository<CandidateProgram>,
     private coordinatorService: CoordinatorService,
     private readonly s3Service: S3Service,
     private readonly instituteService: InstituteService,
@@ -114,10 +111,19 @@ export class CandidateService {
 
       let candidates = await this.candidateRepository
         .createQueryBuilder('candidates')
-        .where('candidates.institute_id = :instituteID', {
-          instituteID: loggedInCoordinator.institute.id,
+        .leftJoinAndSelect("candidates.institute","institute")
+        .where('institute.id = :instituteID', {
+          instituteID: id,
         })
         .getMany();
+      // let candidates = await this.candidateRepository.createQueryBuilder("candidates")
+      // .leftJoinAndSelect("candidates.institute","institute")
+      // .where("institute.id = :instituteID",{instituteID:id})
+      // .getMany()
+      // let candidates = await this.candidateRepository.find({
+       
+      // });
+      console.log(candidates.length);
       return { candidates, count: candidates.length };
     } catch (error) {
       throw error;
@@ -140,10 +146,10 @@ export class CandidateService {
   ): Promise<Candidate> {
     try {
       return this.candidateRepository.findOne({
-        where:{
+        where: {
           chestNO: chestNo,
           session: { id: sessionID },
-        }
+        },
       });
     } catch (error) {
       throw error;
@@ -308,53 +314,65 @@ export class CandidateService {
     }
   }
 
-  async findCandidateDetails(chestNo:number){
-   const candidate = await this.candidateRepository.
-   createQueryBuilder('candidate')
-   .leftJoinAndSelect('candidate.category', 'category')
-   .leftJoinAndSelect('candidate.institute', 'institute')
-   .where('candidate.chestNO = :chestNo', {chestNo})
-   .select(['candidate.id', 'candidate.name','candidate.chestNO', 'candidate.photo', 'category.name', 'institute.shortName','candidate.gender'])
-   .getRawMany();
-       
-   const program = await this.candidateProgramRepo
-   .createQueryBuilder('candidateProgram')
-   .where('candidateProgram.chest_no=:chestNo',{chestNo:chestNo})
-   .leftJoinAndSelect('candidateProgram.program','program')
-   .select('program.name','name')
-   .addSelect('program.program_code','code')
-   .addSelect('program.date','date')
-   .addSelect('program.final_result_entered','entered')
-   .addSelect('program.final_result_published','published')
-   .addSelect('program.type','type')
-   .addSelect('program.skill','skill')
-   .addSelect('program.s_time','time')
-   .addSelect('program.venue','venue')
-   .getRawMany()
+  async findCandidateDetails(chestNo: number) {
+    const candidate = await this.candidateRepository
+      .createQueryBuilder('candidate')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .where('candidate.chestNO = :chestNo', { chestNo })
+      .select([
+        'candidate.id',
+        'candidate.name',
+        'candidate.chestNO',
+        'candidate.photo',
+        'category.name',
+        'institute.shortName',
+        'candidate.gender',
+      ])
+      .getRawMany();
 
-   const result = await this.candidateProgramRepo
-   .createQueryBuilder('candidateProgram')
-   .leftJoinAndSelect('candidateProgram.program','program')
-   .where('candidateProgram.chest_no=:chestNo',{chestNo:chestNo})
-   .andWhere('program.final_result_published = :published',{published:"true"})
-   .select('candidateProgram.point',"mark")
-   .addSelect('program.name','name')
-   .addSelect('candidateProgram.position','position')
-   .addSelect('candidateProgram.grade','grade')
-   .getRawMany()
+    const program = await this.candidateProgramRepo
+      .createQueryBuilder('candidateProgram')
+      .where('candidateProgram.chest_no=:chestNo', { chestNo: chestNo })
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .select('program.name', 'name')
+      .addSelect('program.program_code', 'code')
+      .addSelect('program.date', 'date')
+      .addSelect('program.final_result_entered', 'entered')
+      .addSelect('program.final_result_published', 'published')
+      .addSelect('program.type', 'type')
+      .addSelect('program.skill', 'skill')
+      .addSelect('program.s_time', 'time')
+      .addSelect('program.venue', 'venue')
+      .getRawMany();
 
-   const programDetails = program.map((item)=>{item.result = result.find((res)=>res.name == item.name); return item})    
+    const result = await this.candidateProgramRepo
+      .createQueryBuilder('candidateProgram')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .where('candidateProgram.chest_no=:chestNo', { chestNo: chestNo })
+      .andWhere('program.final_result_published = :published', {
+        published: 'true',
+      })
+      .select('candidateProgram.point', 'mark')
+      .addSelect('program.name', 'name')
+      .addSelect('candidateProgram.position', 'position')
+      .addSelect('candidateProgram.grade', 'grade')
+      .getRawMany();
 
-   const details: Details = {
-     name: candidate[0].candidate_name,
-     chestNO: candidate[0].candidate_chestNO,
-     photo: candidate[0].candidate_photo,
-     gender: candidate[0].candidate_gender,
-     institute: candidate[0].institute_short_name,
-     category: candidate[0].category_name,
-    program:[...programDetails]
-   }
+    const programDetails = program.map((item) => {
+      item.result = result.find((res) => res.name == item.name);
+      return item;
+    });
+
+    const details: Details = {
+      name: candidate[0].candidate_name,
+      chestNO: candidate[0].candidate_chestNO,
+      photo: candidate[0].candidate_photo,
+      gender: candidate[0].candidate_gender,
+      institute: candidate[0].institute_short_name,
+      category: candidate[0].category_name,
+      program: [...programDetails],
+    };
     return details;
-    
   }
 }

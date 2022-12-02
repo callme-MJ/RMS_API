@@ -23,8 +23,8 @@ import { CreateFinalResultDTO } from '../dto/create-final-result.dto';
 import { FinalResultService } from '../final-result.service';
 
 @Controller('user/final-result')
-@UseGuards(AuthGuard('jwt-user'))
-@Roles(Role.CONTROLLER)
+// @UseGuards(AuthGuard('jwt-user'))
+// @Roles(Role.CONTROLLER)
 export class ControllerFinalResultController {
   constructor(
     private readonly finalResultService: FinalResultService,
@@ -242,5 +242,8 @@ export class ControllerFinalResultController {
   submitCodeLetter(@Param('code') code: string){
     return this.finalResultService.submitCodeLetter(code)
   }
- 
+  @Get("scorecard/all")
+  getScoreCard(){
+    return this.finalResultService.getScoreCard()
+  }
 }

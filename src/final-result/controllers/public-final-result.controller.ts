@@ -106,7 +106,7 @@ export class PublicFinalResultController {
     return this.finalResultService.getResultOfAllPrograms();
   }
 
-  @Get("scoreboard/all")
+  @Get("scoreboard/allscoreboard/all")
   getScoreCard(){
     return this.finalResultService.getScoreCard()
   }

@@ -193,22 +193,44 @@ export class CandidateProgramService {
     //     instituteId: loggedInCoordinator.institute.id,
     //   })
     //   .getMany();
-    let candidatePrograms = await this.candidateProgramRepository.find({
-      where: {
-        institute: {
-          id: loggedInCoordinator.institute.id,
-        },
-      },
-    });
+    let candidatePrograms = await this.candidateProgramRepository.createQueryBuilder("candidatePrograms")
+    .leftJoinAndSelect("candidatePrograms.candidate", "candidate")
+    .leftJoinAndSelect("candidatePrograms.program", "program")
+    .leftJoinAndSelect("candidatePrograms.institute", "institute")
+    .where("candidatePrograms.institute_id = :instituteId", {
+      instituteId: loggedInCoordinator.institute.id,
+      })
+    .select("candidatePrograms.id")
+    .addSelect("candidatePrograms.chestNO")
+    .addSelect("candidate.name")
+    .addSelect("candidatePrograms.programCode")
+    .addSelect("program.name","programName")
+    .addSelect("candidatePrograms.topic")
+    .addSelect("candidatePrograms.link")
+    .getRawMany()
+
+
 
     return candidatePrograms;
   }
 
   public async findOne(id: number) {
     try {
-      let candidateProgram = await this.candidateProgramRepository.findOneBy({
-        id,
-      });
+      let candidateProgram = await this.candidateProgramRepository.createQueryBuilder("candidatePrograms")
+      .leftJoinAndSelect("candidatePrograms.candidate", "candidate")
+      .leftJoinAndSelect("candidatePrograms.program", "program")
+      .leftJoinAndSelect("candidatePrograms.institute", "institute")
+      .where("candidatePrograms.id = :id", {
+        id: id,
+        })
+      .select("candidatePrograms.id")
+      .addSelect("candidatePrograms.chestNO")
+      .addSelect("candidate.name")
+      .addSelect("candidatePrograms.programCode")
+      .addSelect("program.name","programName")
+      .addSelect("candidatePrograms.topic")
+      .addSelect("candidatePrograms.link")
+      .getRawOne()
       if (!candidateProgram)
         throw new NotFoundException(
           'Candidate has not applied for this program',
@@ -704,17 +726,39 @@ export class CandidateProgramService {
 
   public async getSelectedCandidates(id: number): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    let selectedCandidates = await this.candidateProgramRepository.find({
-      where: {
-        institute: {
-          id: loggedInCoordinator.institute.id,
-        },
-        isSelected: SelectionStatus.TRUE,
-        program: {
-          resultPublished: PublishingStatus.TRUE,
-        },
-      },
-    });
+    const selectedCandidates = await this.candidateProgramRepository.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.session","session")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.institute","institute")
+    .leftJoinAndSelect("program.category","category")
+    .where("candidateProgram.round = :round",{round:RoundStatus.Final})
+    .andWhere("candidateProgram.is_selected = :status",{status:SelectionStatus.TRUE})
+    .andWhere("program.id = :id",{id:loggedInCoordinator.institute.id})
+    .andWhere("program.final_result_published = :status",{status:PublishingStatus.TRUE})
+    .select("candidateProgram.chestNO","chestNO")
+    .addSelect("candidate.name","candidateName")
+    .addSelect("institute.short_name","institutionCode")
+    .addSelect("institute.name","instituteName")
+    .addSelect("candidateProgram.program_name","programName")
+    .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("program.type","programType")
+    .addSelect("category.name","categoryName")
+    .addSelect("candidateProgram.topic","topics")
+    .addSelect("candidateProgram.link","link")
+    .getRawMany()
+    
+    // let selectedCandidates = await this.candidateProgramRepository.find({
+    //   where: {
+    //     institute: {
+    //       id: loggedInCoordinator.institute.id,
+    //     },
+    //     isSelected: SelectionStatus.TRUE,
+    //     program: {
+    //       resultPublished: PublishingStatus.TRUE,
+    //     },
+    //   },
+    // });
     return selectedCandidates;
   }
 }

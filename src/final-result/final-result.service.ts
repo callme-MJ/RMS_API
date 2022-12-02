@@ -785,12 +785,18 @@ export class FinalResultService {
         .addSelect('institute.short_name', 'insituteShortName')
         .addSelect('session.id', 'sessionID')
         .addSelect('SUM(candidateProgram.point)', 'totalPoint')
+        .addSelect("institute.max_possible_points", "maxPossiblePoints")
         .groupBy('institute.id,session.name,institute.short_name,session.id')
         .orderBy('sessionID', 'ASC')
         .addOrderBy('totalPoint', 'DESC')
         .getRawMany();
     console.log(instituteWiseTotal.length);
-
+    instituteWiseTotal.forEach((object) => {
+      // console.log(object.total/ object.maxPossiblePoints*100);
+      object.percentage = object.totalPoint / object.maxPossiblePoints * 100;
+    });
+    console.log(instituteWiseTotal[0]);
+    instituteWiseTotal.sort((a, b) => b.percentage - a.percentage);
     const categoryWiseTotal =
       await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.program', 'program')
@@ -803,7 +809,7 @@ export class FinalResultService {
         .groupBy('category.id,category.name,institute.id')
         .addGroupBy('institute.id')
         .getRawMany();
-    console.log(categoryWiseTotal);
+    // console.log(categoryWiseTotal);
 
     const scoreCard = instituteWiseTotal.map((institute) => {
       const categoryTotal = categoryWiseTotal.filter(
@@ -814,6 +820,7 @@ export class FinalResultService {
         sessionName: institute.sessionName,
         instituteShortName: institute.insituteShortName,
         totalPoint: institute.totalPoint,
+        percentage: institute.percentage,
         categoryTotal,
       };
     });

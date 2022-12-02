@@ -786,7 +786,8 @@ export class FinalResultService {
         .addSelect('session.id', 'sessionID')
         .addSelect('SUM(candidateProgram.point)', 'totalPoint')
         .groupBy('institute.id,session.name,institute.short_name,session.id')
-        .orderBy('totalPoint', 'DESC')
+        .orderBy('sessionID', 'ASC')
+        .addOrderBy('totalPoint', 'DESC')
         .getRawMany();
     console.log(instituteWiseTotal.length);
 

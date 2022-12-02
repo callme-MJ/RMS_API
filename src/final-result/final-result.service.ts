@@ -224,9 +224,11 @@ export class FinalResultService {
       .andWhere('program.finalResultPublished = :finalResultPublished', {
         finalResultPublished: PublishingStatus.TRUE,
       })
+      .andWhere("institute.id != '41' AND institute.id != '42'")
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
+      console.log(total.length);
     total.forEach((object) => {
       // console.log(object.total/ object.maxPossiblePoints*100);
       object.percentage = object.total / object.maxPossiblePoints * 100;

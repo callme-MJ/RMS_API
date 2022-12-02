@@ -949,6 +949,6 @@ export class FinalResultService {
       where:{resultPublished:PublishingStatus.TRUE},
       select:['updatedAt']
     })
-    return time;
+    return time.updatedAt;
   }
 }

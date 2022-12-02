@@ -115,7 +115,7 @@ export class CandidateService {
       let candidates = await this.candidateRepository
         .createQueryBuilder('candidates')
         .where('candidates.institute_id = :instituteID', {
-          instituteID: loggedInCoordinator.institute.id,
+          instituteID: loggedInCoordinator.institute.id || id,
         })
         .getMany();
       return { candidates, count: candidates.length };

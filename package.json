@@ -47,6 +47,7 @@
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
+    "nest-puppeteer": "^1.1.1",
     "nodemailer": "^6.8.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",

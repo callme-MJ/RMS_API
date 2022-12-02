@@ -18,7 +18,7 @@ async getpdf(){
   // async function printPDF() {
 const browser = await puppeteer.launch({ headless: true });
 const page = await browser.newPage();
-await page.goto('https://sibaq.in/public_portal', {waitUntil: 'networkidle0'});
+await page.goto('https://sibaq.dhiu.in/explore', {waitUntil: 'networkidle0'});
 const pdf = await page.pdf({ format: 'A4' });
 
 await browser.close();

@@ -369,7 +369,7 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
-      .andWhere('program.finalResultPublished = :finalResultEntered', {
+      .andWhere('program.finalResultEntered = :finalResultEntered', {
         finalResultEntered: EnteringStatus.TRUE,
       })
       .andWhere('program.category.id = :categoryID', {

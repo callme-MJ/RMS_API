@@ -217,6 +217,7 @@ export class FinalResultService {
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .addSelect('institute.coverPhoto', 'institutePhoto')
+      .addSelect("institute.max_possible_points", "maxPossiblePoints")
       .where('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
       })
@@ -227,9 +228,11 @@ export class FinalResultService {
       .orderBy('total', 'DESC')
       .getRawMany();
     total.forEach((object) => {
-      object.percentage = (object.total / object.maxPossiblePoint) * 100;
+      // console.log(object.total/ object.maxPossiblePoints*100);
+      object.percentage = object.total / object.maxPossiblePoints * 100;
     });
     // console.log(total.length);
+    total.sort((a, b) => b.percentage - a.percentage);
     return total;
   }
   async getTotalOfInstitutionsPrivatePublished(queryParams: IProgramFilter) {

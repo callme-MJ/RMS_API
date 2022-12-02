@@ -945,10 +945,11 @@ export class FinalResultService {
   }
 
   async getUpdatedAtTime() {
-    const time = await this.ProgramRepo.findOne({
+    const time = await this.ProgramRepo.find({
       where:{resultPublished:PublishingStatus.TRUE},
-      select:['updatedAt']
+      select:['updatedAt'],
+      order:{updatedAt:'DESC'}
     })
-    return time.updatedAt;
+    return time[0].updatedAt;
   }
 }

@@ -804,6 +804,7 @@ export class FinalResultService {
         .leftJoinAndSelect('candidateProgram.institute', 'institute')
         .leftJoinAndSelect('candidateProgram.program', 'program')
         .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
+        .andWhere("institute.id != '41' AND institute.id != '42'")
         .select('institute.id', 'instituteID')
         .addSelect('session.name', 'sessionName')
         .addSelect('institute.short_name', 'insituteShortName')

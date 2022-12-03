@@ -20,7 +20,8 @@ async getpdf(){
     // async function printPDF() {
       const browser = await puppeteer.launch({ 
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        ignoreDefaultArgs: ['--disable-extensions']
     });
       const page = await browser.newPage();
       await page.goto('https://sibaq.in/pdf-gen', {

@@ -202,7 +202,8 @@ export class FinalResultService {
         program:{
           privatePublished:PublishingStatus.TRUE
         },
-        round:RoundStatus.Final
+        round:RoundStatus.Final,
+        point:Between(1,100)
       },
       order:{
         point:'DESC'

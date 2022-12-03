@@ -752,7 +752,6 @@ export class CandidateProgramService {
     .addSelect("institute.name","instituteName")
     .addSelect("candidateProgram.program_name","programName")
     .addSelect("candidateProgram.program_code","program_code")
-    .addSelect("program.updated_at","lastUpdated")
     .addSelect("program.type","programType")
     .addSelect("category.name","categoryName")
     .addSelect("candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point","totalPoint")
@@ -760,6 +759,7 @@ export class CandidateProgramService {
     .addSelect("program.final_result_published","result_published")
     .addSelect("program.private_published","result_accounced")
     .addSelect("session.name","sessionName")
+    .addSelect("program.updated_at","lastUpdated")
     .getRawMany()
     console.log(overview.length)
     return overview;

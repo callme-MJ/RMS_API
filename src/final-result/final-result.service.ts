@@ -569,8 +569,7 @@ export class FinalResultService {
       .addSelect('program.programCode', 'programCode')
       .addSelect('program.updatedAt', 'updatedAt')
       .addSelect('category.name', 'categoryName')
-      .orderBy("session.id", "ASC")
-      .addOrderBy('program.updatedAt', 'DESC')
+      .orderBy('program.updatedAt', 'DESC')
       .getRawMany();
     console.log(programs);
 

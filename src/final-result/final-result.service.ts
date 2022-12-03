@@ -41,6 +41,15 @@ export class FinalResultService {
       throw error;
     }
   }
+  async findCandidatesOfProgramByChestNumOrder(code: string) {
+    try {
+      const candidate =
+        await this.candidateProgramService.findCandidatesOfProgramByChestNumOrder(code);
+      return candidate;
+    } catch (error) {
+      throw error;
+    }
+  }
   async entryMarks(CreateFinalMarkDto: CreateFinalMarkDto) {
     try {
       const FinalMark = await this.FinalMarkRepo.find({

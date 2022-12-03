@@ -102,6 +102,16 @@ export class CandidateProgramService {
     console.log(candidatePrograms.length);
     return candidatePrograms;
   }
+  async findCandidatesOfProgramByChestNumOrder(code: string) {
+    const candidatePrograms = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE  },
+      order:{
+        chestNO:"asc",
+      }
+    });
+    console.log(candidatePrograms.length);
+    return candidatePrograms;
+  }
   
   async findCandidatesOfPublishedProgram(code: string) {
     let candidatePrograms = await this.candidateProgramRepository.find({

@@ -23,8 +23,8 @@ import { CreateFinalResultDTO } from '../dto/create-final-result.dto';
 import { FinalResultService } from '../final-result.service';
 
 @Controller('user/final-result')
-@UseGuards(AuthGuard('jwt-user'))
-@Roles(Role.CONTROLLER)
+// @UseGuards(AuthGuard('jwt-user'))
+// @Roles(Role.CONTROLLER)
 export class ControllerFinalResultController {
   constructor(
     private readonly finalResultService: FinalResultService,
@@ -128,6 +128,10 @@ export class ControllerFinalResultController {
   @Get('/program/:code')
   getResultOfProgram(@Param('code') code: string) {
     return this.finalResultService.getResultOfProgram(code);
+  }
+  @Get('/program/pp/:code')
+  getPrivatePublishedResultOfProgram(@Param('code') code: string) {
+    return this.finalResultService.getPrivatePublishedResultOfProgram(code);
   }
 
   @Get('/institutions/published/all')

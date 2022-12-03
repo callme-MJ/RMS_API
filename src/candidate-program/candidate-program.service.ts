@@ -589,6 +589,47 @@ export class CandidateProgramService {
 
     return output;
   }
+  async findCandidateProgramsForMedia() {
+    const programsOFCandidate = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('candidatePrograms.session', 'session')
+      .select('candidate.name')
+      .addSelect('candidate.photo')
+      .addSelect('program.name')
+      .addSelect('candidate.chestNO')
+      .addSelect('institute.name')
+      .addSelect('category.name')
+      .getRawMany();
+    const result = [];
+
+    programsOFCandidate.forEach((program) => {
+      result.push(program.program_name);
+    });
+
+    var output = [];
+
+    programsOFCandidate.forEach(function (item) {
+      var existing = output.filter(function (v, i) {
+        return v.candidate_chest_no == item.candidate_chest_no;
+      });
+      if (existing.length) {
+        var existingIndex = output.indexOf(existing[0]);
+        output[existingIndex].program_name = output[
+          existingIndex
+        ].program_name.concat(item.program_name);
+      } else {
+        if (typeof item.program_name == 'string')
+          item.program_name = [item.program_name];
+        output.push(item);
+      }
+    });
+
+    return output;
+  }
 
   public async findAllTopicsOfInstitute(
     id: number,

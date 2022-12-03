@@ -11,7 +11,7 @@ import {
   ValidationPipe,
   Query,
 } from '@nestjs/common';
-import { FinalResultService } from '../final-result.service';
+import { FinalResultService, TableFilter } from '../final-result.service';
 import { CreateFinalMarkDto } from '../dto/create-final-mark.dto';
 import { UpdateFinalMarkDto } from '../dto/update-final-mark.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -109,6 +109,11 @@ export class PublicFinalResultController {
   @Get("scoreboard/all")
   getScoreCard(){
     return this.finalResultService.getScoreCard()
+  }
+
+  @Get("pointtable")
+  getPointTable(@Query() tableParams: TableFilter){
+    return this.finalResultService.getPointTable(tableParams)
   }
 
   @Get("updated-at-time")

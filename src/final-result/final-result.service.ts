@@ -196,6 +196,22 @@ export class FinalResultService {
     return result;
   }
 
+  async getPrivatePublishedResultOfProgram(code:string){
+    const result = await this.CandidateProgramRepo.find({
+      where:{programCode:code,
+        program:{
+          privatePublished:PublishingStatus.TRUE
+        },
+        round:RoundStatus.Final,
+        point:Between(1,100)
+      },
+      order:{
+        point:'DESC'
+      },
+    })
+    return result;
+  }
+
   async deleteResult(id: number) {
     const candidateProgram = await this.CandidateProgramRepo.findOneBy({ id });
     if (!candidateProgram) throw new NotFoundException('Candidate not found');

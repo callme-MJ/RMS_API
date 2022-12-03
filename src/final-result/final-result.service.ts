@@ -576,6 +576,9 @@ export class FinalResultService {
     const programs = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.category', 'category')
       .leftJoinAndSelect('program.session', 'session')
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
       .select('program.id', 'programID')
       .addSelect('program.name', 'programName')
       .addSelect('program.programCode', 'programCode')

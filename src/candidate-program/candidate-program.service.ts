@@ -759,6 +759,7 @@ export class CandidateProgramService {
     .addSelect("program.final_result_published","result_published")
     .addSelect("program.private_published","result_accounced")
     .addSelect("session.name","sessionName")
+    .addSelect("program.skill","skill")
     .addSelect("program.updated_at","lastUpdated")
     .getRawMany()
     console.log(overview.length)

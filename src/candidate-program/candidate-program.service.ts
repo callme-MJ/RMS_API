@@ -752,6 +752,7 @@ export class CandidateProgramService {
     .addSelect("institute.name","instituteName")
     .addSelect("candidateProgram.program_name","programName")
     .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("program.updated_at","lastUpdated")
     .addSelect("program.type","programType")
     .addSelect("category.name","categoryName")
     .addSelect("candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point","totalPoint")

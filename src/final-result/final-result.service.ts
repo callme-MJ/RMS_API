@@ -583,7 +583,7 @@ export class FinalResultService {
         'candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id ',
       )
       .addSelect('SUM(candidateProgram.point)', 'score')
-      .groupBy('candidate.category_id, candidateProgram.chestNO')
+      .groupBy('candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id ')
       .orderBy('score', 'DESC')
       .getRawMany();
 

@@ -1013,7 +1013,8 @@ export class FinalResultService {
 
     const program = await this.ProgramRepo.find({
       where:{
-        categoryID:categoryID
+        categoryID:categoryID,
+        finalResultPublished:PublishingStatus.TRUE
       },
       select:['id','programCode','name','type','isStarred','categoryID','sessionID'],
     })

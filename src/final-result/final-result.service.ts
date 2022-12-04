@@ -1006,13 +1006,16 @@ export class FinalResultService {
     .leftJoinAndSelect('candidateProgram.program','program')
     .leftJoinAndSelect('program.category','category')
     .where('category.id = :categoryID',{categoryID})
+    // .andWhere("institute.id != '41' AND institute.id != '42'")
     .select('institute.id','id')
     .addSelect('institute.short_name','instituteShortName')
     .addSelect('institute.name','instituteName')
     .addSelect('institute.max_possible_points','maxPossiblePoints')
     .addSelect('category.id','categoryID')
     .addSelect('session.id','sessionID')
-    .groupBy('institute.id,category.id,session.id')
+    .addSelect('SUM(candidateProgram.point)', 'totalPoint')
+    .groupBy('institute.id,session.name,institute.short_name,session.id,category.id')
+    // .groupBy('institute.id,category.id,session.id')
     .getRawMany();
     // const institutes = await this.InstituteRepo.find({
     //   select:['id','shortName','name','maxPossiblePoints','session'],
@@ -1023,7 +1026,7 @@ export class FinalResultService {
     const program = await this.ProgramRepo.find({
       where:{
         categoryID:categoryID,
-        finalResultPublished:PublishingStatus.TRUE
+        finalResultPublished:PublishingStatus.TRUE,
       },
       select:['id','programCode','name','type','isStarred','categoryID','sessionID'],
     })
@@ -1054,6 +1057,7 @@ export class FinalResultService {
         id:program.id,
         code:program.programCode,
         categoryID:program.categoryID,
+        sessionID:program.sessionID,
         results
       }
     })

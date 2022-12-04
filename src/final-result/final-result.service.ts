@@ -1008,9 +1008,10 @@ export class FinalResultService {
       .leftJoinAndSelect('institute.candidatePrograms', 'candidateProgram')
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
-      .where('category.id = :categoryID', { categoryID })
-      // .andWhere("institute.id != '41' AND institute.id != '42'")
-      .andWhere('program.type  =  :type', { type: type })
+      .where('category.id = :categoryID', { categoryID:categoryID })
+      .andWhere("session.id=:sessionID",{sessionID:sessionID})
+      .andWhere("institute.id != '41' AND institute.id != '42'")
+      // .andWhere('program.type  =  :type', { type: type })
       .select('institute.id', 'id')
       .addSelect('institute.short_name', 'instituteShortName')
       .addSelect('institute.name', 'instituteName')
@@ -1021,7 +1022,6 @@ export class FinalResultService {
       .groupBy(
         'institute.id,session.name,institute.short_name,session.id,category.id',
       )
-      // .groupBy('institute.id,category.id,session.id')
       .getRawMany();
     // const institutes = await this.InstituteRepo.find({
     //   select:['id','shortName','name','maxPossiblePoints','session'],
@@ -1032,6 +1032,7 @@ export class FinalResultService {
       where: {
         categoryID: categoryID,
         finalResultPublished: PublishingStatus.TRUE,
+        sessionID:sessionID
       },
       select: [
         'id',
@@ -1043,7 +1044,6 @@ export class FinalResultService {
         'sessionID',
       ],
     });
-    // console.log(programs);
     const pointTable = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
     )
@@ -1051,7 +1051,7 @@ export class FinalResultService {
       .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('program.category', 'category')
       // .where('program.sessionID = :sessionID',{sessionID})
-      .andWhere('program.categoryID = :categoryID', { categoryID })
+      .andWhere('program.categoryID = :categoryID', { categoryID:categoryID })
       .andWhere('program.final_result_published = :published', {
         published: PublishingStatus.TRUE,
       })
@@ -1081,20 +1081,7 @@ export class FinalResultService {
         results,
       };
     });
-    const institutesPrograms = institutes.map((institute) => {
-      const institutePrograms = pointTable.filter(
-        (program) => program.instituteID == institute.id,
-      );
-      return {
-        instituteShortName: institute.instituteShortName,
-        instituteName: institute.instituteName,
-        instituteID: institute.id,
-        maxPossiblePoints: institute.maxPossiblePoints,
-        categoryID: institute.categoryID,
-        sessionID: institute.sessionID,
-        institutePrograms,
-      };
-    });
+   
 
     console.log();
 

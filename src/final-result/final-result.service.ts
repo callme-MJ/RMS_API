@@ -982,6 +982,7 @@ export class FinalResultService {
     return time[0].updatedAt;
   }
   
+
   async getPointTable(tableParams:TableFilter) {
     const {sessionID,categoryID} = tableParams;
 
@@ -1004,11 +1005,14 @@ export class FinalResultService {
     // })
     // console.log(institutes);
 
-    const programs = await this.ProgramRepo.find({
+
+    const program = await this.ProgramRepo.find({
+      where:{
+        categoryID:categoryID
+      },
       select:['id','programCode','name','type','isStarred','categoryID','sessionID'],
     })
     // console.log(programs);
-    
     const pointTable = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
     .leftJoinAndSelect('candidateProgram.program', 'program')
     .leftJoinAndSelect('candidateProgram.institute', 'institute')
@@ -1027,8 +1031,32 @@ export class FinalResultService {
       // .groupBy('program.name,institute.short_name,institute.id')
       // .orderBy('institute.id','DESC')
       .getRawMany();
-    console.log(institutes);
+
+    const programs = program.map((program)=>{
+      const results = pointTable.filter((points)=>points.programCode == program.programCode)
+      return{
+        name:program.name,
+        id:program.id,
+        code:program.programCode,
+        categoryID:program.categoryID,
+        results
+      }
+    })
+const institutesPrograms = institutes.map((institute) => {
+        const institutePrograms = pointTable.filter((program) => program.instituteID == institute.id);
+        return {
+          instituteShortName: institute.instituteShortName,
+          instituteName: institute.instituteName,
+          instituteID: institute.id,
+          maxPossiblePoints: institute.maxPossiblePoints,
+          categoryID: institute.categoryID,
+          sessionID: institute.sessionID,
+          institutePrograms,
+        };
+      })
+     
+    console.log();
     
-    return {pointTable,institutes};
+    return {programs,institutes};
   }
 }

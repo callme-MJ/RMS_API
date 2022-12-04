@@ -596,6 +596,38 @@ export class FinalResultService {
     return Object.values(toppers);
   }
 
+  async getSkillToppers() {
+    const query = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.session', 'session')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('program.type = :type', {
+        type: 'single',
+      })
+      .select(
+        'program.skill, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id ',
+      )
+      .addSelect('SUM(candidateProgram.point)', 'score')
+      .groupBy('program.skill, candidateProgram.chestNO ,institute.short_name ,candidate.name,candidate.photo ,category.name,session.name , session.id ')
+      .orderBy('score', 'DESC')
+      .getRawMany();
+
+    const toppers = query.reduce((acc, item) => {
+      if (!acc[item.category_id]) {
+        acc[item.category_id] = item;
+      }
+      return acc;
+    }, {});
+    return Object.values(toppers);
+  }
+
   async getResultOfAllPrograms() {
     const programs = await this.ProgramRepo.createQueryBuilder('program')
       .leftJoinAndSelect('program.category', 'category')

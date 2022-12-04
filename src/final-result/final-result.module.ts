@@ -4,6 +4,7 @@ import { CandidateProgramModule } from 'src/candidate-program/candidate-program.
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { CandidateModule } from 'src/candidate/candidate.module';
 import { CategoryModule } from 'src/category/category.module';
+import { Institute } from 'src/institute/entities/institute.entity';
 import { InstituteModule } from 'src/institute/institute.module';
 import { Program } from 'src/program/entities/program.entity';
 import { ProgramModule } from 'src/program/program.module';
@@ -20,7 +21,7 @@ import { FinalResultService } from './final-result.service';
     ProgramModule,
     CategoryModule,
     InstituteModule,
-    TypeOrmModule.forFeature([FinalMark, CandidateProgram,Program]),
+    TypeOrmModule.forFeature([FinalMark, CandidateProgram,Program,Institute]),
   ],
   controllers: [ControllerFinalResultController,PublicFinalResultController],
   providers: [FinalResultService],

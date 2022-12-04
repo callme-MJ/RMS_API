@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { MediaService } from '../media.service';
 import { CreateMediaDTO } from '../dto/create-media.dto';
@@ -19,12 +20,15 @@ import { RolesGuard } from 'src/login/user/guards/roles.guard';
 import { Roles } from 'src/login/user/decorators/roles.decorators';
 import { Role } from 'src/login/interfaces/user-roles.enum';
 import { CreateGalleryDTO } from '../dto/create-gallery.dto';
+import { CandidateProgramService, ICandidateProgramFIilter } from 'src/candidate-program/candidate-program.service';
 
 @UseGuards(AuthGuard('jwt-user'), RolesGuard)
 @Roles(Role.MEDIA)
 @Controller('user/media')
 export class UserMediaController {
-  constructor(private readonly mediaService: MediaService) { }
+  constructor(private readonly mediaService: MediaService
+    , private readonly candidateProgramService: CandidateProgramService) {
+   }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
@@ -77,5 +81,12 @@ export class UserMediaController {
   @Delete('gallery/:id')
   removeGallery(@Param('id') id: string) {
     return this.mediaService.removeGallery(+id);
+  }
+
+  @Get('/candidates/all')
+  async getAllcandidatePrograms() {
+    try {
+      return await this.candidateProgramService.findCandidateProgramsForMedia();
+    } catch (error) {}
   }
 }

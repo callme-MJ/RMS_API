@@ -102,7 +102,17 @@ export class CandidateProgramService {
     console.log(candidatePrograms.length);
     return candidatePrograms;
   }
-
+  async findCandidatesOfProgramByChestNumOrder(code: string) {
+    const candidatePrograms = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE  },
+      order:{
+        chestNO:"asc",
+      }
+    });
+    console.log(candidatePrograms.length);
+    return candidatePrograms;
+  }
+  
   async findCandidatesOfPublishedProgram(code: string) {
     let candidatePrograms = await this.candidateProgramRepository.find({
       where: {
@@ -728,32 +738,30 @@ export class CandidateProgramService {
   }
 
   public async getoverview() {
-    const overview = await this.candidateProgramRepository
-      .createQueryBuilder('candidateProgram')
-      .leftJoinAndSelect('candidateProgram.program', 'program')
-      .leftJoinAndSelect('candidateProgram.session', 'session')
-      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
-      .leftJoinAndSelect('candidate.institute', 'institute')
-      .leftJoinAndSelect('program.category', 'category')
-      .where('candidateProgram.round = :round', { round: RoundStatus.Final })
-      .select('candidateProgram.chestNO', 'chestNO')
-      .addSelect('candidate.name', 'candidateName')
-      .addSelect('institute.short_name', 'institutionCode')
-      .addSelect('institute.name', 'instituteName')
-      .addSelect('candidateProgram.program_name', 'programName')
-      .addSelect('candidateProgram.program_code', 'program_code')
-      .addSelect('program.type', 'programType')
-      .addSelect('category.name', 'categoryName')
-      .addSelect(
-        'candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point',
-        'totalPoint',
-      )
-      .addSelect('program.final_result_entered', 'result_entered')
-      .addSelect('program.final_result_published', 'result_published')
-      .addSelect('program.private_published', 'result_accounced')
-      .addSelect('session.name', 'sessionName')
-      .getRawMany();
-    console.log(overview.length);
+    const overview = await this.candidateProgramRepository.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.session","session")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.institute","institute")
+    .leftJoinAndSelect("program.category","category")
+    .where("candidateProgram.round = :round",{round:RoundStatus.Final})
+    .select("candidateProgram.chestNO","chestNO")
+    .addSelect("candidate.name","candidateName")
+    .addSelect("institute.short_name","institutionCode")
+    .addSelect("institute.name","instituteName")
+    .addSelect("candidateProgram.program_name","programName")
+    .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("program.type","programType")
+    .addSelect("category.name","categoryName")
+    .addSelect("candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point","totalPoint")
+    .addSelect("program.final_result_entered","result_entered")
+    .addSelect("program.final_result_published","result_published")
+    .addSelect("program.private_published","result_accounced")
+    .addSelect("session.name","sessionName")
+    .addSelect("program.skill","skill")
+    .addSelect("program.updated_at","lastUpdated")
+    .getRawMany()
+    console.log(overview.length)
     return overview;
   }
 

@@ -70,6 +70,13 @@ export class ControllerFinalResultController {
     );
     return candidate;
   }
+  @Get('candidateschest/:code')
+  async findOneByChestNumOrder(@Param('code') code: string) {
+    const candidate = await this.finalResultService.findCandidatesOfProgramByChestNumOrder(
+      code,
+    );
+    return candidate;
+  }
 
   @Post('/marks/one')
   @UsePipes(ValidationPipe)

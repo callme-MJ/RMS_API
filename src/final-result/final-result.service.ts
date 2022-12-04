@@ -21,8 +21,9 @@ import { CreateFinalResultDTO } from './dto/create-final-result.dto';
 import { FinalMark } from './entities/final-mark.entity';
 
 export interface TableFilter {
-  sessionID: number,
-  categoryID: number,
+  sessionID: number;
+  categoryID: number;
+  type: string;
 }
 
 @Injectable()
@@ -40,7 +41,7 @@ export class FinalResultService {
     private readonly candidateService: CandidateService,
     private readonly programService: ProgramsService,
   ) {}
-  
+
   async findCandidatesOfProgram(code: string) {
     try {
       const candidate =
@@ -53,7 +54,9 @@ export class FinalResultService {
   async findCandidatesOfProgramByChestNumOrder(code: string) {
     try {
       const candidate =
-        await this.candidateProgramService.findCandidatesOfProgramByChestNumOrder(code);
+        await this.candidateProgramService.findCandidatesOfProgramByChestNumOrder(
+          code,
+        );
       return candidate;
     } catch (error) {
       throw error;
@@ -816,20 +819,21 @@ export class FinalResultService {
 
   // }
   async getScoreCard() {
-
     const instituteWiseTotal =
       await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.session', 'session')
         .leftJoinAndSelect('candidateProgram.institute', 'institute')
         .leftJoinAndSelect('candidateProgram.program', 'program')
-        .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
+        .where('program.final_result_published = :published', {
+          published: PublishingStatus.TRUE,
+        })
         .andWhere("institute.id != '41' AND institute.id != '42'")
         .select('institute.id', 'instituteID')
         .addSelect('session.name', 'sessionName')
         .addSelect('institute.short_name', 'insituteShortName')
         .addSelect('session.id', 'sessionID')
         .addSelect('SUM(candidateProgram.point)', 'totalPoint')
-        .addSelect("institute.max_possible_points", "maxPossiblePoints")
+        .addSelect('institute.max_possible_points', 'maxPossiblePoints')
         .groupBy('institute.id,session.name,institute.short_name,session.id')
         .orderBy('sessionID', 'ASC')
         .addOrderBy('totalPoint', 'DESC')
@@ -837,18 +841,19 @@ export class FinalResultService {
     console.log(instituteWiseTotal.length);
     instituteWiseTotal.forEach((object) => {
       // console.log(object.total/ object.maxPossiblePoints*100);
-      object.percentage = object.totalPoint / object.maxPossiblePoints * 100;
+      object.percentage = (object.totalPoint / object.maxPossiblePoints) * 100;
     });
     console.log(instituteWiseTotal[0]);
     instituteWiseTotal.sort((a, b) => b.percentage - a.percentage);
-
 
     const categoryWiseTotal =
       await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.program', 'program')
         .leftJoinAndSelect('candidateProgram.institute', 'institute')
         .leftJoinAndSelect('program.category', 'category')
-        .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
+        .where('program.final_result_published = :published', {
+          published: PublishingStatus.TRUE,
+        })
         .select('category.id', 'categoryID')
         .addSelect('category.name', 'categoryName')
         .addSelect('institute.id', 'instituteID')
@@ -887,33 +892,33 @@ export class FinalResultService {
       await this.candidateProgramService.update(
         candidate_program.id,
         candidate_program,
-        );
-        return candidate_program;
-      } catch (error) {
-        throw error;
-      }
+      );
+      return candidate_program;
+    } catch (error) {
+      throw error;
     }
-    
-    async getPositionPoint(position: string, programCode: string) {
-      const programData = await this.CandidateProgramRepo.createQueryBuilder(
-        'candidateProgram',
-        )
+  }
+
+  async getPositionPoint(position: string, programCode: string) {
+    const programData = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
       .where('candidateProgram.programCode = :programCode', { programCode })
       .select('category.id')
       .addSelect('program.type')
       .getRawOne();
-      // console.log(programData);
-      switch (programData.program_type) {
-        case 'single':
+    // console.log(programData);
+    switch (programData.program_type) {
+      case 'single':
         switch (position) {
           case 'First':
             return 5;
           case 'Second':
             return 3;
-            case 'Third':
-              return 1;
+          case 'Third':
+            return 1;
           case 'None':
             return 0;
         }
@@ -926,156 +931,173 @@ export class FinalResultService {
                 return 10;
               case 'Second':
                 return 7;
-                case 'Third':
-                  return 5;
+              case 'Third':
+                return 5;
               case 'None':
                 return 0;
-              }
+            }
           default:
             switch (position) {
               case 'First':
                 console.log(programData.category_id);
                 return 7;
-                case 'Second':
-                  return 5;
-                  case 'Third':
-                    return 3;
+              case 'Second':
+                return 5;
+              case 'Third':
+                return 3;
               case 'None':
                 return 0;
-              }
+            }
         }
-      }
+    }
   }
   async getGradePoint(grade: string, programCode: string) {
     const programData = await this.CandidateProgramRepo.createQueryBuilder(
       'candidateProgram',
-      )
+    )
       .leftJoinAndSelect('candidateProgram.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
       .where('candidateProgram.programCode = :programCode', { programCode })
       .select('program.isStarred')
       .getRawOne();
-      // console.log(programData);
-      switch (programData.program_is_starred) {
-        case 'True':
-          switch (grade) {
+    // console.log(programData);
+    switch (programData.program_is_starred) {
+      case 'True':
+        switch (grade) {
           case 'A':
             return 7;
           case 'B':
             return 5;
           default:
             return 0;
-          }
+        }
       default:
         switch (grade) {
           case 'A':
             return 5;
-            case 'B':
-              return 3;
-              default:
-                return 0;
-              }
-            }
-          }
+          case 'B':
+            return 3;
+          default:
+            return 0;
+        }
+    }
+  }
   async getGrade(percetage: number) {
     switch (true) {
       case percetage >= 80 && percetage <= 100:
         return 'A';
-        case percetage >= 65 && percetage <= 79.9:
-          return 'B';
-        }
-      }
-      
-      
-      async getUpdatedAtTime() {
-      const time = await this.ProgramRepo.find({
-        where:{resultPublished:PublishingStatus.TRUE},
-      select:['updatedAt'],
-      order:{updatedAt:'DESC'}
-    })
+      case percetage >= 65 && percetage <= 79.9:
+        return 'B';
+    }
+  }
+
+  async getUpdatedAtTime() {
+    const time = await this.ProgramRepo.find({
+      where: { resultPublished: PublishingStatus.TRUE },
+      select: ['updatedAt'],
+      order: { updatedAt: 'DESC' },
+    });
     return time[0].updatedAt;
   }
-  
 
-  async getPointTable(tableParams:TableFilter) {
-    const {sessionID,categoryID} = tableParams;
+  async getPointTable(tableParams: TableFilter) {
+    const { sessionID, categoryID, type } = tableParams;
 
     const institutes = await this.InstituteRepo.createQueryBuilder('institute')
-    .leftJoinAndSelect('institute.session','session')
-    .leftJoinAndSelect('institute.candidatePrograms','candidateProgram')
-    .leftJoinAndSelect('candidateProgram.program','program')
-    .leftJoinAndSelect('program.category','category')
-    .where('category.id = :categoryID',{categoryID})
-    // .andWhere("institute.id != '41' AND institute.id != '42'")
-    .select('institute.id','id')
-    .addSelect('institute.short_name','instituteShortName')
-    .addSelect('institute.name','instituteName')
-    .addSelect('institute.max_possible_points','maxPossiblePoints')
-    .addSelect('category.id','categoryID')
-    .addSelect('session.id','sessionID')
-    .addSelect('SUM(candidateProgram.point)', 'totalPoint')
-    .groupBy('institute.id,session.name,institute.short_name,session.id,category.id')
-    // .groupBy('institute.id,category.id,session.id')
-    .getRawMany();
+      .leftJoinAndSelect('institute.session', 'session')
+      .leftJoinAndSelect('institute.candidatePrograms', 'candidateProgram')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .where('category.id = :categoryID', { categoryID })
+      // .andWhere("institute.id != '41' AND institute.id != '42'")
+      .andWhere('program.type  =  :type', { type: type })
+      .select('institute.id', 'id')
+      .addSelect('institute.short_name', 'instituteShortName')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('institute.max_possible_points', 'maxPossiblePoints')
+      .addSelect('category.id', 'categoryID')
+      .addSelect('session.id', 'sessionID')
+      .addSelect('SUM(candidateProgram.point)', 'totalPoint')
+      .groupBy(
+        'institute.id,session.name,institute.short_name,session.id,category.id',
+      )
+      // .groupBy('institute.id,category.id,session.id')
+      .getRawMany();
     // const institutes = await this.InstituteRepo.find({
     //   select:['id','shortName','name','maxPossiblePoints','session'],
     // })
     // console.log(institutes);
 
-
     const program = await this.ProgramRepo.find({
-      where:{
-        categoryID:categoryID,
-        finalResultPublished:PublishingStatus.TRUE,
+      where: {
+        categoryID: categoryID,
+        finalResultPublished: PublishingStatus.TRUE,
       },
-      select:['id','programCode','name','type','isStarred','categoryID','sessionID'],
-    })
+      select: [
+        'id',
+        'programCode',
+        'name',
+        'type',
+        'isStarred',
+        'categoryID',
+        'sessionID',
+      ],
+    });
     // console.log(programs);
-    const pointTable = await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
-    .leftJoinAndSelect('candidateProgram.program', 'program')
-    .leftJoinAndSelect('candidateProgram.institute', 'institute')
+    const pointTable = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.institute', 'institute')
       .leftJoinAndSelect('program.category', 'category')
       // .where('program.sessionID = :sessionID',{sessionID})
-      .andWhere('program.categoryID = :categoryID',{categoryID})
-      .andWhere('program.final_result_published = :published',{published:PublishingStatus.TRUE})
+      .andWhere('program.categoryID = :categoryID', { categoryID })
+      .andWhere('program.final_result_published = :published', {
+        published: PublishingStatus.TRUE,
+      })
       .andWhere('candidateProgram.point IS NOT NULL')
-      .select('program.name','programName')
-      .addSelect('program.programCode','programCode')
-      .addSelect('institute.short_name','instituteShortName')
-      .addSelect('institute.id','instituteID')
-      .addSelect('candidateProgram.point','point')
-      .addSelect('candidateProgram.grade','grade')
-      .addSelect('candidateProgram.position','position')
+      .andWhere('program.type  =  :type', { type: type })
+      .select('program.name', 'programName')
+      .addSelect('program.programCode', 'programCode')
+      .addSelect('institute.short_name', 'instituteShortName')
+      .addSelect('institute.id', 'instituteID')
+      .addSelect('candidateProgram.point', 'point')
+      .addSelect('candidateProgram.grade', 'grade')
+      .addSelect('candidateProgram.position', 'position')
       // .groupBy('program.name,institute.short_name,institute.id')
       // .orderBy('institute.id','DESC')
       .getRawMany();
 
-    const programs = program.map((program)=>{
-      const results = pointTable.filter((points)=>points.programCode == program.programCode)
-      return{
-        name:program.name,
-        id:program.id,
-        code:program.programCode,
-        categoryID:program.categoryID,
-        sessionID:program.sessionID,
-        results
-      }
-    })
-const institutesPrograms = institutes.map((institute) => {
-        const institutePrograms = pointTable.filter((program) => program.instituteID == institute.id);
-        return {
-          instituteShortName: institute.instituteShortName,
-          instituteName: institute.instituteName,
-          instituteID: institute.id,
-          maxPossiblePoints: institute.maxPossiblePoints,
-          categoryID: institute.categoryID,
-          sessionID: institute.sessionID,
-          institutePrograms,
-        };
-      })
-     
+    const programs = program.map((program) => {
+      const results = pointTable.filter(
+        (points) => points.programCode == program.programCode,
+      );
+      return {
+        name: program.name,
+        id: program.id,
+        code: program.programCode,
+        categoryID: program.categoryID,
+        sessionID: program.sessionID,
+        results,
+      };
+    });
+    const institutesPrograms = institutes.map((institute) => {
+      const institutePrograms = pointTable.filter(
+        (program) => program.instituteID == institute.id,
+      );
+      return {
+        instituteShortName: institute.instituteShortName,
+        instituteName: institute.instituteName,
+        instituteID: institute.id,
+        maxPossiblePoints: institute.maxPossiblePoints,
+        categoryID: institute.categoryID,
+        sessionID: institute.sessionID,
+        institutePrograms,
+      };
+    });
+
     console.log();
-    
-    return {programs,institutes};
+
+    return { programs, institutes };
   }
 }

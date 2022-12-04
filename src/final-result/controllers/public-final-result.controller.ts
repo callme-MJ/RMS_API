@@ -101,6 +101,11 @@ export class PublicFinalResultController {
     return this.finalResultService.getToppers();
   }
 
+  @Get('/toppers/skill')
+  getSkillToppers() {
+    return this.finalResultService.getSkillToppers();
+  }
+
   @Get('/programs/all')
   getResultOfAllPrograms() {
     return this.finalResultService.getResultOfAllPrograms();

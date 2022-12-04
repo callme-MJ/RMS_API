@@ -583,7 +583,39 @@ export class FinalResultService {
         'candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id ',
       )
       .addSelect('SUM(candidateProgram.point)', 'score')
-      .groupBy('candidate.category_id, candidateProgram.chestNO')
+      .groupBy('candidate.category_id, candidateProgram.chestNO ,institute.short_name ,candidate.name,candidate.photo ,category.name,session.name , session.id ')
+      .orderBy('score', 'DESC')
+      .getRawMany();
+
+    const toppers = query.reduce((acc, item) => {
+      if (!acc[item.category_id]) {
+        acc[item.category_id] = item;
+      }
+      return acc;
+    }, {});
+    return Object.values(toppers);
+  }
+
+  async getSkillToppers() {
+    const query = await this.CandidateProgramRepo.createQueryBuilder(
+      'candidateProgram',
+    )
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.session', 'session')
+      .leftJoinAndSelect('candidate.category', 'category')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .where('program.finalResultPublished = :finalResultPublished', {
+        finalResultPublished: PublishingStatus.TRUE,
+      })
+      .andWhere('program.type = :type', {
+        type: 'single',
+      })
+      .select(
+        'program.skill, candidateProgram.chestNO ,institute.short_name ,candidate.name as candidateName,candidate.photo ,category.name as categoryName,session.name as sessionName , session.id ',
+      )
+      .addSelect('SUM(candidateProgram.point)', 'score')
+      .groupBy('program.skill, candidateProgram.chestNO ,institute.short_name ,candidate.name,candidate.photo ,category.name,session.name , session.id ')
       .orderBy('score', 'DESC')
       .getRawMany();
 
@@ -1056,7 +1088,7 @@ export class FinalResultService {
         published: PublishingStatus.TRUE,
       })
       .andWhere('candidateProgram.point IS NOT NULL')
-      .andWhere('program.type  =  :type', { type: type })
+      // .andWhere('program.type  =  :type', { type: type })
       .select('program.name', 'programName')
       .addSelect('program.programCode', 'programCode')
       .addSelect('institute.short_name', 'instituteShortName')

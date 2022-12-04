@@ -156,11 +156,12 @@ export class FinalResultService {
     candidateProgram.position = null;
     candidateProgram.point = candidateProgram.gradePoint;
     candidateProgram.position = createFinalResultDTO.position;
-
+    console.log(candidateProgram.position);
     const postionPoint = await this.getPositionPoint(
       createFinalResultDTO.position,
       candidateProgram.programCode,
     );
+    console.log(postionPoint);
     candidateProgram.postionPoint = postionPoint;
 
     candidateProgram.point = postionPoint + candidateProgram.point;
@@ -205,19 +206,20 @@ export class FinalResultService {
     return result;
   }
 
-  async getPrivatePublishedResultOfProgram(code:string){
+  async getPrivatePublishedResultOfProgram(code: string) {
     const result = await this.CandidateProgramRepo.find({
-      where:{programCode:code,
-        program:{
-          privatePublished:PublishingStatus.TRUE
+      where: {
+        programCode: code,
+        program: {
+          privatePublished: PublishingStatus.TRUE,
         },
-        round:RoundStatus.Final,
-        point:Between(1,100)
+        round: RoundStatus.Final,
+        point: Between(1, 100),
       },
-      order:{
-        point:'DESC'
+      order: {
+        point: 'DESC',
       },
-    })
+    });
     return result;
   }
 
@@ -242,7 +244,7 @@ export class FinalResultService {
       .addSelect('institute.shortName', 'instituteShortName')
       .addSelect('Sum(candidateProgram.point)', 'total')
       .addSelect('institute.coverPhoto', 'institutePhoto')
-      .addSelect("institute.max_possible_points", "maxPossiblePoints")
+      .addSelect('institute.max_possible_points', 'maxPossiblePoints')
       .where('session.id = :sessionID', {
         sessionID: queryParams.sessionID,
       })
@@ -253,10 +255,10 @@ export class FinalResultService {
       .groupBy('institute.id')
       .orderBy('total', 'DESC')
       .getRawMany();
-      console.log(total.length);
+    console.log(total.length);
     total.forEach((object) => {
       // console.log(object.total/ object.maxPossiblePoints*100);
-      object.percentage = object.total / object.maxPossiblePoints * 100;
+      object.percentage = (object.total / object.maxPossiblePoints) * 100;
     });
     // console.log(total.length);
     total.sort((a, b) => b.percentage - a.percentage);
@@ -804,6 +806,65 @@ export class FinalResultService {
   //   .addSelect("institute.shortName", "insituteShortName")
 
   // }
+  async getScoreCard() {
+
+    const instituteWiseTotal =
+      await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+        .leftJoinAndSelect('candidateProgram.session', 'session')
+        .leftJoinAndSelect('candidateProgram.institute', 'institute')
+        .leftJoinAndSelect('candidateProgram.program', 'program')
+        .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
+        .andWhere("institute.id != '41' AND institute.id != '42'")
+        .select('institute.id', 'instituteID')
+        .addSelect('session.name', 'sessionName')
+        .addSelect('institute.short_name', 'insituteShortName')
+        .addSelect('session.id', 'sessionID')
+        .addSelect('SUM(candidateProgram.point)', 'totalPoint')
+        .addSelect("institute.max_possible_points", "maxPossiblePoints")
+        .groupBy('institute.id,session.name,institute.short_name,session.id')
+        .orderBy('sessionID', 'ASC')
+        .addOrderBy('totalPoint', 'DESC')
+        .getRawMany();
+    console.log(instituteWiseTotal.length);
+    instituteWiseTotal.forEach((object) => {
+      // console.log(object.total/ object.maxPossiblePoints*100);
+      object.percentage = object.totalPoint / object.maxPossiblePoints * 100;
+    });
+    console.log(instituteWiseTotal[0]);
+    instituteWiseTotal.sort((a, b) => b.percentage - a.percentage);
+
+
+    const categoryWiseTotal =
+      await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
+        .leftJoinAndSelect('candidateProgram.program', 'program')
+        .leftJoinAndSelect('candidateProgram.institute', 'institute')
+        .leftJoinAndSelect('program.category', 'category')
+        .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
+        .select('category.id', 'categoryID')
+        .addSelect('category.name', 'categoryName')
+        .addSelect('institute.id', 'instituteID')
+        .addSelect('SUM(candidateProgram.point)', 'totalPoint')
+        .groupBy('category.id,category.name,institute.id')
+        .addGroupBy('institute.id')
+        .getRawMany();
+    // console.log(categoryWiseTotal);
+
+    const scoreCard = instituteWiseTotal.map((institute) => {
+      const categoryTotal = categoryWiseTotal.filter(
+        (category) => category.instituteID == institute.instituteID,
+      );
+      return {
+        sessionID: institute.sessionID,
+        sessionName: institute.sessionName,
+        instituteShortName: institute.insituteShortName,
+        totalPoint: institute.totalPoint,
+        percentage: institute.percentage,
+        categoryTotal,
+      };
+    });
+
+    return scoreCard;
+  }
 
   async addCodeLetter(createCodeLetterDto: CreateCodeLetterDto) {
     try {
@@ -846,12 +907,13 @@ export class FinalResultService {
               return 1;
           case 'None':
             return 0;
-          }
-          case 'group':
-        switch (programData.category_id) {
-          case 6 || 12:
+        }
+      case 'group':
+        switch (true) {
+          case programData.category_id == 6 || programData.category_id == 12:
             switch (position) {
               case 'First':
+                console.log(programData.category_id);
                 return 10;
               case 'Second':
                 return 7;
@@ -863,6 +925,7 @@ export class FinalResultService {
           default:
             switch (position) {
               case 'First':
+                console.log(programData.category_id);
                 return 7;
                 case 'Second':
                   return 5;
@@ -914,65 +977,7 @@ export class FinalResultService {
         }
       }
       
-      async getScoreCard() {
-    
-        const instituteWiseTotal =
-          await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
-            .leftJoinAndSelect('candidateProgram.session', 'session')
-            .leftJoinAndSelect('candidateProgram.institute', 'institute')
-            .leftJoinAndSelect('candidateProgram.program', 'program')
-            .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
-            .andWhere("institute.id != '41' AND institute.id != '42'")
-            .select('institute.id', 'instituteID')
-            .addSelect('session.name', 'sessionName')
-            .addSelect('institute.short_name', 'insituteShortName')
-            .addSelect('session.id', 'sessionID')
-            .addSelect('SUM(candidateProgram.point)', 'totalPoint')
-            .addSelect("institute.max_possible_points", "maxPossiblePoints")
-            .groupBy('institute.id,session.name,institute.short_name,session.id')
-            .orderBy('sessionID', 'ASC')
-            .addOrderBy('totalPoint', 'DESC')
-            .getRawMany();
-        console.log(instituteWiseTotal.length);
-        instituteWiseTotal.forEach((object) => {
-          // console.log(object.total/ object.maxPossiblePoints*100);
-          object.percentage = object.totalPoint / object.maxPossiblePoints * 100;
-        });
-        console.log(instituteWiseTotal[0]);
-        instituteWiseTotal.sort((a, b) => b.percentage - a.percentage);
-    
-    
-        const categoryWiseTotal =
-          await this.CandidateProgramRepo.createQueryBuilder('candidateProgram')
-            .leftJoinAndSelect('candidateProgram.program', 'program')
-            .leftJoinAndSelect('candidateProgram.institute', 'institute')
-            .leftJoinAndSelect('program.category', 'category')
-            .where("program.final_result_published = :published", {published: PublishingStatus.TRUE})
-            .select('category.id', 'categoryID')
-            .addSelect('category.name', 'categoryName')
-            .addSelect('institute.id', 'instituteID')
-            .addSelect('SUM(candidateProgram.point)', 'totalPoint')
-            .groupBy('category.id,category.name,institute.id')
-            .addGroupBy('institute.id')
-            .getRawMany();
-        // console.log(categoryWiseTotal);
-    
-        const scoreCard = instituteWiseTotal.map((institute) => {
-          const categoryTotal = categoryWiseTotal.filter(
-            (category) => category.instituteID == institute.instituteID,
-          );
-          return {
-            sessionID: institute.sessionID,
-            sessionName: institute.sessionName,
-            instituteShortName: institute.insituteShortName,
-            totalPoint: institute.totalPoint,
-            percentage: institute.percentage,
-            categoryTotal,
-          };
-        });
-    
-        return scoreCard;
-      }
+      
       async getUpdatedAtTime() {
       const time = await this.ProgramRepo.find({
         where:{resultPublished:PublishingStatus.TRUE},

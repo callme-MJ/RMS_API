@@ -61,6 +61,7 @@ export class ControllerFinalResultController {
       throw error;
     }
   }
+ 
 
   @Get('candidates/:code')
   async findOne(@Param('code') code: string) {

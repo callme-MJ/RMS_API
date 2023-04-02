@@ -5,3 +5,7 @@ export interface Photo {
 
   url:string
 }
+
+export interface Type{
+  
+} 

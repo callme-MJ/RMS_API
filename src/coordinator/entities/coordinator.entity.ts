@@ -39,6 +39,6 @@ export class Coordinator {
     institute: Institute;
 
     @Expose({ name: 'session_id' })
-    @ManyToOne(() =>  Session,(session) => session.coordinators,{eager:true})
+    @ManyToOne(() => Session, (session) => session.coordinators, { eager: true })
     session: Session;
 }

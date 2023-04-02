@@ -8,18 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateSessionDTO } from './dto/create-session.dto';
-import { Session } from './entities/session.entity';
-import { SessionService } from './session.service';
+import { CreateSessionDTO } from '../dto/create-session.dto';
+import { Session } from '../entities/session.entity';
+import { SessionService } from '../session.service';
 
 @UseGuards(AuthGuard('jwt-admin'))
 @Controller('admin/sessions')
 export class AdminSessionController {
-  constructor(private readonly sessionService: SessionService) {}
-//   @Post()
-//   create(@Body() body: CreateSessionDTO) {
-//     return this.sessionService.create(body);
-//   }
+  constructor(private readonly sessionService: SessionService) { }
+  //   @Post()
+  //   create(@Body() body: CreateSessionDTO) {
+  //     return this.sessionService.create(body);
+  //   }
 
   @Get()
   @SerializeOptions({ groups: ['collection'] })

@@ -32,10 +32,13 @@ export class Institute {
   @Column({ nullable: true, type: 'json' })
   coverPhoto: Photo;
 
+  @Column({ nullable: true })
+  maxPossiblePoints: number;
+
   @OneToMany(() => Candidate, (candidate) => candidate.institute)
   candidates: Candidate[];
 
- 
+
 
   @OneToMany(() => Coordinator, (coordinator) => coordinator.institute)
   coordinators: Coordinator[];

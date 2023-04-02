@@ -70,4 +70,9 @@ export class ControllerCandidatesController {
   ) {
     return this.candidateService.updateCandidate(+id, body, photo);
   }
+
+  @Get('details/:chestNO')
+  async findCandidateDetails(@Param('chestNO', ParseIntPipe) chestNO: number,) {
+      return this.candidateService.findCandidateDetails(+chestNO)
+  }
 }

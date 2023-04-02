@@ -33,6 +33,15 @@ export class AdminCandidatesController {
       throw error;
     }
   }
+  
+  @Get("/:id")
+  async getCandidatesByInstitute(@Query() queryParams: ICandidateFilter,@Param("id")id:number) {
+    try {
+      return await this.candidateService.findAllCandidatesOfInstitute(+id,queryParams)
+    } catch (error) {
+      throw error;
+    }
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('photo'))
@@ -47,8 +56,9 @@ export class AdminCandidatesController {
   @Get(':chestNO')
   async findCandidateBychestNO(
     @Param('chestNO', ParseIntPipe) chestNO: number,
+    @Query() queryParams: ICandidateFilter
   ) {
-    return await this.candidateService.findCandidateBychestNO(+chestNO);
+    return await this.candidateService.findCandidateBychestNO(+chestNO,queryParams.sessionID);
   }
 
   @Delete(':id')

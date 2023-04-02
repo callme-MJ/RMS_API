@@ -17,6 +17,13 @@ import { ProgramModule } from './program/program.module';
 import { SessionModule } from './session/session.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { EliminationResultModule } from './elimination-result/elimination-result.module';
+import { MediaModule } from './media/media.module';
+import { FinalResultModule } from './final-result/final-result.module';
+import { JudgesModule } from './judges/judges.module';
+import { PdfGenerate } from './pdf-generate/entities/pdf-generate.entity';
+import { PdfGenerateModule } from './pdf-generate/pdf-generate.module';
 
 
 @Module({
@@ -82,6 +89,10 @@ import { UserModule } from './user/user.module';
       }),
       inject: [ConfigService],
     }),
+    
+   MulterModule.register({
+  dest: './upload',
+}),
     CategoryModule,
     CandidateModule,
     InstituteModule,
@@ -92,6 +103,12 @@ import { UserModule } from './user/user.module';
     UserModule,
     CandidateProgramModule,
     SessionModule,
+    EliminationResultModule,
+    MediaModule,
+    FinalResultModule,
+    JudgesModule,
+    PdfGenerateModule
+
   ],
   controllers: [AppController],
   providers: [AppService],

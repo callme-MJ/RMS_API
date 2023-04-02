@@ -8,16 +8,24 @@ import { CandidateProgram } from './entities/candidate-program.entity';
 import { CoordinatorCandidateProgramController } from './controllers/coordinator-candidate-program.controller';
 import { CoordinatorModule } from 'src/coordinator/coordinator.module';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
+import { ControllerCandidateProgramController } from './controllers/controller-candidate-program.controller';
+import { PublicCandidateProgramController } from './controllers/public-candidate-proram.controller';
 
 @Module({
   imports: [
     CandidateModule,
     ProgramModule,
     CoordinatorModule,
-    TypeOrmModule.forFeature([CandidateProgram,Candidate]),
+
+    TypeOrmModule.forFeature([CandidateProgram, Candidate]),
   ],
-  controllers: [AdminCandidateProgramController, CoordinatorCandidateProgramController],
+  controllers: [
+    AdminCandidateProgramController,
+    CoordinatorCandidateProgramController,
+    ControllerCandidateProgramController,
+    PublicCandidateProgramController
+  ],
   providers: [CandidateProgramService],
-  exports: [CandidateProgramService]
+  exports: [CandidateProgramService],
 })
-export class CandidateProgramModule { }
+export class CandidateProgramModule {}

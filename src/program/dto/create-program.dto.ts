@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { EnteringStatus, PublishingStatus } from '../entities/program.entity';
 export class CreateProgramDto {
   @IsNotEmpty()
   programCode: string;
@@ -34,7 +35,7 @@ export class CreateProgramDto {
   time: string;
 
   @IsNotEmpty()
-  venue: number;
+  venue: string;
 
   @IsNotEmpty()
   curbGroup: string;

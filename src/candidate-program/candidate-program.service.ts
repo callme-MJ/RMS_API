@@ -4,14 +4,23 @@ import { Candidate } from 'src/candidate/entities/candidate.entity';
 import { IFilter } from 'src/candidate/interfaces/filter.interface';
 import { CandidateService } from 'src/candidate/services/candidate.service';
 import { CoordinatorService } from 'src/coordinator/services/coordinator.service';
-import { Program } from 'src/program/entities/program.entity';
+import {
+  EnteringStatus,
+  Program,
+  PublishingStatus,
+} from 'src/program/entities/program.entity';
 import { ProgramsService } from 'src/program/program.service';
-import { SessionStatus } from 'src/session/entities/session.entity';
+import { Session, SessionStatus } from 'src/session/entities/session.entity';
 import { Repository } from 'typeorm';
 import { CreateCandidateProgramDTO } from './dto/create-candidate-program.dto';
 import { CreateTopicProgramDTO } from './dto/create-topic-program.dto';
 import { UpdateCandidateProgramDTO } from './dto/update-candidate-program.dto';
-import { CandidateProgram, Status } from './entities/candidate-program.entity';
+import {
+  CandidateProgram,
+  RoundStatus,
+  SelectionStatus,
+  Status,
+} from './entities/candidate-program.entity';
 export interface ICandidateProgramFIilter extends IFilter {
   candidateID: number;
   instituteID: number;
@@ -31,16 +40,21 @@ export class CandidateProgramService {
     private readonly coordinatorService: CoordinatorService,
     private readonly programsService: ProgramsService,
   ) {}
-  public async create(createCandidateProgramDTO: CreateCandidateProgramDTO  ,id?:number) {
+  public async create(
+    createCandidateProgramDTO: CreateCandidateProgramDTO,
+    id?: number,
+  ) {
     try {
+      const loggedInCoordinator = await this.coordinatorService.findOne(id);
+      const session: Session = loggedInCoordinator.institute.session;
       const candidate: Candidate =
         await this.candidateService.findCandidateBychestNO(
           createCandidateProgramDTO.chestNO,
+          session.id,
         );
       const program: Program = await this.programsService.findOneByProgramCode(
         createCandidateProgramDTO.programCode,
       );
-      const loggedInCoordinator = await this.coordinatorService.findOne(id)
       if (!candidate) throw new NotFoundException('Candidate not found');
       const newCandidateProgram: CandidateProgram =
         await this.candidateProgramRepository.create(createCandidateProgramDTO);
@@ -52,10 +66,11 @@ export class CandidateProgramService {
         .where('candidate.id = :candidateId', { candidateId: candidate.id })
         .execute();
 
-        newCandidateProgram.categoryID = candidate.categoryID;
-        newCandidateProgram.institute = loggedInCoordinator.institute
-        newCandidateProgram.program = program;
-      await this.candidateProgramRepository.save(newCandidateProgram,);
+      newCandidateProgram.categoryID = candidate.categoryID;
+      newCandidateProgram.institute = loggedInCoordinator.institute;
+      newCandidateProgram.program = program;
+      newCandidateProgram.session = session;
+      await this.candidateProgramRepository.save(newCandidateProgram);
       await this.checkEligibility(newCandidateProgram);
       return newCandidateProgram;
     } catch (error) {
@@ -63,11 +78,83 @@ export class CandidateProgramService {
     }
   }
 
+  async findCandidatesOfProgram(code: string) {
+    const program = await this.programsService.findOneByProgramCode(code);
+    // if (program.type == 'single') {
+    const data = await this.candidateProgramRepository.find({
+      where: { programCode: code },
+    });
+    const candidate = data.map((candidate) => candidate.candidate);
+    console.log(candidate.length);
+    return candidate;
+  }
+
+  async findCandidatesOfProgramOfFinal(code: string) {
+    // const program = await this.programsService.findOneByProgramCode(code);
+    const candidatePrograms = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE },
+      order: {
+        codeLetter: 'asc',
+      },
+    });
+    // const candidate = data.map((candidate) => candidate.candidate);
+
+    console.log(candidatePrograms.length);
+    return candidatePrograms;
+  }
+  async findCandidatesOfProgramByChestNumOrder(code: string) {
+    const candidatePrograms = await this.candidateProgramRepository.find({
+      where: { programCode: code, isSelected: SelectionStatus.TRUE  },
+      order:{
+        chestNO:"asc",
+      }
+    });
+    console.log(candidatePrograms.length);
+    return candidatePrograms;
+  }
+  
+  async findCandidatesOfPublishedProgram(code: string) {
+    let candidatePrograms = await this.candidateProgramRepository.find({
+      where: {
+        programCode: code,
+        isSelected: SelectionStatus.TRUE,
+        program: {
+          resultPublished: PublishingStatus.TRUE,
+        },
+      },
+    });
+    return candidatePrograms;
+  }
+
+  async findSelectedOfInstitute(id: number) {
+    let candidatePrograms = await this.candidateProgramRepository.find({
+      where: {
+        institute: {
+          id: id,
+        },
+        isSelected: SelectionStatus.TRUE,
+        program: {
+          resultPublished: PublishingStatus.TRUE,
+        },
+      },
+    });
+    return candidatePrograms;
+  }
+
+  public async findSelected(code: string) {
+    return this.candidateProgramRepository.find({
+      where: {
+        programCode: code,
+        isSelected: SelectionStatus.TRUE,
+      },
+    });
+  }
+
   public async findAll(
     queryParams: ICandidateProgramFIilter,
   ): Promise<CandidateProgram[]> {
     const candidateprogramsQuery =
-      this.candidateProgramRepository.createQueryBuilder('candidates');
+      this.candidateProgramRepository.createQueryBuilder('candidatePrograms');
 
     const search = queryParams.search;
     const sort = queryParams.sort;
@@ -75,25 +162,26 @@ export class CandidateProgramService {
 
     if (search) {
       candidateprogramsQuery.where(
-        'name LIKE :search OR chestNO LIKE :search',
+        'program_name LIKE :search OR chestNO LIKE :search',
         { search: `%${search}%` },
       );
     }
     if (sort) {
-      candidateprogramsQuery.orderBy('candidates.name', sort).getMany();
+      candidateprogramsQuery.orderBy('candidatePrograms.name', sort).getMany();
     }
 
     const perPage = 10;
     candidateprogramsQuery.offset((page - 1) * perPage).limit(perPage);
     try {
-      let candidatePrograms = await this.candidateProgramRepository.find({
+      let candidatePrograms = this.candidateProgramRepository.find({
         where: {
-          candidate: {
-            session: {
-              id: queryParams.sessionID,
-              status: SessionStatus.ACTIVE,
-            },
+          session: {
+            id: queryParams.sessionID,
+            status: SessionStatus.ACTIVE,
           },
+        },
+        order: {
+          chestNO: 'ASC',
         },
       });
 
@@ -108,22 +196,51 @@ export class CandidateProgramService {
     queryParams: ICandidateFIilter,
   ): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    // let candidatePrograms = await this.candidateProgramRepository
+    //   .createQueryBuilder('candidatePrograms')
+    //   .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+    //   .where('candidatePrograms.institute_id = :instituteId', {
+    //     instituteId: loggedInCoordinator.institute.id,
+    //   })
+    //   .getMany();
     let candidatePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('candidatePrograms.institute', 'institute')
       .where('candidatePrograms.institute_id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
-      .getMany();
+      .select('candidatePrograms.id')
+      .addSelect('candidatePrograms.chestNO')
+      .addSelect('candidate.name')
+      .addSelect('candidatePrograms.programCode')
+      .addSelect('program.name', 'programName')
+      .addSelect('candidatePrograms.topic')
+      .addSelect('candidatePrograms.link')
+      .getRawMany();
 
     return candidatePrograms;
   }
 
   public async findOne(id: number) {
     try {
-      let candidateProgram = await this.candidateProgramRepository.findOneBy({
-        id,
-      });
+      let candidateProgram = await this.candidateProgramRepository
+        .createQueryBuilder('candidatePrograms')
+        .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+        .leftJoinAndSelect('candidatePrograms.program', 'program')
+        .leftJoinAndSelect('candidatePrograms.institute', 'institute')
+        .where('candidatePrograms.id = :id', {
+          id: id,
+        })
+        .select('candidatePrograms.id')
+        .addSelect('candidatePrograms.chestNO')
+        .addSelect('candidate.name')
+        .addSelect('candidatePrograms.programCode')
+        .addSelect('program.name', 'programName')
+        .addSelect('candidatePrograms.topic')
+        .addSelect('candidatePrograms.link')
+        .getRawOne();
       if (!candidateProgram)
         throw new NotFoundException(
           'Candidate has not applied for this program',
@@ -178,24 +295,17 @@ export class CandidateProgramService {
   public async checkEligibility(newCandidateProgram): Promise<boolean> {
     try {
       const { chestNO, programCode } = newCandidateProgram;
-      // const sessionID = newCandidateProgram.program.sessionID;
-      // console.log(sessionID);
 
-      const candidateProgram = await this.candidateProgramRepository
+      const candidateProgram = this.candidateProgramRepository
         .createQueryBuilder('candidateProgram')
         .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
         .leftJoinAndSelect('candidateProgram.program', 'program')
         .leftJoinAndSelect('program.category', 'category')
-        .leftJoinAndSelect('candidate.institute', 'institute')
-        .leftJoinAndSelect('institute.session', 'session');
-        
-        // const instituteID = await candidateProgram
-        // .where('candidate.chestNO = :chestNO', { chestNO })
-        // //.andWhere('session.id = :sessionID', { sessionID })
-        // .select('institute.id')
-        // .getRawOne();
-        const instituteID = await newCandidateProgram.institute.id
+        .leftJoinAndSelect('candidateProgram.institute', 'institute')
+        .leftJoinAndSelect('candidateProgram.session', 'session');
 
+      const instituteID = await newCandidateProgram.institute.id;
+      const sessionID = await newCandidateProgram.session.id;
       const duplicateSingle = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,
@@ -206,10 +316,8 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
-        console.log(duplicateSingle)
       const duplicateGroup = await candidateProgram
         .where('institute.id = :instituteID', {
           instituteID,
@@ -224,17 +332,16 @@ export class CandidateProgramService {
         .select('candidateProgram.id')
         .getCount();
 
-        const groupCountData = await candidateProgram
+      const groupCountData = await candidateProgram
         .where('program.programCode = :programCode', {
           programCode,
         })
         .select('program.group_count')
         .getRawOne();
 
-      console.log(groupCountData)
       let result3 = Object.values(JSON.parse(JSON.stringify(groupCountData)));
       let groupCount = result3[0];
-
+      console.log(duplicateSingle, duplicateGroup);
       if (duplicateSingle > 1 || duplicateGroup > groupCount) {
         await this.candidateProgramRepository.delete(newCandidateProgram.id);
         throw new NotFoundException(
@@ -249,7 +356,7 @@ export class CandidateProgramService {
         .andWhere('program.type = :type', {
           type: 'single',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
       if (single > 6) {
@@ -269,7 +376,7 @@ export class CandidateProgramService {
         .andWhere('program.mode = :mode', {
           mode: 'stage',
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -306,7 +413,7 @@ export class CandidateProgramService {
         .andWhere('program.curb_group = :curbGroup', {
           curbGroup,
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -331,7 +438,6 @@ export class CandidateProgramService {
         .where('program.program_code = :programCode', {
           programCode,
         })
-        //.andWhere('session.id = :sessionID', { sessionID })
         .select('program.language_group')
         .getRawOne();
 
@@ -347,6 +453,7 @@ export class CandidateProgramService {
         .andWhere('program.language_group = :languageGroup', {
           languageGroup,
         })
+        .andWhere('session.id = :sessionID', { sessionID })
         .select('candidateProgram.id')
         .getCount();
 
@@ -376,7 +483,6 @@ export class CandidateProgramService {
     const loggedInCoordinator = await this.coordinatorService.findOne(
       coordinatorID,
     );
-    console.log(loggedInCoordinator.institute.id);
     const programsOFCandidate = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
@@ -426,7 +532,6 @@ export class CandidateProgramService {
       .where('institute.id = :id', { id: loggedInCoordinator.institute.id })
       .getRawMany();
     const result = [];
-    console.log(programsOFCandidate);
 
     programsOFCandidate.forEach((program) => {
       result.push(program.program_name);
@@ -452,13 +557,56 @@ export class CandidateProgramService {
 
     return output;
   }
-  async findCandidatePrograms() {
+  async findCandidatePrograms(queryParams: any) {
     const programsOFCandidate = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
       .leftJoinAndSelect('candidate.institute', 'institute')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('candidatePrograms.session', 'session')
+      .select('candidate.name')
+      .addSelect('candidate.photo')
+      .addSelect('program.name')
+      .addSelect('candidate.chestNO')
+      .addSelect('institute.name')
+      .addSelect('category.name')
+      .where('session.id = :id', { id: queryParams.sessionID })
+      .getRawMany();
+    const result = [];
+
+    programsOFCandidate.forEach((program) => {
+      result.push(program.program_name);
+    });
+
+    var output = [];
+
+    programsOFCandidate.forEach(function (item) {
+      var existing = output.filter(function (v, i) {
+        return v.candidate_chest_no == item.candidate_chest_no;
+      });
+      if (existing.length) {
+        var existingIndex = output.indexOf(existing[0]);
+        output[existingIndex].program_name = output[
+          existingIndex
+        ].program_name.concat(item.program_name);
+      } else {
+        if (typeof item.program_name == 'string')
+          item.program_name = [item.program_name];
+        output.push(item);
+      }
+    });
+
+    return output;
+  }
+  async findCandidateProgramsForMedia() {
+    const programsOFCandidate = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .leftJoinAndSelect('program.category', 'category')
+      .leftJoinAndSelect('candidatePrograms.session', 'session')
       .select('candidate.name')
       .addSelect('candidate.photo')
       .addSelect('program.name')
@@ -467,7 +615,6 @@ export class CandidateProgramService {
       .addSelect('category.name')
       .getRawMany();
     const result = [];
-    console.log(programsOFCandidate);
 
     programsOFCandidate.forEach((program) => {
       result.push(program.program_name);
@@ -498,7 +645,6 @@ export class CandidateProgramService {
     id: number,
   ): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    console.log(loggedInCoordinator.institute.id);
     let registerablePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
@@ -507,8 +653,10 @@ export class CandidateProgramService {
       .andWhere('candidate.institute.id = :instituteId', {
         instituteId: loggedInCoordinator.institute.id,
       })
+      .andWhere('candidatePrograms.isSelected = :status', {
+        status: 'true',
+      })
       .getMany();
-    console.log(registerablePrograms);
     return registerablePrograms;
   }
 
@@ -520,9 +668,7 @@ export class CandidateProgramService {
       id,
     });
     if (!candidateProgram) {
-      throw new NotFoundException(
-        'Candidate not  not registered for this program',
-      );
+      throw new NotFoundException('Candidate  not registered for this program');
     }
     candidateProgram.topic = createTopicProgramDto.topic;
     candidateProgram.link = createTopicProgramDto.link;
@@ -531,18 +677,145 @@ export class CandidateProgramService {
     return candidateProgram;
   }
 
+  public async updateSelection(id: number): Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({
+      id,
+    });
+    if (!candidateProgram) {
+      throw new NotFoundException('Candidate not registered for this program');
+    }
+    const program: Program = await this.programsService.findOne(
+      candidateProgram.program.id,
+    );
+    const selectedCount = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .select('COUNT(candidatePrograms.id)')
+      .where('candidatePrograms.programCode = :programCode', {
+        programCode: program.programCode,
+      })
+      .andWhere("candidatePrograms.is_selected = 'true'")
+      .getCount();
+    console.log(program.programCode);
+    console.log('selected count  ' + selectedCount);
+
+    if (selectedCount >= program.maxSelection) {
+      throw new NotFoundException('Maximum Selection Reached');
+    } else {
+      candidateProgram.isSelected = SelectionStatus.TRUE;
+    }
+    await this.candidateProgramRepository.save(candidateProgram);
+    const selectedCount2 = await this.candidateProgramRepository
+      .createQueryBuilder('candidatePrograms')
+      .leftJoinAndSelect('candidatePrograms.program', 'program')
+      .select('COUNT(candidatePrograms.id)')
+      .where('program.id = :id', { id: program.id })
+      .andWhere("candidatePrograms.is_selected = 'true'")
+      .getCount();
+    if (selectedCount2 == program.maxSelection) {
+      program.resultEntered = EnteringStatus.TRUE;
+    } else if (selectedCount2 < program.maxSelection) {
+      program.resultEntered = EnteringStatus.FALSE;
+    }
+    await this.programsService.update(program.id, program);
+    console.log(selectedCount2, program.maxSelection);
+    console.log("program's result is " + program.resultEntered);
+    candidateProgram.round = RoundStatus.Final;
+    await this.candidateProgramRepository.save(candidateProgram);
+    return candidateProgram;
+  }
+
+  public async deleteSelection(id: number): Promise<CandidateProgram> {
+    const candidateProgram = await this.candidateProgramRepository.findOneBy({
+      id,
+    });
+    if (!candidateProgram) {
+      throw new NotFoundException('Candidate  not registered for this program');
+    }
+    candidateProgram.isSelected = SelectionStatus.FALSE;
+    await this.candidateProgramRepository.save(candidateProgram);
+    return candidateProgram;
+  }
+
+  public async getoverview() {
+    const overview = await this.candidateProgramRepository.createQueryBuilder("candidateProgram")
+    .leftJoinAndSelect("candidateProgram.program","program")
+    .leftJoinAndSelect("candidateProgram.session","session")
+    .leftJoinAndSelect("candidateProgram.candidate","candidate")
+    .leftJoinAndSelect("candidate.institute","institute")
+    .leftJoinAndSelect("program.category","category")
+    .where("candidateProgram.round = :round",{round:RoundStatus.Final})
+    .select("candidateProgram.chestNO","chestNO")
+    .addSelect("candidate.name","candidateName")
+    .addSelect("institute.short_name","institutionCode")
+    .addSelect("institute.name","instituteName")
+    .addSelect("candidateProgram.program_name","programName")
+    .addSelect("candidateProgram.program_code","program_code")
+    .addSelect("program.type","programType")
+    .addSelect("category.name","categoryName")
+    .addSelect("candidateProgram.position,candidateProgram.grade,candidateProgram.postion_point,candidateProgram.grade_point,candidateProgram.point","totalPoint")
+    .addSelect("program.final_result_entered","result_entered")
+    .addSelect("program.final_result_published","result_published")
+    .addSelect("program.private_published","result_accounced")
+    .addSelect("session.name","sessionName")
+    .addSelect("program.skill","skill")
+    .addSelect("program.updated_at","lastUpdated")
+    .getRawMany()
+    console.log(overview.length)
+    return overview;
+  }
+
   public async findAllTopics(id: number): Promise<CandidateProgram[]> {
     const loggedInCoordinator = await this.coordinatorService.findOne(id);
-    console.log(loggedInCoordinator.institute.id);
     let registerablePrograms = await this.candidateProgramRepository
       .createQueryBuilder('candidatePrograms')
       .leftJoinAndSelect('candidatePrograms.program', 'program')
       .leftJoinAndSelect('candidatePrograms.candidate', 'candidate')
       .where('program.isRegisterable = :status', { status: 'true' })
       .getMany();
-    console.log(registerablePrograms);
     return registerablePrograms;
   }
 
+  public async getSelectedCandidates(id: number): Promise<CandidateProgram[]> {
+    const loggedInCoordinator = await this.coordinatorService.findOne(id);
+    const selectedCandidates = await this.candidateProgramRepository
+      .createQueryBuilder('candidateProgram')
+      .leftJoinAndSelect('candidateProgram.program', 'program')
+      .leftJoinAndSelect('candidateProgram.session', 'session')
+      .leftJoinAndSelect('candidateProgram.candidate', 'candidate')
+      .leftJoinAndSelect('candidate.institute', 'institute')
+      .leftJoinAndSelect('program.category', 'category')
+      .where('candidateProgram.round = :round', { round: RoundStatus.Final })
+      .andWhere('candidateProgram.is_selected = :status', {
+        status: SelectionStatus.TRUE,
+      })
+      .andWhere('program.id = :id', { id: loggedInCoordinator.institute.id })
+      .andWhere('program.final_result_published = :status', {
+        status: PublishingStatus.TRUE,
+      })
+      .select('candidateProgram.chestNO', 'chestNO')
+      .addSelect('candidate.name', 'candidateName')
+      .addSelect('institute.short_name', 'institutionCode')
+      .addSelect('institute.name', 'instituteName')
+      .addSelect('candidateProgram.program_name', 'programName')
+      .addSelect('candidateProgram.program_code', 'program_code')
+      .addSelect('program.type', 'programType')
+      .addSelect('category.name', 'categoryName')
+      .addSelect('candidateProgram.topic', 'topics')
+      .addSelect('candidateProgram.link', 'link')
+      .getRawMany();
 
+    // let selectedCandidates = await this.candidateProgramRepository.find({
+    //   where: {
+    //     institute: {
+    //       id: loggedInCoordinator.institute.id,
+    //     },
+    //     isSelected: SelectionStatus.TRUE,
+    //     program: {
+    //       resultPublished: PublishingStatus.TRUE,
+    //     },
+    //   },
+    // });
+    return selectedCandidates;
+  }
 }

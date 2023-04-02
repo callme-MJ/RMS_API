@@ -1,3 +1,4 @@
+import { String } from 'aws-sdk/clients/acm';
 import { Exclude, Expose } from 'class-transformer';
 import { CandidateProgram } from 'src/candidate-program/entities/candidate-program.entity';
 import { Category } from 'src/category/entities/category.entity';
@@ -8,6 +9,14 @@ import {
   DeleteDateColumn,
   Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn
 } from 'typeorm';
+export enum EnteringStatus {
+  TRUE = 'True',
+  FALSE = 'False',
+}
+export enum PublishingStatus {
+  TRUE = 'True',
+  FALSE = 'False',
+}
 @Entity({ name: 'program' })
 export class Program {
   @PrimaryGeneratedColumn()
@@ -45,10 +54,10 @@ export class Program {
   date: string;
 
   @Column({ nullable: true })
-  time: string;
+  s_time: string;
 
   @Column({ nullable: true })
-  venue: number;
+  venue: string;
 
   @Column({ nullable: true })
   curbGroup: string;
@@ -66,7 +75,7 @@ export class Program {
   isStarred: string;
 
   @Column({ nullable: true })
-  duration: number;
+  e_time: string;
 
   @Column({ nullable: true })
   conceptNote: string;
@@ -74,13 +83,26 @@ export class Program {
   @Column({ nullable: true })
   resultEntered: string;
 
-  @Column({ nullable: true })
+  @Column({nullable: true})
   resultPublished: string;
+
+
+
+  @Column({nullable: true, default:"false"})
+  codeLetterSubmitted: string;
+  
+  @Column({nullable: true, default:"false"})
+  privatePublished: string;
+
+  @Column({ nullable: true })
+  finalResultEntered: string;
+
+  @Column({nullable: true})
+  finalResultPublished: string;
 
   @Column({ nullable: true })
   maxSelection: number;
 
-  @Exclude()
   @Column({ nullable: true })
   categoryByFeatures: string;
 
@@ -96,11 +118,11 @@ export class Program {
   @ManyToOne(() => Session, (session) => session.programs)
   session: Session;
 
-  @Expose({ groups: ['single'], name: 'created_at' })
+  @Expose({  name: 'created_at' })
   @CreateDateColumn()
   createdAt: Date;
 
-  @Expose({ groups: ['single'], name: 'updated_at' })
+  @Expose({  name: 'updated_at' })
   @UpdateDateColumn()
   updatedAt: Date;
 
